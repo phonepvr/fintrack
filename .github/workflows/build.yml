@@ -132,11 +132,13 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
 
-      - name: Write step summary on failure
+      - name: Write diagnostic summary
         if: always()
         run: |
+          mkdir -p .ci_diag
+          OUT=.ci_diag/last-run.md
           {
-            echo "# Build summary"
+            echo "# Build summary (run ${{ github.run_id }}, sha ${{ github.sha }})"
             echo ""
             echo "| Step | Outcome |"
             echo "|---|---|"
@@ -151,7 +153,7 @@ jobs:
                 echo "## Tail of $(basename "$f")"
                 echo ""
                 echo '```'
-                tail -120 "$f"
+                tail -200 "$f"
                 echo '```'
                 echo ""
               fi
@@ -166,7 +168,36 @@ jobs:
                 echo ""
               fi
             done
-          } >> "$GITHUB_STEP_SUMMARY"
+          } > "$OUT"
+          # Also surface in the GitHub UI for users with repo access.
+          cat "$OUT" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Push diagnostic file back to the branch
+        # Lets the agent that triggered this CI read the failure log via the
+        # authenticated git API. The [skip ci] tag on the commit message
+        # prevents an infinite trigger loop.
+        if: always()
+        run: |
+          if [ ! -f .ci_diag/last-run.md ]; then exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Pull latest in case other commits landed between trigger and now.
+          git fetch origin "${{ github.ref_name }}" || true
+          git checkout "${{ github.ref_name }}" || git checkout -b "${{ github.ref_name }}"
+          mkdir -p .ci_diag
+          cp /tmp/*.log .ci_diag/ 2>/dev/null || true
+          git add .ci_diag
+          if git diff --cached --quiet; then
+            echo "no diagnostic changes"
+            exit 0
+          fi
+          git commit -m "ci: diagnostic snapshot for run ${{ github.run_id }} [skip ci]"
+          for attempt in 1 2 3; do
+            if git push origin "${{ github.ref_name }}"; then exit 0; fi
+            git pull --rebase origin "${{ github.ref_name }}" || true
+            sleep 2
+          done
+          exit 1
 
       - name: Fail job if any required step failed
         if: |
