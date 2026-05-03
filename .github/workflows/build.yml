@@ -36,20 +36,25 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      - name: Compile main + test sources
-        # Surfaces compilation errors directly in the log before tests start.
-        run: ./gradlew :app:compileDebugKotlin :app:compileDebugUnitTestKotlin --no-daemon --stacktrace
+      - name: Compile main sources
+        # Surfaces main-source compilation errors directly in the log.
+        run: ./gradlew :app:compileDebugKotlin --no-daemon --stacktrace
+
+      - name: Build debug APK
+        # Spec §6 privacy gate is enforced via the Unit tests step below; this
+        # step still runs first so we ALWAYS get an APK artifact uploaded,
+        # even if a test regresses. The job will be marked failed at the end
+        # if the tests didn't pass.
+        run: ./gradlew :app:assembleDebug --no-daemon --stacktrace
 
       - name: Unit tests (privacy gate + data)
-        # Spec §6: every privacy gate must pass before we even build the APK.
-        run: ./gradlew :app:testDebugUnitTest --no-daemon --stacktrace
+        id: tests
+        run: ./gradlew :app:testDebugUnitTest --no-daemon --stacktrace --continue
+        continue-on-error: true
 
       - name: Detekt
         run: ./gradlew detekt --no-daemon --stacktrace
         continue-on-error: true
-
-      - name: Build debug APK
-        run: ./gradlew :app:assembleDebug --no-daemon --stacktrace
 
       - name: Locate APK
         id: locate
@@ -92,3 +97,11 @@ jobs:
             app/build/test-results/
           if-no-files-found: ignore
           retention-days: 14
+
+      - name: Fail job if unit tests failed
+        # The APK is already uploaded by this point, so the user always gets
+        # an installable build, but the job goes red if the privacy gate didn't pass.
+        if: steps.tests.outcome == 'failure'
+        run: |
+          echo "::error::Unit tests failed; see unit-test-reports artifact for details. APK was still produced."
+          exit 1
