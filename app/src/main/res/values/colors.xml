@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Launcher background -->
+    <color name="ic_launcher_background">#0F172A</color>
+
+    <!-- Material 3 brand seed -->
+    <color name="brand_primary">#1976D2</color>
+    <color name="brand_on_primary">#FFFFFF</color>
+
+    <!-- Allocation drift bands -->
+    <color name="drift_within">#1B5E20</color>   <!-- ±2% green -->
+    <color name="drift_warn">#F57C00</color>     <!-- ±5% amber -->
+    <color name="drift_off">#C62828</color>      <!-- >5% red -->
+</resources>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FinTrack</string>
+
+    <!-- Lock / biometric -->
+    <string name="lock_title">FinTrack is locked</string>
+    <string name="lock_subtitle">Authenticate to continue</string>
+    <string name="lock_unlock">Unlock</string>
+    <string name="biometric_prompt_title">Unlock FinTrack</string>
+    <string name="biometric_prompt_subtitle">Use your device biometric to access your portfolio</string>
+    <string name="biometric_prompt_negative">Cancel</string>
+    <string name="biometric_unavailable_title">Biometric required</string>
+    <string name="biometric_unavailable_message">FinTrack requires a device biometric (fingerprint or face). Please enrol one in your device settings, then return to FinTrack.</string>
+    <string name="biometric_unavailable_open_settings">Open settings</string>
+    <string name="biometric_unavailable_retry">Retry</string>
+
+    <!-- Onboarding / first profile -->
+    <string name="onboarding_title">Create your first profile</string>
+    <string name="onboarding_subtitle">Profiles let you keep portfolios separate on this device. They are not separately encrypted — anyone with this device\'s biometric can view all profiles.</string>
+    <string name="onboarding_name_label">Name</string>
+    <string name="onboarding_name_placeholder">e.g. Mr. X</string>
+    <string name="onboarding_color_label">Profile colour</string>
+    <string name="onboarding_create">Create profile</string>
+    <string name="onboarding_name_required">Name is required</string>
+    <string name="onboarding_name_too_long">Keep it under 40 characters</string>
+
+    <!-- Home -->
+    <string name="home_tab_snapshots">Snapshots</string>
+    <string name="home_tab_overview">Overview</string>
+    <string name="home_tab_settings">Settings</string>
+    <string name="home_switch_user">Switch user</string>
+    <string name="home_active_user_content_description">Active profile</string>
+
+    <!-- Empty states (Phase 1 placeholders) -->
+    <string name="snapshots_empty_title">No snapshots yet</string>
+    <string name="snapshots_empty_message">Tap + to capture your first portfolio snapshot.</string>
+    <string name="overview_empty_title">No data to summarise</string>
+    <string name="overview_empty_message">Add at least one snapshot to see trends and allocation drift.</string>
+    <string name="settings_empty_title">Settings</string>
+    <string name="settings_empty_message">Aim percentages, holdings, backup, and profile management land in Phase 5.</string>
+</resources>

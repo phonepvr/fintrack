@@ -1,0 +1,112 @@
+[versions]
+# Build plugins
+agp                       = "8.7.3"
+kotlin                    = "2.1.20"
+ksp                       = "2.1.20-1.0.32"
+hilt                      = "2.54"
+detekt                    = "1.23.7"
+
+# AndroidX core / lifecycle
+coreKtx                   = "1.15.0"
+activityCompose           = "1.9.3"
+lifecycle                 = "2.8.7"
+navigationCompose         = "2.8.5"
+
+# Compose
+composeBom                = "2024.12.01"
+
+# DI
+hiltNavigationCompose     = "1.2.0"
+
+# Persistence
+room                      = "2.6.1"
+sqlcipher                 = "4.6.1"
+sqliteKtx                 = "2.4.0"
+
+# Security
+biometric                 = "1.2.0-alpha05"
+securityCrypto            = "1.1.0-alpha06"
+
+# Charts / dates / serialization
+vico                      = "2.0.2"
+kotlinxDatetime           = "0.6.1"
+kotlinxSerializationJson  = "1.7.3"
+
+# Test
+junitJupiter              = "5.11.4"
+turbine                   = "1.2.0"
+mockk                     = "1.13.13"
+robolectric               = "4.14.1"
+truth                     = "1.4.4"
+androidxTestExtJunit      = "1.2.1"
+espressoCore              = "3.6.1"
+sqliteJdbc                = "3.47.1.0"
+
+[libraries]
+# AndroidX core
+androidx-core-ktx                  = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
+androidx-activity-compose          = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
+androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
+androidx-lifecycle-process         = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycle" }
+androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+androidx-navigation-compose        = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+
+# Compose (BOM-managed)
+androidx-compose-bom               = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
+androidx-compose-ui                = { module = "androidx.compose.ui:ui" }
+androidx-compose-ui-graphics       = { module = "androidx.compose.ui:ui-graphics" }
+androidx-compose-ui-tooling        = { module = "androidx.compose.ui:ui-tooling" }
+androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+androidx-compose-material3         = { module = "androidx.compose.material3:material3" }
+androidx-compose-material-icons    = { module = "androidx.compose.material:material-icons-extended" }
+
+# DI
+hilt-android                       = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
+hilt-compiler                      = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
+androidx-hilt-navigation-compose   = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
+
+# Persistence
+androidx-room-runtime              = { module = "androidx.room:room-runtime", version.ref = "room" }
+androidx-room-ktx                  = { module = "androidx.room:room-ktx", version.ref = "room" }
+androidx-room-compiler             = { module = "androidx.room:room-compiler", version.ref = "room" }
+androidx-sqlite-ktx                = { module = "androidx.sqlite:sqlite-ktx", version.ref = "sqliteKtx" }
+sqlcipher-android                  = { module = "net.zetetic:sqlcipher-android", version.ref = "sqlcipher" }
+
+# Security
+androidx-biometric-ktx             = { module = "androidx.biometric:biometric-ktx", version.ref = "biometric" }
+androidx-security-crypto           = { module = "androidx.security:security-crypto", version.ref = "securityCrypto" }
+
+# Charts / dates / serialization
+vico-compose-m3                    = { module = "com.patrykandpatrick.vico:compose-m3", version.ref = "vico" }
+vico-compose                       = { module = "com.patrykandpatrick.vico:compose", version.ref = "vico" }
+vico-core                          = { module = "com.patrykandpatrick.vico:core", version.ref = "vico" }
+kotlinx-datetime                   = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
+kotlinx-serialization-json         = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+
+# Test
+junit-jupiter                      = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junitJupiter" }
+junit-jupiter-engine               = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junitJupiter" }
+junit-platform-launcher            = { module = "org.junit.platform:junit-platform-launcher", version = "1.11.4" }
+turbine                            = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
+mockk                              = { module = "io.mockk:mockk", version.ref = "mockk" }
+mockk-android                      = { module = "io.mockk:mockk-android", version.ref = "mockk" }
+robolectric                        = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+truth                              = { module = "com.google.truth:truth", version.ref = "truth" }
+androidx-test-ext-junit            = { module = "androidx.test.ext:junit", version.ref = "androidxTestExtJunit" }
+androidx-test-espresso-core        = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCore" }
+androidx-compose-ui-test-junit4    = { module = "androidx.compose.ui:ui-test-junit4" }
+androidx-compose-ui-test-manifest  = { module = "androidx.compose.ui:ui-test-manifest" }
+androidx-room-testing              = { module = "androidx.room:room-testing", version.ref = "room" }
+sqlite-jdbc                        = { module = "org.xerial:sqlite-jdbc", version.ref = "sqliteJdbc" }
+
+# Detekt formatting plugin
+detekt-formatting                  = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
+
+[plugins]
+android-application      = { id = "com.android.application", version.ref = "agp" }
+kotlin-android           = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-compose           = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-serialization     = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ksp                      = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+hilt                     = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+detekt                   = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
