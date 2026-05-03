@@ -153,10 +153,28 @@ jobs:
             echo ""
             for f in /tmp/compile.log /tmp/assemble.log /tmp/tests.log /tmp/detekt.log; do
               if [ -f "$f" ]; then
-                echo "## Tail of $(basename "$f")"
+                echo "## $(basename "$f") — error/warning lines"
                 echo ""
                 echo '```'
-                tail -200 "$f"
+                # Kotlin compiler uses `e:` and `w:` prefixes; KSP uses `error:`/`warning:`.
+                # Cast a wide net.
+                grep -nE '^(e:|w:|error:|warning:|FAILURE|FAILED|Caused by:|Compilation error|Unresolved reference|Cannot access|Type mismatch|Conflicting overloads)' "$f" || true
+                echo '```'
+                echo ""
+                LINES=$(wc -l < "$f")
+                echo "## $(basename "$f") — full log ($LINES lines)"
+                echo ""
+                echo '```'
+                if [ "$LINES" -le 800 ]; then
+                  cat "$f"
+                else
+                  echo "[truncated to first 200 + last 400 lines]"
+                  head -200 "$f"
+                  echo ""
+                  echo "... ($((LINES-600)) lines elided) ..."
+                  echo ""
+                  tail -400 "$f"
+                fi
                 echo '```'
                 echo ""
               fi
