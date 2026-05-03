@@ -31,11 +31,12 @@ class FlagSecureTest {
     @Test
     @DisplayName("FLAG_SECURE is set BEFORE setContent so no frame is ever rendered insecurely")
     fun flagBeforeSetContent() {
-        val flagIndex = mainActivitySource.indexOf("FLAG_SECURE")
-        val setContentIndex = mainActivitySource.indexOf("setContent")
-        assertThat(flagIndex).isGreaterThan(-1)
-        assertThat(setContentIndex).isGreaterThan(-1)
-        assertThat(flagIndex).isLessThan(setContentIndex)
+        // Match the call site (`setContent {`), not the import (`androidx.activity.compose.setContent`).
+        val setFlagsIndex = mainActivitySource.indexOf("window.setFlags(")
+        val setContentCallIndex = mainActivitySource.indexOf("setContent {")
+        assertThat(setFlagsIndex).isGreaterThan(-1)
+        assertThat(setContentCallIndex).isGreaterThan(-1)
+        assertThat(setFlagsIndex).isLessThan(setContentCallIndex)
     }
 
     @Test
