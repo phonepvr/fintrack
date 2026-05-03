@@ -62,7 +62,6 @@ object DatabaseModule {
                     )
                 }
             })
-            .fallbackToDestructiveMigrationOnDowngrade(false)
             .build()
         // Note: Room is lazy — the file isn't actually opened until the first
         // DAO call, so the SQLCipher key check happens off the main thread on
