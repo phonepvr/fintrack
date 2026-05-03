@@ -196,8 +196,9 @@ jobs:
       - name: Push diagnostic file back to the branch
         # Lets the agent that triggered this CI read the failure log via the
         # authenticated git API. The [skip ci] tag on the commit message
-        # prevents an infinite trigger loop.
-        if: always()
+        # prevents an infinite trigger loop. Only runs on failure so green
+        # builds don't keep committing back to the branch.
+        if: failure()
         run: |
           if [ ! -f .ci_diag/last-run.md ]; then exit 0; fi
           git config user.name "github-actions[bot]"
