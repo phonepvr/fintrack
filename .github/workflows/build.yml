@@ -36,28 +36,52 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
+      - name: Print build environment
+        run: |
+          echo "JDK:"
+          java -version 2>&1
+          echo ""
+          echo "Gradle:"
+          ./gradlew --version --no-daemon 2>&1 | head -20
+          echo ""
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+          ls -la "$ANDROID_HOME" | head -5 || true
+
       - name: Compile main sources
-        # Surfaces main-source compilation errors directly in the log.
-        run: ./gradlew :app:compileDebugKotlin --no-daemon --stacktrace
+        id: compile
+        run: |
+          set -o pipefail
+          ./gradlew :app:compileDebugKotlin --no-daemon --stacktrace --info 2>&1 | tee /tmp/compile.log
+        continue-on-error: true
 
       - name: Build debug APK
-        # Spec §6 privacy gate is enforced via the Unit tests step below; this
-        # step still runs first so we ALWAYS get an APK artifact uploaded,
-        # even if a test regresses. The job will be marked failed at the end
-        # if the tests didn't pass.
-        run: ./gradlew :app:assembleDebug --no-daemon --stacktrace
+        id: assemble
+        if: steps.compile.outcome == 'success'
+        run: |
+          set -o pipefail
+          ./gradlew :app:assembleDebug --no-daemon --stacktrace 2>&1 | tee /tmp/assemble.log
+        continue-on-error: true
 
-      - name: Unit tests (privacy gate + data)
+      - name: Unit tests
         id: tests
-        run: ./gradlew :app:testDebugUnitTest --no-daemon --stacktrace --continue
+        if: steps.assemble.outcome == 'success'
+        run: |
+          set -o pipefail
+          ./gradlew :app:testDebugUnitTest --no-daemon --stacktrace --continue 2>&1 | tee /tmp/tests.log
         continue-on-error: true
 
       - name: Detekt
-        run: ./gradlew detekt --no-daemon --stacktrace
+        id: detekt
+        if: steps.assemble.outcome == 'success'
+        run: |
+          set -o pipefail
+          ./gradlew detekt --no-daemon --stacktrace 2>&1 | tee /tmp/detekt.log || true
         continue-on-error: true
 
       - name: Locate APK
         id: locate
+        if: steps.assemble.outcome == 'success'
         run: |
           APK=$(find app/build/outputs/apk/debug -name '*.apk' | head -1)
           if [ -z "$APK" ]; then
@@ -69,6 +93,7 @@ jobs:
           echo "Built: $APK ($(stat -c%s "$APK") bytes)"
 
       - name: Upload APK artifact
+        if: steps.locate.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: fintrack-debug-apk
@@ -98,10 +123,56 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
 
-      - name: Fail job if unit tests failed
-        # The APK is already uploaded by this point, so the user always gets
-        # an installable build, but the job goes red if the privacy gate didn't pass.
-        if: steps.tests.outcome == 'failure'
+      - name: Upload gradle logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-logs
+          path: /tmp/*.log
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Write step summary on failure
+        if: always()
         run: |
-          echo "::error::Unit tests failed; see unit-test-reports artifact for details. APK was still produced."
+          {
+            echo "# Build summary"
+            echo ""
+            echo "| Step | Outcome |"
+            echo "|---|---|"
+            echo "| compile | ${{ steps.compile.outcome }} |"
+            echo "| assemble | ${{ steps.assemble.outcome }} |"
+            echo "| tests | ${{ steps.tests.outcome }} |"
+            echo "| detekt | ${{ steps.detekt.outcome }} |"
+            echo "| locate APK | ${{ steps.locate.outcome }} |"
+            echo ""
+            for f in /tmp/compile.log /tmp/assemble.log /tmp/tests.log /tmp/detekt.log; do
+              if [ -f "$f" ]; then
+                echo "## Tail of $(basename "$f")"
+                echo ""
+                echo '```'
+                tail -120 "$f"
+                echo '```'
+                echo ""
+              fi
+            done
+            for xml in $(find app/build/test-results -name '*.xml' 2>/dev/null); do
+              if grep -q '<failure\|<error' "$xml" 2>/dev/null; then
+                echo "## Failed test: $xml"
+                echo ""
+                echo '```xml'
+                cat "$xml"
+                echo '```'
+                echo ""
+              fi
+            done
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Fail job if any required step failed
+        if: |
+          steps.compile.outcome != 'success' ||
+          steps.assemble.outcome != 'success' ||
+          (steps.tests.outcome != 'success' && steps.tests.outcome != 'skipped')
+        run: |
+          echo "::error::Build pipeline incomplete. compile=${{ steps.compile.outcome }} assemble=${{ steps.assemble.outcome }} tests=${{ steps.tests.outcome }}"
           exit 1
