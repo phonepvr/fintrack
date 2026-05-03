@@ -153,8 +153,7 @@ dependencies {
     testImplementation(libs.truth)
     testImplementation(libs.androidx.room.testing)
     testImplementation(libs.sqlite.jdbc)
-    testImplementation(platform(libs.androidx.compose.bom))
-    testImplementation(libs.androidx.compose.ui.test.junit4)
+    testImplementation(libs.kotlin.reflect)
 
     // Instrumented test (Phase 2+)
     androidTestImplementation(libs.androidx.test.ext.junit)

@@ -3,7 +3,6 @@ package com.fintrack.privacy
 import com.google.common.truth.Truth.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import java.io.File
 
 /**
  * Spec §8 demands that money values are always [java.math.BigDecimal]. This
@@ -17,22 +16,17 @@ import java.io.File
  */
 class MoneyTypesTest {
 
-    private val watchedDirs = listOf(
-        "src/main/kotlin/com/fintrack/data",
-        "src/main/kotlin/com/fintrack/domain",
-        "app/src/main/kotlin/com/fintrack/data",
-        "app/src/main/kotlin/com/fintrack/domain",
-    )
-
     private val forbiddenTokens = listOf(": Double", ": Float", "kotlin.Double", "kotlin.Float")
 
     @Test
     @DisplayName("Data and domain layers contain no Double or Float fields")
     fun noFloatingPointInMoneyLayers() {
         val violations = mutableListOf<String>()
-        for (dirPath in watchedDirs) {
-            val dir = File(dirPath)
-            if (!dir.exists()) continue
+        val roots = listOf(
+            TestPaths.appFile("src/main/kotlin/com/fintrack/data"),
+            TestPaths.appFile("src/main/kotlin/com/fintrack/domain"),
+        )
+        for (dir in roots) {
             dir.walkTopDown().filter { it.isFile && it.extension == "kt" }.forEach { file ->
                 val text = file.readText()
                 for (token in forbiddenTokens) {

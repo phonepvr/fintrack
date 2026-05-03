@@ -3,7 +3,6 @@ package com.fintrack.privacy
 import com.google.common.truth.Truth.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import java.io.File
 
 /**
  * Privacy gate #2 from spec §6:
@@ -34,11 +33,11 @@ class DependencyGraphTest {
     )
 
     private val versionCatalog: String by lazy {
-        File("../gradle/libs.versions.toml").readText()
+        TestPaths.rootFile("gradle/libs.versions.toml").readText()
     }
 
     private val appBuild: String by lazy {
-        File("build.gradle.kts").readText()
+        TestPaths.appFile("build.gradle.kts").readText()
     }
 
     @Test

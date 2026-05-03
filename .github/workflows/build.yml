@@ -36,9 +36,13 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      - name: Privacy acceptance tests
+      - name: Compile main + test sources
+        # Surfaces compilation errors directly in the log before tests start.
+        run: ./gradlew :app:compileDebugKotlin :app:compileDebugUnitTestKotlin --no-daemon --stacktrace
+
+      - name: Unit tests (privacy gate + data)
         # Spec §6: every privacy gate must pass before we even build the APK.
-        run: ./gradlew :app:testDebugUnitTest --tests 'com.fintrack.privacy.*' --tests 'com.fintrack.data.*' --no-daemon --stacktrace
+        run: ./gradlew :app:testDebugUnitTest --no-daemon --stacktrace
 
       - name: Detekt
         run: ./gradlew detekt --no-daemon --stacktrace

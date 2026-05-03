@@ -41,6 +41,7 @@ truth                     = "1.4.4"
 androidxTestExtJunit      = "1.2.1"
 espressoCore              = "3.6.1"
 sqliteJdbc                = "3.47.1.0"
+kotlinReflect             = "2.1.20"
 
 [libraries]
 # AndroidX core
@@ -98,6 +99,7 @@ androidx-compose-ui-test-junit4    = { module = "androidx.compose.ui:ui-test-jun
 androidx-compose-ui-test-manifest  = { module = "androidx.compose.ui:ui-test-manifest" }
 androidx-room-testing              = { module = "androidx.room:room-testing", version.ref = "room" }
 sqlite-jdbc                        = { module = "org.xerial:sqlite-jdbc", version.ref = "sqliteJdbc" }
+kotlin-reflect                     = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlinReflect" }
 
 # Detekt formatting plugin
 detekt-formatting                  = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }

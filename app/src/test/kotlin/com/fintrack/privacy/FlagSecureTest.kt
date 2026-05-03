@@ -3,7 +3,6 @@ package com.fintrack.privacy
 import com.google.common.truth.Truth.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import java.io.File
 
 /**
  * Privacy gate #5 from spec §6 (source-side coverage):
@@ -19,12 +18,7 @@ import java.io.File
 class FlagSecureTest {
 
     private val mainActivitySource: String by lazy {
-        val candidates = listOf(
-            File("src/main/kotlin/com/fintrack/MainActivity.kt"),
-            File("app/src/main/kotlin/com/fintrack/MainActivity.kt"),
-        )
-        candidates.firstOrNull { it.exists() }?.readText()
-            ?: error("MainActivity.kt not found from working dir ${File(".").absolutePath}")
+        TestPaths.appFile("src/main/kotlin/com/fintrack/MainActivity.kt").readText()
     }
 
     @Test

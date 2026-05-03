@@ -3,7 +3,6 @@ package com.fintrack.privacy
 import com.google.common.truth.Truth.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import java.io.File
 
 /**
  * Privacy gate #4 from spec §6 (source-side coverage):
@@ -23,12 +22,7 @@ import java.io.File
 class SqlCipherEncryptionTest {
 
     private val databaseModuleSource: String by lazy {
-        val candidates = listOf(
-            File("src/main/kotlin/com/fintrack/di/DatabaseModule.kt"),
-            File("app/src/main/kotlin/com/fintrack/di/DatabaseModule.kt"),
-        )
-        candidates.firstOrNull { it.exists() }?.readText()
-            ?: error("DatabaseModule.kt not found from working dir ${File(".").absolutePath}")
+        TestPaths.appFile("src/main/kotlin/com/fintrack/di/DatabaseModule.kt").readText()
     }
 
     @Test
@@ -54,11 +48,9 @@ class SqlCipherEncryptionTest {
     @Test
     @DisplayName("KeystorePassphraseStore generates 256 random bits via SecureRandom")
     fun passphraseIs256BitSecureRandom() {
-        val source = listOf(
-            File("src/main/kotlin/com/fintrack/security/KeystorePassphraseStore.kt"),
-            File("app/src/main/kotlin/com/fintrack/security/KeystorePassphraseStore.kt"),
-        ).firstOrNull { it.exists() }?.readText()
-            ?: error("KeystorePassphraseStore.kt not found")
+        val source = TestPaths.appFile(
+            "src/main/kotlin/com/fintrack/security/KeystorePassphraseStore.kt",
+        ).readText()
         assertThat(source).contains("SecureRandom")
         assertThat(source).contains("PASSPHRASE_BYTES = 32")
         assertThat(source).contains("EncryptedSharedPreferences")

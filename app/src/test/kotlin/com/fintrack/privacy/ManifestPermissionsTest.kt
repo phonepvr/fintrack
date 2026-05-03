@@ -3,7 +3,6 @@ package com.fintrack.privacy
 import com.google.common.truth.Truth.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import java.io.File
 
 /**
  * Privacy gate #1 from spec §6:
@@ -19,11 +18,7 @@ import java.io.File
 class ManifestPermissionsTest {
 
     private val manifest: String by lazy {
-        val file = File("src/main/AndroidManifest.xml")
-        require(file.exists()) {
-            "Expected to run from app/ working directory; manifest not found at ${file.absolutePath}"
-        }
-        file.readText()
+        TestPaths.appFile("src/main/AndroidManifest.xml").readText()
     }
 
     @Test
