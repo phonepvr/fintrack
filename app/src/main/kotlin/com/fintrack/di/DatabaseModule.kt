@@ -50,7 +50,9 @@ object DatabaseModule {
             .openHelperFactory(factory)
             // v3 is a clean rebuild from v2 — v2 only ever held dummy data.
             // No migration files; if Room sees a schema mismatch, drop and rebuild.
-            .fallbackToDestructiveMigration(true)
+            // Room 2.6.1's fallbackToDestructiveMigration takes no arguments;
+            // the boolean overload landed in 2.7.
+            .fallbackToDestructiveMigration()
             .addCallback(object : RoomDatabase.Callback() {
                 override fun onCreate(db: SupportSQLiteDatabase) {
                     super.onCreate(db)
