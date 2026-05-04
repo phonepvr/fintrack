@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -6,6 +8,24 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
 }
+
+// Optional release signing: drop a keystore.properties file next to this
+// build script with the four entries below. When the file exists, release
+// builds are signed automatically; when it doesn't, the release variant is
+// produced unsigned. Debug builds always use the auto-generated debug keystore.
+//
+//   storeFile=/abs/path/to/fintrack-release.jks
+//   storePassword=...
+//   keyAlias=fintrack
+//   keyPassword=...
+//
+// keystore.properties and *.jks are .gitignore'd at the repo root.
+val keystorePropsFile = rootProject.file("keystore.properties")
+val keystoreProps = Properties().apply {
+    if (keystorePropsFile.exists()) keystorePropsFile.inputStream().use(::load)
+}
+val releaseSigningEnabled = keystoreProps.getProperty("storeFile")
+    ?.let { java.io.File(it).exists() } == true
 
 android {
     namespace = "com.fintrack"
@@ -28,6 +48,17 @@ android {
         named("androidTest") { kotlin.srcDirs("src/androidTest/kotlin") }
     }
 
+    if (releaseSigningEnabled) {
+        signingConfigs {
+            create("release") {
+                storeFile = java.io.File(keystoreProps.getProperty("storeFile"))
+                storePassword = keystoreProps.getProperty("storePassword")
+                keyAlias = keystoreProps.getProperty("keyAlias")
+                keyPassword = keystoreProps.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         debug {
             isMinifyEnabled = false
@@ -41,7 +72,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-            // Signing config is left to local developer setup; see README.
+            if (releaseSigningEnabled) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
 
