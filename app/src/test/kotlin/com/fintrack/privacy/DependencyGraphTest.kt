@@ -20,7 +20,12 @@ class DependencyGraphTest {
 
     private val forbidden = listOf(
         "okhttp",
+        "okhttp3",
         "retrofit",
+        "retrofit2",
+        "ktor-client",
+        "volley",
+        "org.apache.http",
         "firebase",
         "crashlytics",
         "analytics",
@@ -30,6 +35,7 @@ class DependencyGraphTest {
         "amplitude",
         "mixpanel",
         "branch",
+        "segment",
     )
 
     private val versionCatalog: String by lazy {

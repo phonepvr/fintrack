@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Defense-in-depth network policy. The app declares no networking permissions,
+  so on a stock Android version this file is redundant — but it makes the
+  intent explicit for code reviewers and for OEMs that ship custom HTTP stacks.
+
+  - cleartextTrafficPermitted="false" everywhere.
+  - Empty <trust-anchors> means the system trusts NO certificates for outbound
+    traffic. If somehow a network call were attempted, it would fail SSL
+    handshake.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors />
+    </base-config>
+    <debug-overrides cleartextTrafficPermitted="false">
+        <trust-anchors />
+    </debug-overrides>
+</network-security-config>

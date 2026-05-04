@@ -21,6 +21,7 @@ import com.fintrack.ui.lock.LockRoute
 import com.fintrack.ui.onboarding.CreateFirstProfileRoute
 import com.fintrack.ui.picker.ProfilePickerRoute
 import com.fintrack.ui.settings.about.AboutRoute
+import com.fintrack.ui.settings.about.ManifestViewerRoute
 import com.fintrack.ui.settings.aim.AimEditorRoute
 import com.fintrack.ui.settings.backup.BackupRoute
 import com.fintrack.ui.settings.holdings.HoldingsManagementRoute
@@ -97,7 +98,13 @@ private fun AuthenticatedNavHost(appViewModel: AppViewModel) {
             BackupRoute(onBack = { navController.popBackStack() })
         }
         composable("settings/about") {
-            AboutRoute(onBack = { navController.popBackStack() })
+            AboutRoute(
+                onBack = { navController.popBackStack() },
+                onViewManifest = { navController.navigate("settings/about/manifest") },
+            )
+        }
+        composable("settings/about/manifest") {
+            ManifestViewerRoute(onBack = { navController.popBackStack() })
         }
         composable(SNAPSHOT_NEW_ROUTE) {
             SnapshotEntryRoute(onDone = { navController.popBackStack() })

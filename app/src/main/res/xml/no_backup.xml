@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Empty include list = nothing is backed up. Used by android:fullBackupContent
+  alongside dataExtractionRules. Belt and braces: allowBackup is also "false"
+  on the application tag, so this only matters if a future change accidentally
+  flips that. Leaving the empty XML form prevents the boolean form from
+  silently re-enabling backup on a future merge.
+-->
+<full-backup-content>
+    <exclude domain="root" path="." />
+    <exclude domain="file" path="." />
+    <exclude domain="database" path="." />
+    <exclude domain="sharedpref" path="." />
+    <exclude domain="external" path="." />
+</full-backup-content>
