@@ -1,8 +1,8 @@
 package com.fintrack.ui.picker
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -139,7 +139,6 @@ fun ProfilePickerRoute(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ProfileTile(
     user: UserEntity,
@@ -210,7 +209,7 @@ private fun AddProfileTile(onClick: () -> Unit) {
                 color = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
                 shape = RoundedCornerShape(12.dp),
             )
-            .combinedClickableSafe(onClick),
+            .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -220,11 +219,6 @@ private fun AddProfileTile(onClick: () -> Unit) {
         }
     }
 }
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun Modifier.combinedClickableSafe(onClick: () -> Unit): Modifier =
-    this.combinedClickable(onClick = onClick, onLongClick = null)
 
 private val DefaultColorPalette = listOf(
     "#1976D2",
@@ -287,7 +281,7 @@ private fun ProfileEditorDialog(
                                     else MaterialTheme.colorScheme.outline,
                                     shape = CircleShape,
                                 )
-                                .combinedClickableSafe { colorHex = hex },
+                                .clickable { colorHex = hex },
                         )
                     }
                 }
