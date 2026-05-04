@@ -43,6 +43,7 @@ import com.fintrack.data.repo.UserRepository
 import com.fintrack.domain.UserScope
 import com.fintrack.ui.home.overview.OverviewTab
 import com.fintrack.ui.home.snapshots.SnapshotsTab
+import com.fintrack.ui.settings.SettingsTab
 import com.fintrack.ui.onboarding.parseHex
 import java.util.UUID
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -81,6 +82,11 @@ fun HomeRoute(
     onNewSnapshot: () -> Unit,
     onSnapshotDetail: (UUID) -> Unit,
     onEditSnapshot: (UUID) -> Unit,
+    onAimEditor: () -> Unit,
+    onHoldings: () -> Unit,
+    onManageUsers: () -> Unit,
+    onBackup: () -> Unit,
+    onAbout: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val activeUser by viewModel.activeUser.collectAsState()
@@ -139,9 +145,12 @@ fun HomeRoute(
                     onEditSnapshot = onEditSnapshot,
                 )
                 HomeTab.Overview -> OverviewTab(onSnapshotDetail = onSnapshotDetail)
-                HomeTab.Settings -> EmptyPlaceholder(
-                    title = stringResource(R.string.settings_empty_title),
-                    message = stringResource(R.string.settings_empty_message),
+                HomeTab.Settings -> SettingsTab(
+                    onAimEditor = onAimEditor,
+                    onHoldings = onHoldings,
+                    onManageUsers = onManageUsers,
+                    onBackup = onBackup,
+                    onAbout = onAbout,
                 )
             }
         }

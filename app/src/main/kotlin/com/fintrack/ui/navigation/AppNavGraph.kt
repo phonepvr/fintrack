@@ -20,6 +20,11 @@ import com.fintrack.ui.lock.BiometricUnavailableScreen
 import com.fintrack.ui.lock.LockRoute
 import com.fintrack.ui.onboarding.CreateFirstProfileRoute
 import com.fintrack.ui.picker.ProfilePickerRoute
+import com.fintrack.ui.settings.about.AboutRoute
+import com.fintrack.ui.settings.aim.AimEditorRoute
+import com.fintrack.ui.settings.backup.BackupRoute
+import com.fintrack.ui.settings.holdings.HoldingsManagementRoute
+import com.fintrack.ui.settings.users.ManageUsersRoute
 import com.fintrack.ui.snapshots.detail.SnapshotDetailRoute
 import com.fintrack.ui.snapshots.detail.SnapshotDetailViewModel
 import com.fintrack.ui.snapshots.entry.SnapshotEntryRoute
@@ -72,7 +77,27 @@ private fun AuthenticatedNavHost(appViewModel: AppViewModel) {
                 onNewSnapshot = { navController.navigate(SNAPSHOT_NEW_ROUTE) },
                 onSnapshotDetail = { id -> navController.navigate("snapshot/detail/$id") },
                 onEditSnapshot = { id -> navController.navigate("snapshot/edit/$id") },
+                onAimEditor = { navController.navigate("settings/aim") },
+                onHoldings = { navController.navigate("settings/holdings") },
+                onManageUsers = { navController.navigate("settings/users") },
+                onBackup = { navController.navigate("settings/backup") },
+                onAbout = { navController.navigate("settings/about") },
             )
+        }
+        composable("settings/aim") {
+            AimEditorRoute(onDone = { navController.popBackStack() })
+        }
+        composable("settings/holdings") {
+            HoldingsManagementRoute(onBack = { navController.popBackStack() })
+        }
+        composable("settings/users") {
+            ManageUsersRoute(onBack = { navController.popBackStack() })
+        }
+        composable("settings/backup") {
+            BackupRoute(onBack = { navController.popBackStack() })
+        }
+        composable("settings/about") {
+            AboutRoute(onBack = { navController.popBackStack() })
         }
         composable(SNAPSHOT_NEW_ROUTE) {
             SnapshotEntryRoute(onDone = { navController.popBackStack() })
