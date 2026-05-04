@@ -1,5 +1,6 @@
 package com.fintrack.ui.picker
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -139,6 +140,7 @@ fun ProfilePickerRoute(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ProfileTile(
     user: UserEntity,
