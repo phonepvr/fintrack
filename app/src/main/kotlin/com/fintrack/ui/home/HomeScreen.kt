@@ -41,6 +41,7 @@ import androidx.lifecycle.viewModelScope
 import com.fintrack.R
 import com.fintrack.data.repo.UserRepository
 import com.fintrack.domain.UserScope
+import com.fintrack.ui.home.overview.OverviewTab
 import com.fintrack.ui.home.snapshots.SnapshotsTab
 import com.fintrack.ui.onboarding.parseHex
 import java.util.UUID
@@ -137,10 +138,7 @@ fun HomeRoute(
                     onSnapshotDetail = onSnapshotDetail,
                     onEditSnapshot = onEditSnapshot,
                 )
-                HomeTab.Overview -> EmptyPlaceholder(
-                    title = stringResource(R.string.overview_empty_title),
-                    message = stringResource(R.string.overview_empty_message),
-                )
+                HomeTab.Overview -> OverviewTab(onSnapshotDetail = onSnapshotDetail)
                 HomeTab.Settings -> EmptyPlaceholder(
                     title = stringResource(R.string.settings_empty_title),
                     message = stringResource(R.string.settings_empty_message),
