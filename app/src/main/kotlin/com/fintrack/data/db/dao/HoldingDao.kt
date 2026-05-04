@@ -6,7 +6,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.fintrack.data.db.entities.HoldingEntity
-import com.fintrack.domain.model.AssetClass
 import kotlinx.coroutines.flow.Flow
 import java.util.UUID
 
@@ -23,8 +22,14 @@ interface HoldingDao {
     @Query("SELECT * FROM holdings WHERE is_active = 1 ORDER BY display_order ASC, name ASC")
     fun observeActive(): Flow<List<HoldingEntity>>
 
-    @Query("SELECT * FROM holdings WHERE asset_class = :assetClass AND is_active = 1 ORDER BY display_order ASC, name ASC")
-    fun observeByAssetClass(assetClass: AssetClass): Flow<List<HoldingEntity>>
+    @Query(
+        """
+        SELECT * FROM holdings
+        WHERE sub_bucket_id = :subBucketId AND is_active = 1
+        ORDER BY display_order ASC, name ASC
+        """,
+    )
+    fun observeBySubBucket(subBucketId: UUID): Flow<List<HoldingEntity>>
 
     @Query("SELECT * FROM holdings WHERE id = :holdingId LIMIT 1")
     suspend fun get(holdingId: UUID): HoldingEntity?

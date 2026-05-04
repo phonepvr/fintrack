@@ -1,16 +1,23 @@
 package com.fintrack.data.db.seed
 
+import com.fintrack.data.db.entities.AimAllocationEntity
+import com.fintrack.data.db.entities.GoalEntity
+import com.fintrack.data.db.entities.LoanEntity
 import com.fintrack.data.db.entities.UserEntity
-import com.fintrack.data.db.entities.UserSettingsEntity
 import com.fintrack.data.repo.HoldingValueDraft
+import com.fintrack.domain.model.GoalType
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import java.math.BigDecimal
 import java.util.UUID
 
 /**
- * Spec §5: two seed users with their snapshots, inserted in debug builds only.
- * UUIDs are deterministic so re-seeding is idempotent across rebuilds.
+ * Spec §3.4-3.6: two seed users with their snapshots, loans, and goals,
+ * inserted in debug builds only. UUIDs deterministic so re-seeding is idempotent.
+ *
+ * Holding name → renamed in v3:
+ *   "Equity (Direct)" → "Stocks (Direct)"
+ *   "RD" — dropped (not in v3 catalog)
  */
 object DevSeedData {
 
@@ -25,13 +32,11 @@ object DevSeedData {
         isActive = true,
     )
 
-    /** Default aim percentages — User A keeps the spec defaults. */
-    val userASettings = UserSettingsEntity(
-        userId = userAId,
-        aimPctMfNps = 55,
-        aimPctEquity = 15,
-        aimPctFixedReturn = 25,
-        aimPctCrypto = 5,
+    /** User A keeps the spec defaults: Market Linked 70 / Fixed Return 25 / Crypto 5. */
+    val userAAimAllocations: List<AimAllocationEntity> = listOf(
+        AimAllocationEntity(userAId, SeedData.MARKET_LINKED_ID, 70),
+        AimAllocationEntity(userAId, SeedData.FIXED_RETURN_ID, 25),
+        AimAllocationEntity(userAId, SeedData.CRYPTO_ID, 5),
     )
 
     val userB = UserEntity(
@@ -42,19 +47,53 @@ object DevSeedData {
         isActive = true,
     )
 
-    /** Spec §5: User B is more conservative — 40 / 10 / 45 / 5. */
-    val userBSettings = UserSettingsEntity(
-        userId = userBId,
-        aimPctMfNps = 40,
-        aimPctEquity = 10,
-        aimPctFixedReturn = 45,
-        aimPctCrypto = 5,
+    /** User B is more conservative: Market Linked 50 / Fixed Return 45 / Crypto 5. */
+    val userBAimAllocations: List<AimAllocationEntity> = listOf(
+        AimAllocationEntity(userBId, SeedData.MARKET_LINKED_ID, 50),
+        AimAllocationEntity(userBId, SeedData.FIXED_RETURN_ID, 45),
+        AimAllocationEntity(userBId, SeedData.CRYPTO_ID, 5),
     )
 
     data class SeedSnapshot(
         val date: LocalDate,
         val earningsInCr: BigDecimal,
         val rows: List<HoldingValueDraft>,
+    )
+
+    /** Loans are seeded as separate entities; each snapshot has matching LoanValue rows. */
+    data class SeedLoan(
+        val name: String,
+        val originalAmount: BigDecimal,
+        val takenDate: LocalDate,
+        val monthlyEmi: BigDecimal,
+    ) {
+        val id: UUID = UUID.nameUUIDFromBytes("fintrack-seed-loan:$name".toByteArray())
+        fun toEntity(userId: UUID, now: Instant): LoanEntity = LoanEntity(
+            id = id, userId = userId, name = name, originalAmount = originalAmount,
+            takenDate = takenDate, monthlyEmi = monthlyEmi, isActive = true,
+            closedDate = null, createdAt = now, updatedAt = now,
+        )
+    }
+
+    val seedLoansForUserA: List<SeedLoan> = listOf(
+        SeedLoan("Home Loan – HDFC", BigDecimal("6000000"), LocalDate.parse("2022-07-01"), BigDecimal("52000")),
+        SeedLoan("Car Loan – ICICI", BigDecimal("800000"), LocalDate.parse("2024-03-15"), BigDecimal("17500")),
+    )
+
+    /** Per-snapshot LoanValue outstanding amounts, indexed by snapshotDate then loanName. */
+    val loanValuesForUserA: Map<LocalDate, Map<String, BigDecimal>> = mapOf(
+        LocalDate.parse("2025-01-01") to mapOf(
+            "Home Loan – HDFC" to BigDecimal("5480000"),
+            "Car Loan – ICICI" to BigDecimal("690000"),
+        ),
+        LocalDate.parse("2025-05-01") to mapOf(
+            "Home Loan – HDFC" to BigDecimal("5390000"),
+            "Car Loan – ICICI" to BigDecimal("640000"),
+        ),
+        LocalDate.parse("2025-10-01") to mapOf(
+            "Home Loan – HDFC" to BigDecimal("5280000"),
+            "Car Loan – ICICI" to BigDecimal("580000"),
+        ),
     )
 
     fun snapshotsForUserA(byName: Map<String, UUID>): List<SeedSnapshot> = listOf(
@@ -66,9 +105,10 @@ object DevSeedData {
                 row(byName, "Kuvera", invested = "1500000", current = "1620000", sip = "15000"),
                 row(byName, "Tata Capital", invested = "200000", current = "210000", sip = "0"),
                 row(byName, "NPS", invested = "300000", current = "340000", sip = "35000"),
-                row(byName, "Equity (Direct)", invested = "1000000", current = "1100000", sip = "0"),
+                row(byName, "Stocks (Direct)", invested = "1000000", current = "1100000", sip = "0"),
+                row(byName, "EPF", invested = null, current = "200000", sip = "10000"),
                 row(byName, "PPF", invested = null, current = "400000", sip = "5000"),
-                row(byName, "RD", invested = null, current = "0", sip = "0"),
+                row(byName, "FD", invested = null, current = "0", sip = null),
                 row(byName, "Wint Wealth", invested = null, current = "700000", sip = "8000"),
                 row(byName, "HDFC", invested = null, current = "100000", sip = null),
                 row(byName, "Kotak", invested = null, current = "150000", sip = null),
@@ -85,9 +125,10 @@ object DevSeedData {
                 row(byName, "Kuvera", invested = "1560000", current = "1780000", sip = "15000"),
                 row(byName, "Tata Capital", invested = "200000", current = "225000", sip = "0"),
                 row(byName, "NPS", invested = "440000", current = "500000", sip = "35000"),
-                row(byName, "Equity (Direct)", invested = "1000000", current = "1220000", sip = "0"),
+                row(byName, "Stocks (Direct)", invested = "1000000", current = "1220000", sip = "0"),
+                row(byName, "EPF", invested = null, current = "240000", sip = "10000"),
                 row(byName, "PPF", invested = null, current = "420000", sip = "5000"),
-                row(byName, "RD", invested = null, current = "0", sip = "0"),
+                row(byName, "FD", invested = null, current = "0", sip = null),
                 row(byName, "Wint Wealth", invested = null, current = "730000", sip = "8000"),
                 row(byName, "HDFC", invested = null, current = "120000", sip = null),
                 row(byName, "Kotak", invested = null, current = "160000", sip = null),
@@ -104,9 +145,10 @@ object DevSeedData {
                 row(byName, "Kuvera", invested = "1620000", current = "1950000", sip = "15000"),
                 row(byName, "Tata Capital", invested = "200000", current = "240000", sip = "0"),
                 row(byName, "NPS", invested = "580000", current = "660000", sip = "35000"),
-                row(byName, "Equity (Direct)", invested = "1000000", current = "1350000", sip = "0"),
+                row(byName, "Stocks (Direct)", invested = "1000000", current = "1350000", sip = "0"),
+                row(byName, "EPF", invested = null, current = "290000", sip = "10000"),
                 row(byName, "PPF", invested = null, current = "450000", sip = "5000"),
-                row(byName, "RD", invested = null, current = "0", sip = "0"),
+                row(byName, "FD", invested = null, current = "0", sip = null),
                 row(byName, "Wint Wealth", invested = null, current = "800000", sip = "8000"),
                 row(byName, "HDFC", invested = null, current = "150000", sip = null),
                 row(byName, "Kotak", invested = null, current = "180000", sip = null),
@@ -139,6 +181,27 @@ object DevSeedData {
                 row(byName, "HDFC", invested = null, current = "90000", sip = null),
                 row(byName, "ICICI", invested = null, current = "70000", sip = null),
             ),
+        ),
+    )
+
+    fun goalsForUserA(now: Instant): List<GoalEntity> = listOf(
+        GoalEntity(
+            id = UUID.nameUUIDFromBytes("fintrack-seed-goal:Mr. X/First Crore".toByteArray()),
+            userId = userAId,
+            name = "First Crore (Net Worth)",
+            goalType = GoalType.NET_WORTH,
+            targetNetWorth = BigDecimal("10000000"),
+            targetDate = LocalDate.parse("2027-12-01"),
+            createdAt = now,
+        ),
+        GoalEntity(
+            id = UUID.nameUUIDFromBytes("fintrack-seed-goal:Mr. X/Debt-free".toByteArray()),
+            userId = userAId,
+            name = "Debt-free",
+            goalType = GoalType.DEBT_FREE,
+            targetNetWorth = BigDecimal.ZERO,
+            targetDate = LocalDate.parse("2030-07-01"),
+            createdAt = now,
         ),
     )
 

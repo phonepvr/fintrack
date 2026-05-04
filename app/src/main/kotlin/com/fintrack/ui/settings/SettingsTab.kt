@@ -183,6 +183,9 @@ private fun InactivityCard(
 }
 
 private fun aimSummary(state: SettingsTabUiState): String {
-    val s = state.activeUserSettings ?: return "Configure per-class aim percentages"
-    return "${s.aimPctMfNps}/${s.aimPctEquity}/${s.aimPctFixedReturn}/${s.aimPctCrypto} (MF/Eq/Fix/Cr)"
+    val rows = state.activeUserAim
+    if (rows.isEmpty()) return "Configure per-class aim percentages"
+    val total = rows.sumOf { it.aimPercent }
+    val joined = rows.sortedBy { it.assetClassId }.joinToString("/") { "${it.aimPercent}" }
+    return if (total == 100) "$joined (sums to 100%)" else "$joined (sums to $total%)"
 }

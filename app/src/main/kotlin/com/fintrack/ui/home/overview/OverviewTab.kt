@@ -30,7 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.fintrack.domain.analytics.SnapshotAnalytics
-import com.fintrack.domain.model.AssetClass
+import com.fintrack.data.db.seed.SeedData
 import com.fintrack.domain.util.formatIndianCurrency
 import com.fintrack.domain.util.formatPercent
 import com.fintrack.domain.util.formatSignedCurrency
@@ -101,7 +101,7 @@ private fun HeadlineCardsRow(card: HeadlineCard) {
         HeadlineCardBox(
             modifier = Modifier.weight(1f),
             label = "Total portfolio",
-            value = formatIndianCurrency(card.totalPortfolio),
+            value = formatIndianCurrency(card.netWorth),
             sub = card.deltaAbsolute?.let { abs ->
                 val pct = card.deltaPercent
                 if (pct == null) formatSignedCurrency(abs)
@@ -205,26 +205,32 @@ private fun seriesFor(view: ChartView, analytics: List<SnapshotAnalytics>): List
     return when (view) {
         ChartView.TOTAL -> listOf(
             ChartSeries(
-                name = "Total",
+                name = "Net Worth",
                 color = TotalLineColor,
-                points = analytics.map { it.date to it.totalPortfolio },
+                points = analytics.map { it.date to it.netWorth },
             ),
         )
 
-        ChartView.BY_ASSET_CLASS -> AssetClass.entries.map { ac ->
-            ChartSeries(
-                name = ac.displayName,
-                color = AssetClassColor(ac),
-                points = analytics.map { a -> a.date to a.byAssetClass.getValue(ac).current },
-            )
+        ChartView.BY_ASSET_CLASS -> {
+            // Take the asset class set from the latest snapshot's analytics
+            // (it's keyed by AssetClass UUID and dynamic in v3).
+            val classOrder = analytics.last().byAssetClass.keys.toList()
+            classOrder.mapIndexed { idx, acId ->
+                val name = analytics.last().byAssetClass[acId]?.assetClassName ?: "Class"
+                ChartSeries(
+                    name = name,
+                    color = AssetClassColor(idx),
+                    points = analytics.map { a -> a.date to (a.byAssetClass[acId]?.current ?: java.math.BigDecimal.ZERO) },
+                )
+            }
         }
 
         ChartView.FIXED_VS_INVESTMENT -> listOf(
             ChartSeries(
                 name = "Fixed Return",
-                color = AssetClassColor(AssetClass.FIXED_RETURN),
+                color = AssetClassColor(2),
                 points = analytics.map { a ->
-                    a.date to a.byAssetClass.getValue(AssetClass.FIXED_RETURN).current
+                    a.date to (a.byAssetClass[SeedData.FIXED_RETURN_ID]?.current ?: java.math.BigDecimal.ZERO)
                 },
             ),
             ChartSeries(
@@ -245,11 +251,13 @@ private fun seriesFor(view: ChartView, analytics: List<SnapshotAnalytics>): List
 }
 
 private val TotalLineColor = Color(0xFF1976D2)
-private fun AssetClassColor(ac: AssetClass): Color = when (ac) {
-    AssetClass.MF_NPS -> Color(0xFF1976D2)
-    AssetClass.EQUITY -> Color(0xFFE91E63)
-    AssetClass.FIXED_RETURN -> Color(0xFF2E7D32)
-    AssetClass.CRYPTO -> Color(0xFFF57C00)
+
+/** Stable colour palette indexed by asset-class display order. */
+private fun AssetClassColor(index: Int): Color = when (index % 4) {
+    0 -> Color(0xFF1976D2) // blue
+    1 -> Color(0xFFE91E63) // rose
+    2 -> Color(0xFF2E7D32) // green
+    else -> Color(0xFFF57C00) // orange
 }
 
 @Composable
@@ -276,7 +284,7 @@ private fun HistoryTableRow(row: HistoryRow, onTap: () -> Unit) {
         TableCell(row.analytics.date.toString(), weight = 1.2f)
         TableCell(formatIndianCurrency(row.fixedReturn), weight = 1f)
         TableCell(formatIndianCurrency(row.investmentValue), weight = 1f)
-        TableCell(formatIndianCurrency(row.total), weight = 1.1f, bold = true)
+        TableCell(formatIndianCurrency(row.netWorth), weight = 1.1f, bold = true)
         TableCell(formatPercent(row.analytics.percentOfEarnings), weight = 0.9f)
         TableCell(
             text = row.deltaTotal?.let(::formatSignedCurrency).orEmpty(),

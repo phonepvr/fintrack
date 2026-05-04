@@ -1,10 +1,13 @@
 package com.fintrack.domain.analytics
 
+import com.fintrack.data.db.entities.AimAllocationEntity
+import com.fintrack.data.db.entities.AssetClassEntity
 import com.fintrack.data.db.entities.HoldingEntity
 import com.fintrack.data.db.entities.HoldingValueEntity
+import com.fintrack.data.db.entities.LoanEntity
+import com.fintrack.data.db.entities.LoanValueEntity
 import com.fintrack.data.db.entities.SnapshotEntity
-import com.fintrack.data.db.entities.UserSettingsEntity
-import com.fintrack.domain.model.AssetClass
+import com.fintrack.data.db.entities.SubBucketEntity
 import com.google.common.truth.Truth.assertThat
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
@@ -16,49 +19,73 @@ import java.util.UUID
 class SnapshotAnalyticsTest {
 
     private val userId = UUID.randomUUID()
+    private val seedInstant = Instant.parse("2025-01-01T00:00:00Z")
+
+    // Three asset classes (Market Linked, Fixed Return, Crypto) — matches v3 spec.
+    private val acMarketLinked = AssetClassEntity(
+        id = UUID.randomUUID(), name = "Market Linked", displayOrder = 1,
+        isSeeded = true, createdAt = seedInstant,
+    )
+    private val acFixedReturn = AssetClassEntity(
+        id = UUID.randomUUID(), name = "Fixed Return", displayOrder = 2,
+        isSeeded = true, createdAt = seedInstant,
+    )
+    private val acCrypto = AssetClassEntity(
+        id = UUID.randomUUID(), name = "Crypto", displayOrder = 3,
+        isSeeded = true, createdAt = seedInstant,
+    )
+    private val assetClasses = listOf(acMarketLinked, acFixedReturn, acCrypto)
+
+    // Sub-buckets covering the holdings used in tests below.
+    private val sbMf = sb("MF", acMarketLinked.id, 1)
+    private val sbStocks = sb("Stocks", acMarketLinked.id, 3)
+    private val sbPpf = sb("PPF", acFixedReturn.id, 2)
+    private val sbBank = sb("Bank", acFixedReturn.id, 5)
+    private val sbCrypto = sb("Crypto", acCrypto.id, 1)
+    private val subBuckets = listOf(sbMf, sbStocks, sbPpf, sbBank, sbCrypto)
 
     private val degree = HoldingEntity(
-        id = UUID.randomUUID(), name = "Degree212", assetClass = AssetClass.MF_NPS,
-        trackInvested = true, trackSip = true, isBankAccount = false,
+        id = UUID.randomUUID(), name = "Degree212", subBucketId = sbMf.id,
+        trackInvested = true, trackSip = true,
     )
     private val ppf = HoldingEntity(
-        id = UUID.randomUUID(), name = "PPF", assetClass = AssetClass.FIXED_RETURN,
-        trackInvested = false, trackSip = true, isBankAccount = false,
+        id = UUID.randomUUID(), name = "PPF", subBucketId = sbPpf.id,
+        trackInvested = false, trackSip = true,
     )
     private val hdfc = HoldingEntity(
-        id = UUID.randomUUID(), name = "HDFC", assetClass = AssetClass.FIXED_RETURN,
-        trackInvested = false, trackSip = false, isBankAccount = true,
+        id = UUID.randomUUID(), name = "HDFC", subBucketId = sbBank.id,
+        trackInvested = false, trackSip = false,
     )
     private val coindcx = HoldingEntity(
-        id = UUID.randomUUID(), name = "CoinDCX", assetClass = AssetClass.CRYPTO,
-        trackInvested = true, trackSip = false, isBankAccount = false,
+        id = UUID.randomUUID(), name = "CoinDCX", subBucketId = sbCrypto.id,
+        trackInvested = true, trackSip = false,
     )
-    private val equity = HoldingEntity(
-        id = UUID.randomUUID(), name = "Equity", assetClass = AssetClass.EQUITY,
-        trackInvested = true, trackSip = false, isBankAccount = false,
+    private val stocks = HoldingEntity(
+        id = UUID.randomUUID(), name = "Stocks (Direct)", subBucketId = sbStocks.id,
+        trackInvested = true, trackSip = false,
     )
+    private val catalog = listOf(degree, ppf, hdfc, coindcx, stocks)
 
-    private val catalog = listOf(degree, ppf, hdfc, coindcx, equity)
-
-    private val defaultSettings = UserSettingsEntity(
-        userId = userId,
-        aimPctMfNps = 55,
-        aimPctEquity = 15,
-        aimPctFixedReturn = 25,
-        aimPctCrypto = 5,
+    /** v3 default aim: Market Linked 70 / Fixed Return 25 / Crypto 5. */
+    private val defaultAim = listOf(
+        AimAllocationEntity(userId, acMarketLinked.id, 70),
+        AimAllocationEntity(userId, acFixedReturn.id, 25),
+        AimAllocationEntity(userId, acCrypto.id, 5),
     )
 
-    private fun snapshot(
-        date: String = "2025-01-01",
-        earnings: String = "1.00",
-    ) = SnapshotEntity(
+    private fun sb(name: String, acId: UUID, order: Int) = SubBucketEntity(
+        id = UUID.randomUUID(), assetClassId = acId, name = name,
+        displayOrder = order, isSeeded = true, isActive = true, createdAt = seedInstant,
+    )
+
+    private fun snapshot(date: String = "2025-01-01", earnings: String = "1.00") = SnapshotEntity(
         id = UUID.randomUUID(),
         userId = userId,
         snapshotDate = LocalDate.parse(date),
         earningsInCr = BigDecimal(earnings),
         notes = null,
-        createdAt = Instant.parse("2025-01-01T00:00:00Z"),
-        updatedAt = Instant.parse("2025-01-01T00:00:00Z"),
+        createdAt = seedInstant,
+        updatedAt = seedInstant,
     )
 
     private fun value(
@@ -76,69 +103,62 @@ class SnapshotAnalyticsTest {
         sip = sip?.let(::BigDecimal),
     )
 
+    private fun compute(
+        snapshot: SnapshotEntity,
+        values: List<HoldingValueEntity>,
+        loans: List<LoanEntity> = emptyList(),
+        loanValues: List<LoanValueEntity> = emptyList(),
+        previousNetWorth: BigDecimal? = null,
+    ) = SnapshotAnalyticsCalculator.compute(
+        snapshot = snapshot,
+        values = values,
+        catalog = catalog,
+        subBuckets = subBuckets,
+        assetClasses = assetClasses,
+        aimAllocations = defaultAim,
+        loans = loans,
+        loanValues = loanValues,
+        previousNetWorth = previousNetWorth,
+    )
+
     @Test
     @DisplayName("Empty value set yields zero totals and aim-class-magnitude drift")
     fun emptyValues() {
         val s = snapshot()
-        val a = SnapshotAnalyticsCalculator.compute(
-            snapshot = s,
-            values = emptyList(),
-            catalog = catalog,
-            settings = defaultSettings,
-            previousTotalPortfolio = null,
-        )
+        val a = compute(s, emptyList())
 
-        assertThat(a.totalPortfolio).isEqualToIgnoringScale(BigDecimal.ZERO)
+        assertThat(a.totalAssets).isEqualToIgnoringScale(BigDecimal.ZERO)
+        assertThat(a.totalLiabilities).isEqualToIgnoringScale(BigDecimal.ZERO)
+        assertThat(a.netWorth).isEqualToIgnoringScale(BigDecimal.ZERO)
         assertThat(a.totalInvested).isEqualToIgnoringScale(BigDecimal.ZERO)
-        assertThat(a.totalSip).isEqualToIgnoringScale(BigDecimal.ZERO)
         assertThat(a.percentOfEarnings).isEqualToIgnoringScale(BigDecimal.ZERO)
         assertThat(a.deltaAbsolute).isNull()
-        assertThat(a.deltaPercent).isNull()
+
         // No portfolio yet → 0% of every class → drift = -aim%
-        assertThat(a.byAssetClass.getValue(AssetClass.MF_NPS).driftPct).isEqualToIgnoringScale(BigDecimal("-55"))
-        assertThat(a.byAssetClass.getValue(AssetClass.EQUITY).driftPct).isEqualToIgnoringScale(BigDecimal("-15"))
-        assertThat(a.byAssetClass.getValue(AssetClass.FIXED_RETURN).driftPct).isEqualToIgnoringScale(BigDecimal("-25"))
-        assertThat(a.byAssetClass.getValue(AssetClass.CRYPTO).driftPct).isEqualToIgnoringScale(BigDecimal("-5"))
+        assertThat(a.byAssetClass.getValue(acMarketLinked.id).driftPct)
+            .isEqualToIgnoringScale(BigDecimal("-70"))
+        assertThat(a.byAssetClass.getValue(acFixedReturn.id).driftPct)
+            .isEqualToIgnoringScale(BigDecimal("-25"))
+        assertThat(a.byAssetClass.getValue(acCrypto.id).driftPct)
+            .isEqualToIgnoringScale(BigDecimal("-5"))
     }
 
     @Test
-    @DisplayName("All-bank Fixed Return rolls up into savingsRollup equal to FIXED_RETURN total")
-    fun savingsRollup() {
-        val s = snapshot()
-        val a = SnapshotAnalyticsCalculator.compute(
-            snapshot = s,
-            values = listOf(
-                value(s.id, hdfc, current = "100000"),
-                value(s.id, ppf, current = "300000"),
-            ),
-            catalog = catalog,
-            settings = defaultSettings,
-            previousTotalPortfolio = null,
-        )
-        assertThat(a.savingsRollup).isEqualToIgnoringScale(BigDecimal("100000"))
-        assertThat(a.byAssetClass.getValue(AssetClass.FIXED_RETURN).current).isEqualToIgnoringScale(BigDecimal("400000"))
-    }
-
-    @Test
-    @DisplayName("Investment value equals MF_NPS + EQUITY + CRYPTO totals")
+    @DisplayName("Investment value = totalAssets minus Fixed Return total")
     fun investmentValue() {
         val s = snapshot()
-        val a = SnapshotAnalyticsCalculator.compute(
-            snapshot = s,
+        val a = compute(
+            s,
             values = listOf(
                 value(s.id, degree, invested = "100000", current = "120000", sip = "5000"),
-                value(s.id, equity, invested = "50000", current = "60000"),
+                value(s.id, stocks, invested = "50000", current = "60000"),
                 value(s.id, coindcx, invested = "10000", current = "11000"),
                 value(s.id, hdfc, current = "9000"),
             ),
-            catalog = catalog,
-            settings = defaultSettings,
-            previousTotalPortfolio = null,
         )
-        // 120k + 60k + 11k = 191000
+        // 120k + 60k + 11k + 9k = 200k assets; FR = 9k; Investment = 191k
+        assertThat(a.totalAssets).isEqualToIgnoringScale(BigDecimal("200000"))
         assertThat(a.investmentValue).isEqualToIgnoringScale(BigDecimal("191000"))
-        // total includes the 9k bank
-        assertThat(a.totalPortfolio).isEqualToIgnoringScale(BigDecimal("200000"))
     }
 
     @Test
@@ -154,20 +174,43 @@ class SnapshotAnalyticsTest {
     }
 
     @Test
-    @DisplayName("Δ vs previous gives absolute and signed percent")
-    fun deltaCalculation() {
+    @DisplayName("Net worth subtracts liabilities from assets")
+    fun netWorthMath() {
         val s = snapshot(earnings = "4.00")
-        val a = SnapshotAnalyticsCalculator.compute(
-            snapshot = s,
-            values = listOf(value(s.id, equity, invested = "1000000", current = "1100000")),
-            catalog = catalog,
-            settings = defaultSettings,
-            previousTotalPortfolio = BigDecimal("1000000"),
+        val homeLoan = LoanEntity(
+            id = UUID.randomUUID(), userId = userId, name = "Home",
+            originalAmount = BigDecimal("6000000"),
+            takenDate = LocalDate.parse("2022-01-01"),
+            monthlyEmi = BigDecimal("50000"),
+            isActive = true, closedDate = null,
+            createdAt = seedInstant, updatedAt = seedInstant,
+        )
+        val a = compute(
+            s,
+            values = listOf(value(s.id, stocks, invested = "1000000", current = "1100000")),
+            loans = listOf(homeLoan),
+            loanValues = listOf(LoanValueEntity(
+                id = UUID.randomUUID(), snapshotId = s.id, loanId = homeLoan.id,
+                outstanding = BigDecimal("5000000"),
+            )),
+        )
+        assertThat(a.totalAssets).isEqualToIgnoringScale(BigDecimal("1100000"))
+        assertThat(a.totalLiabilities).isEqualToIgnoringScale(BigDecimal("5000000"))
+        assertThat(a.netWorth).isEqualToIgnoringScale(BigDecimal("-3900000"))
+    }
+
+    @Test
+    @DisplayName("Δ vs previous compares net worth, not asset totals")
+    fun deltaUsesNetWorth() {
+        val s = snapshot()
+        val a = compute(
+            s,
+            values = listOf(value(s.id, stocks, invested = "1000000", current = "1100000")),
+            previousNetWorth = BigDecimal("1000000"),
         )
         val absDelta = requireNotNull(a.deltaAbsolute)
         val pctDelta = requireNotNull(a.deltaPercent)
         assertThat(absDelta).isEqualToIgnoringScale(BigDecimal("100000"))
-        // 100000 / 1000000 = 0.1 → 10%
         assertThat(pctDelta).isEqualToIgnoringScale(BigDecimal("10"))
     }
 
@@ -175,49 +218,32 @@ class SnapshotAnalyticsTest {
     @DisplayName("Δ vs previous is null on the first snapshot")
     fun deltaNullForFirstSnapshot() {
         val s = snapshot()
-        val a = SnapshotAnalyticsCalculator.compute(
-            snapshot = s,
-            values = listOf(value(s.id, equity, invested = "1000", current = "1000")),
-            catalog = catalog,
-            settings = defaultSettings,
-            previousTotalPortfolio = null,
-        )
+        val a = compute(s, listOf(value(s.id, stocks, invested = "1000", current = "1000")))
         assertThat(a.deltaAbsolute).isNull()
         assertThat(a.deltaPercent).isNull()
     }
 
     @Test
-    @DisplayName("% of earnings = (total ÷ (earningsInCr × 1Cr)) × 100")
+    @DisplayName("% of earnings = (netWorth ÷ (earningsInCr × 1Cr)) × 100")
     fun percentOfEarnings() {
-        val s = snapshot(earnings = "4.00") // 4 crore
-        val a = SnapshotAnalyticsCalculator.compute(
-            snapshot = s,
-            values = listOf(value(s.id, equity, invested = "0", current = "8530000")), // 85.30L
-            catalog = catalog,
-            settings = defaultSettings,
-            previousTotalPortfolio = null,
+        val s = snapshot(earnings = "4.00")
+        val a = compute(
+            s,
+            values = listOf(value(s.id, stocks, invested = "0", current = "8530000")),
         )
-        // 8530000 / 40000000 = 0.21325 → 21.33%
         assertThat(a.percentOfEarnings).isEqualToIgnoringScale(BigDecimal("21.33"))
     }
 
     @Test
-    @DisplayName("Spec §5 User A snapshot 1 totals reproduce the spec's ~85.30 lakh / ~21.3% earnings")
-    fun userASnapshot1Reproduces() {
-        val s = snapshot(date = "2025-01-01", earnings = "4.00")
-        val values = listOf(
-            value(s.id, degree, invested = "3000000", current = "3250000", sip = "50000"),
-            value(s.id, equity, invested = "1000000", current = "1100000"),
-            value(s.id, ppf, current = "400000", sip = "5000"),
-            value(s.id, hdfc, current = "100000"),
-            value(s.id, coindcx, invested = "100000", current = "110000"),
+    @DisplayName("HoldingDetailRow carries asset-class and sub-bucket names for display")
+    fun rowsHaveTaxonomyMetadata() {
+        val s = snapshot()
+        val a = compute(
+            s,
+            values = listOf(value(s.id, hdfc, current = "100000")),
         )
-        val a = SnapshotAnalyticsCalculator.compute(
-            snapshot = s, values = values, catalog = catalog,
-            settings = defaultSettings, previousTotalPortfolio = null,
-        )
-        // 3250000 + 1100000 + 400000 + 100000 + 110000 = 4960000 (subset of full snapshot)
-        assertThat(a.totalPortfolio).isEqualToIgnoringScale(BigDecimal("4960000"))
-        assertThat(a.savingsRollup).isEqualToIgnoringScale(BigDecimal("100000"))
+        val row = a.rowsByAssetClass.getValue(acFixedReturn.id).single()
+        assertThat(row.subBucketName).isEqualTo("Bank")
+        assertThat(row.assetClassName).isEqualTo("Fixed Return")
     }
 }

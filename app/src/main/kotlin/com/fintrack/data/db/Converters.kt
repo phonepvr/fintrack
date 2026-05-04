@@ -1,7 +1,8 @@
 package com.fintrack.data.db
 
 import androidx.room.TypeConverter
-import com.fintrack.domain.model.AssetClass
+import com.fintrack.domain.model.GoalType
+import com.fintrack.domain.model.MilestoneType
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import java.math.BigDecimal
@@ -31,6 +32,10 @@ class Converters {
     @TypeConverter fun bigDecimalToString(value: BigDecimal?): String? = value?.normalise()?.toPlainString()
     @TypeConverter fun stringToBigDecimal(value: String?): BigDecimal? = value?.let(::BigDecimal)?.normalise()
 
-    @TypeConverter fun assetClassToString(value: AssetClass?): String? = value?.name
-    @TypeConverter fun stringToAssetClass(value: String?): AssetClass? = value?.let(AssetClass::valueOf)
+    @TypeConverter fun milestoneTypeToString(value: MilestoneType?): String? = value?.name
+    @TypeConverter fun stringToMilestoneType(value: String?): MilestoneType? =
+        value?.let(MilestoneType::valueOf)
+
+    @TypeConverter fun goalTypeToString(value: GoalType?): String? = value?.name
+    @TypeConverter fun stringToGoalType(value: String?): GoalType? = value?.let(GoalType::valueOf)
 }

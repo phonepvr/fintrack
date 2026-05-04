@@ -2,9 +2,9 @@ package com.fintrack.data.repo
 
 import androidx.room.withTransaction
 import com.fintrack.data.db.FintrackDatabase
+import com.fintrack.data.db.entities.AimAllocationEntity
 import com.fintrack.data.db.entities.UserEntity
-import com.fintrack.data.db.entities.UserSettingsEntity
-import com.fintrack.domain.model.AssetClass
+import com.fintrack.data.db.seed.SeedData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Clock
 import java.util.UUID
@@ -16,7 +16,7 @@ class UserRepository @Inject constructor(
     private val database: FintrackDatabase,
 ) {
     private val users get() = database.userDao()
-    private val settings get() = database.userSettingsDao()
+    private val aim get() = database.aimAllocationDao()
     private val global get() = database.globalSettingsDao()
 
     fun observeActiveUsers(): Flow<List<UserEntity>> = users.observeActiveUsers()
@@ -30,10 +30,10 @@ class UserRepository @Inject constructor(
     suspend fun getUser(userId: UUID): UserEntity? = users.getUser(userId)
 
     /**
-     * Creates a user, seeds their [UserSettingsEntity] with default aim
-     * percentages from [AssetClass], and (when [makeActive] is true) writes
-     * the new id into [GlobalSettingsEntity.activeUserId]. Wrapped in a
-     * transaction so partial state can never reach disk.
+     * Creates a user, seeds their AimAllocation rows from the spec defaults
+     * (Market Linked 70 / Fixed Return 25 / Crypto 5), and (when [makeActive]
+     * is true) writes the new id into GlobalSettings.activeUserId. Wrapped in
+     * a transaction so partial state can never reach disk.
      */
     suspend fun createUser(
         name: String,
@@ -49,15 +49,10 @@ class UserRepository @Inject constructor(
         )
         database.withTransaction {
             users.insert(user)
-            settings.upsert(
-                UserSettingsEntity(
-                    userId = user.id,
-                    aimPctMfNps = AssetClass.MF_NPS.defaultAimPct,
-                    aimPctEquity = AssetClass.EQUITY.defaultAimPct,
-                    aimPctFixedReturn = AssetClass.FIXED_RETURN.defaultAimPct,
-                    aimPctCrypto = AssetClass.CRYPTO.defaultAimPct,
-                ),
-            )
+            val seedRows = SeedData.defaultAimPercentByAssetClass.map { (acId, pct) ->
+                AimAllocationEntity(userId = user.id, assetClassId = acId, aimPercent = pct)
+            }
+            aim.upsertAll(seedRows)
             if (makeActive) {
                 global.setActiveUserId(user.id)
             }
@@ -71,9 +66,10 @@ class UserRepository @Inject constructor(
     }
 
     /**
-     * Hard-cascade delete: snapshots and user_settings go via FK ON DELETE
-     * CASCADE. Caller must verify [activeUserCount] > 1 before invoking — the
-     * UI also disables the affordance, this is belt-and-braces.
+     * Hard-cascade delete: snapshots, aim allocations, loans, milestones,
+     * goals, streak state all cascade via the FK on userId. Caller must
+     * verify [activeUserCount] > 1 before invoking — the UI also disables
+     * the affordance, this is belt-and-braces.
      */
     suspend fun deleteUser(userId: UUID) {
         check(users.activeUserCount() > 1) { "Cannot delete the last remaining user." }

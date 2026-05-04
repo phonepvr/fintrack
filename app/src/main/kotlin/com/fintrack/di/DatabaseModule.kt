@@ -5,12 +5,19 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.fintrack.data.db.FintrackDatabase
+import com.fintrack.data.db.dao.AimAllocationDao
+import com.fintrack.data.db.dao.AssetClassDao
 import com.fintrack.data.db.dao.GlobalSettingsDao
+import com.fintrack.data.db.dao.GoalDao
 import com.fintrack.data.db.dao.HoldingDao
 import com.fintrack.data.db.dao.HoldingValueDao
+import com.fintrack.data.db.dao.LoanDao
+import com.fintrack.data.db.dao.LoanValueDao
+import com.fintrack.data.db.dao.MilestoneDao
 import com.fintrack.data.db.dao.SnapshotDao
+import com.fintrack.data.db.dao.StreakStateDao
+import com.fintrack.data.db.dao.SubBucketDao
 import com.fintrack.data.db.dao.UserDao
-import com.fintrack.data.db.dao.UserSettingsDao
 import com.fintrack.data.db.seed.SeedData
 import com.fintrack.security.KeystorePassphraseStore
 import dagger.Module
@@ -31,11 +38,7 @@ object DatabaseModule {
         @ApplicationContext context: Context,
         passphraseStore: KeystorePassphraseStore,
     ): FintrackDatabase {
-        // Load the SQLCipher native library before any DB open. Idempotent —
-        // safe to call from a Hilt provider that may be invoked once per
-        // process.
         System.loadLibrary("sqlcipher")
-
         val passphrase: ByteArray = passphraseStore.getOrCreate()
         val factory = SupportOpenHelperFactory(passphrase)
 
@@ -45,16 +48,17 @@ object DatabaseModule {
             FintrackDatabase.DATABASE_NAME,
         )
             .openHelperFactory(factory)
+            // v3 is a clean rebuild from v2 — v2 only ever held dummy data.
+            // No migration files; if Room sees a schema mismatch, drop and rebuild.
+            .fallbackToDestructiveMigration(true)
             .addCallback(object : RoomDatabase.Callback() {
                 override fun onCreate(db: SupportSQLiteDatabase) {
                     super.onCreate(db)
-                    // First-launch seed: holdings catalog + singleton GlobalSettings row.
                     seedOnCreate(db)
                 }
 
                 override fun onOpen(db: SupportSQLiteDatabase) {
                     super.onOpen(db)
-                    // Self-heal: ensure the GlobalSettings singleton row is always present.
                     db.execSQL(
                         "INSERT OR IGNORE INTO global_settings " +
                             "(id, inactivity_lock_seconds, default_currency_symbol, active_user_id, always_show_profile_picker) " +
@@ -63,9 +67,6 @@ object DatabaseModule {
                 }
             })
             .build()
-        // Note: Room is lazy — the file isn't actually opened until the first
-        // DAO call, so the SQLCipher key check happens off the main thread on
-        // first use rather than during DI provisioning.
     }
 
     private fun seedOnCreate(db: SupportSQLiteDatabase) {
@@ -75,18 +76,39 @@ object DatabaseModule {
                 "VALUES (?, ?, ?, NULL, 0)",
             arrayOf<Any>(1, 60, "₹"),
         )
+
+        // Seed AssetClass rows first.
+        val nowIso = kotlinx.datetime.Clock.System.now().toString()
+        for (ac in SeedData.defaultAssetClasses) {
+            db.execSQL(
+                "INSERT OR IGNORE INTO asset_classes " +
+                    "(id, name, display_order, is_seeded, is_active, created_at) " +
+                    "VALUES (?, ?, ?, 1, 1, ?)",
+                arrayOf(ac.id.toString(), ac.name, ac.displayOrder, nowIso),
+            )
+        }
+        // Then SubBucket rows.
+        for (sb in SeedData.defaultSubBuckets) {
+            db.execSQL(
+                "INSERT OR IGNORE INTO sub_buckets " +
+                    "(id, asset_class_id, name, display_order, is_seeded, is_active, created_at) " +
+                    "VALUES (?, ?, ?, ?, 1, 1, ?)",
+                arrayOf(
+                    sb.id.toString(), sb.assetClassId.toString(),
+                    sb.name, sb.displayOrder, nowIso,
+                ),
+            )
+        }
+        // Then Holdings — all reference a seeded SubBucket.
         for (h in SeedData.defaultHoldings) {
             db.execSQL(
                 "INSERT OR IGNORE INTO holdings " +
-                    "(id, name, asset_class, track_invested, track_sip, is_bank_account, is_active, display_order) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                    "(id, sub_bucket_id, name, track_invested, track_sip, is_active, display_order) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)",
                 arrayOf(
-                    h.id.toString(),
-                    h.name,
-                    h.assetClass.name,
+                    h.id.toString(), h.subBucketId.toString(), h.name,
                     if (h.trackInvested) 1 else 0,
                     if (h.trackSip) 1 else 0,
-                    if (h.isBankAccount) 1 else 0,
                     if (h.isActive) 1 else 0,
                     h.displayOrder,
                 ),
@@ -95,9 +117,16 @@ object DatabaseModule {
     }
 
     @Provides fun provideUserDao(db: FintrackDatabase): UserDao = db.userDao()
-    @Provides fun provideUserSettingsDao(db: FintrackDatabase): UserSettingsDao = db.userSettingsDao()
     @Provides fun provideGlobalSettingsDao(db: FintrackDatabase): GlobalSettingsDao = db.globalSettingsDao()
+    @Provides fun provideAssetClassDao(db: FintrackDatabase): AssetClassDao = db.assetClassDao()
+    @Provides fun provideSubBucketDao(db: FintrackDatabase): SubBucketDao = db.subBucketDao()
     @Provides fun provideHoldingDao(db: FintrackDatabase): HoldingDao = db.holdingDao()
+    @Provides fun provideAimAllocationDao(db: FintrackDatabase): AimAllocationDao = db.aimAllocationDao()
     @Provides fun provideSnapshotDao(db: FintrackDatabase): SnapshotDao = db.snapshotDao()
     @Provides fun provideHoldingValueDao(db: FintrackDatabase): HoldingValueDao = db.holdingValueDao()
+    @Provides fun provideLoanDao(db: FintrackDatabase): LoanDao = db.loanDao()
+    @Provides fun provideLoanValueDao(db: FintrackDatabase): LoanValueDao = db.loanValueDao()
+    @Provides fun provideStreakStateDao(db: FintrackDatabase): StreakStateDao = db.streakStateDao()
+    @Provides fun provideMilestoneDao(db: FintrackDatabase): MilestoneDao = db.milestoneDao()
+    @Provides fun provideGoalDao(db: FintrackDatabase): GoalDao = db.goalDao()
 }

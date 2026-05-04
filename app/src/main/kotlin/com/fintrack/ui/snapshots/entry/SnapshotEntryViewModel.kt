@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.fintrack.data.repo.HoldingValueDraft
 import com.fintrack.data.repo.HoldingRepository
 import com.fintrack.data.repo.SnapshotRepository
+import com.fintrack.data.repo.TaxonomyRepository
 import com.fintrack.domain.UserScope
-import com.fintrack.domain.model.AssetClass
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,8 +25,10 @@ import javax.inject.Inject
 data class HoldingFieldsState(
     val holdingId: UUID,
     val name: String,
-    val assetClass: AssetClass,
-    val isBank: Boolean,
+    val subBucketId: UUID,
+    val subBucketName: String,
+    val assetClassId: UUID,
+    val assetClassName: String,
     val trackInvested: Boolean,
     val trackSip: Boolean,
     val invested: String = "",
@@ -50,6 +52,7 @@ data class SnapshotEntryUiState(
 class SnapshotEntryViewModel @Inject constructor(
     private val snapshotRepository: SnapshotRepository,
     private val holdingRepository: HoldingRepository,
+    private val taxonomyRepository: TaxonomyRepository,
     private val userScope: UserScope,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -71,12 +74,18 @@ class SnapshotEntryViewModel @Inject constructor(
             return
         }
         val holdings = holdingRepository.observeActive().first()
-        val rowsTemplate = holdings.map { h ->
+        val subBuckets = taxonomyRepository.getActiveSubBuckets().associateBy { it.id }
+        val assetClasses = taxonomyRepository.getActiveAssetClasses().associateBy { it.id }
+        val rowsTemplate = holdings.mapNotNull { h ->
+            val sb = subBuckets[h.subBucketId] ?: return@mapNotNull null
+            val ac = assetClasses[sb.assetClassId] ?: return@mapNotNull null
             HoldingFieldsState(
                 holdingId = h.id,
                 name = h.name,
-                assetClass = h.assetClass,
-                isBank = h.isBankAccount,
+                subBucketId = sb.id,
+                subBucketName = sb.name,
+                assetClassId = ac.id,
+                assetClassName = ac.name,
                 trackInvested = h.trackInvested,
                 trackSip = h.trackSip,
             )

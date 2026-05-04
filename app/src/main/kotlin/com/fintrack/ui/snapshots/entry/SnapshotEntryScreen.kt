@@ -47,7 +47,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.fintrack.domain.model.AssetClass
 import com.fintrack.domain.util.formatIndianCurrency
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
@@ -135,8 +134,14 @@ private fun SnapshotEntryForm(
     onSetNotes: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val grouped: Map<AssetClass, List<HoldingFieldsState>> = remember(state.rows) {
-        state.rows.groupBy { it.assetClass }
+    // Phase A: order rows by assetClass display order (the asset-class id is
+    // already on each row from the VM hydrator). Phase B introduces the new
+    // three-level grouping. For now we render assetClass → sub-bucket sub-headers.
+    val orderedAssetClassNames: List<String> = remember(state.rows) {
+        state.rows.map { it.assetClassName }.distinct()
+    }
+    val rowsByClass: Map<String, List<HoldingFieldsState>> = remember(state.rows) {
+        state.rows.groupBy { it.assetClassName }
     }
     var showDatePicker by remember { mutableStateOf(false) }
 
@@ -158,27 +163,16 @@ private fun SnapshotEntryForm(
             Spacer(Modifier.height(8.dp))
         }
 
-        for (assetClass in AssetClass.entries) {
-            val rows = grouped[assetClass].orEmpty()
+        for (acName in orderedAssetClassNames) {
+            val rows = rowsByClass[acName].orEmpty()
             if (rows.isEmpty()) continue
-            item(key = "section_$assetClass") {
-                SectionHeader(assetClass.displayName)
-            }
-            // For Fixed Return, show non-banks first then a "Banks" sub-header.
-            val (nonBanks, banks) = rows.partition { !it.isBank }
-            items(nonBanks, key = { "row_${it.holdingId}" }) { row ->
-                HoldingRow(
-                    row = row,
-                    onInvested = { onSetInvested(row.holdingId, it) },
-                    onCurrent = { onSetCurrent(row.holdingId, it) },
-                    onSip = { onSetSip(row.holdingId, it) },
-                )
-            }
-            if (banks.isNotEmpty()) {
-                item(key = "banks_header_$assetClass") {
-                    SubSectionHeader("Banks")
-                }
-                items(banks, key = { "row_${it.holdingId}" }) { row ->
+            item(key = "section_$acName") { SectionHeader(acName) }
+            val rowsBySubBucket = rows.groupBy { it.subBucketName }
+            for (sbName in rows.map { it.subBucketName }.distinct()) {
+                val sbRows = rowsBySubBucket[sbName].orEmpty()
+                if (sbRows.isEmpty()) continue
+                item(key = "subhead_${acName}_$sbName") { SubSectionHeader(sbName) }
+                items(sbRows, key = { "row_${it.holdingId}" }) { row ->
                     HoldingRow(
                         row = row,
                         onInvested = { onSetInvested(row.holdingId, it) },

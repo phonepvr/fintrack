@@ -44,8 +44,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.fintrack.domain.analytics.AssetClassSummary
 import com.fintrack.domain.analytics.DriftBand
 import com.fintrack.domain.analytics.HoldingDetailRow
+import com.fintrack.domain.analytics.LoanDetailRow
 import com.fintrack.domain.analytics.SnapshotAnalytics
-import com.fintrack.domain.model.AssetClass
 import com.fintrack.domain.util.formatIndianCurrency
 import com.fintrack.domain.util.formatPercent
 import com.fintrack.domain.util.formatSignedCurrency
@@ -53,7 +53,7 @@ import com.fintrack.domain.util.formatSignedPercent
 import com.fintrack.ui.theme.DriftOff
 import com.fintrack.ui.theme.DriftWarn
 import com.fintrack.ui.theme.DriftWithin
-import java.math.BigDecimal
+import java.util.UUID
 
 @Composable
 fun SnapshotDetailRoute(
@@ -90,9 +90,7 @@ fun SnapshotDetailRoute(
             state.error != null -> Box(
                 modifier = Modifier.fillMaxSize().padding(padding),
                 contentAlignment = Alignment.Center,
-            ) {
-                Text(state.error.orEmpty(), color = MaterialTheme.colorScheme.error)
-            }
+            ) { Text(state.error.orEmpty(), color = MaterialTheme.colorScheme.error) }
 
             analytics != null -> SnapshotDetailContent(
                 analytics = analytics,
@@ -110,33 +108,27 @@ private fun SnapshotDetailContent(
     analytics: SnapshotAnalytics,
     modifier: Modifier = Modifier,
 ) {
+    val assetClassOrder: List<UUID> = analytics.byAssetClass.keys.toList()
+
     LazyColumn(
         modifier = modifier,
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        item { AllocationTable(analytics) }
+        item { AllocationTable(analytics, assetClassOrder) }
         item { FooterChips(analytics) }
 
-        for (assetClass in AssetClass.entries) {
-            val rows = analytics.rowsByAssetClass[assetClass].orEmpty()
+        for (assetClassId in assetClassOrder) {
+            val rows = analytics.rowsByAssetClass[assetClassId].orEmpty()
             if (rows.isEmpty()) continue
-            item(key = "card_$assetClass") {
-                if (assetClass == AssetClass.FIXED_RETURN) {
-                    FixedReturnBreakdownCard(rows = rows, savingsRollup = analytics.savingsRollup)
-                } else {
-                    BreakdownCard(title = assetClass.displayName, rows = rows)
-                }
+            val name = analytics.byAssetClass[assetClassId]?.assetClassName ?: "Asset class"
+            item(key = "card_$assetClassId") {
+                BreakdownCard(title = name, rows = rows)
             }
         }
 
-        // Banks card — separate from Fixed Return per spec §4.6.
-        val banks = analytics.rowsByAssetClass[AssetClass.FIXED_RETURN]
-            ?.filter { it.isBank }.orEmpty()
-        if (banks.isNotEmpty()) {
-            item(key = "banks") {
-                BanksCard(rows = banks)
-            }
+        if (analytics.loanRows.isNotEmpty()) {
+            item(key = "loans") { LoansCard(rows = analytics.loanRows, totalLiabilities = analytics.totalLiabilities) }
         }
 
         analytics.notes?.let { notes ->
@@ -155,7 +147,7 @@ private fun SnapshotDetailContent(
 }
 
 @Composable
-private fun AllocationTable(analytics: SnapshotAnalytics) {
+private fun AllocationTable(analytics: SnapshotAnalytics, assetClassOrder: List<UUID>) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
@@ -166,8 +158,8 @@ private fun AllocationTable(analytics: SnapshotAnalytics) {
                 modifier = Modifier.padding(vertical = 6.dp),
                 color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
             )
-            for (assetClass in AssetClass.entries) {
-                val summary = analytics.byAssetClass.getValue(assetClass)
+            for (assetClassId in assetClassOrder) {
+                val summary = analytics.byAssetClass[assetClassId] ?: continue
                 AllocationDataRow(summary)
             }
         }
@@ -178,7 +170,6 @@ private fun AllocationTable(analytics: SnapshotAnalytics) {
 private fun AllocationHeaderRow() {
     Row(modifier = Modifier.fillMaxWidth()) {
         AllocCell("Class", weight = 1.4f, header = true)
-        AllocCell("Risk", weight = 1f, header = true)
         AllocCell("Current", weight = 1.2f, header = true)
         AllocCell("Cur %", weight = 0.8f, header = true)
         AllocCell("Aim %", weight = 0.8f, header = true)
@@ -189,8 +180,7 @@ private fun AllocationHeaderRow() {
 @Composable
 private fun AllocationDataRow(summary: AssetClassSummary) {
     Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
-        AllocCell(summary.assetClass.displayName, weight = 1.4f)
-        AllocCell(summary.assetClass.riskLabel, weight = 1f)
+        AllocCell(summary.assetClassName, weight = 1.4f)
         AllocCell(formatIndianCurrency(summary.current), weight = 1.2f)
         AllocCell(formatPercent(summary.currentPct), weight = 0.8f)
         AllocCell("${summary.aimPct}%", weight = 0.8f)
@@ -228,13 +218,15 @@ private fun FooterChips(analytics: SnapshotAnalytics) {
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
     ) {
         Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            FooterRow("Total Portfolio", formatIndianCurrency(analytics.totalPortfolio), bold = true)
+            FooterRow("Net Worth", formatIndianCurrency(analytics.netWorth), bold = true)
+            FooterRow("Total Assets", formatIndianCurrency(analytics.totalAssets))
+            if (analytics.totalLiabilities.signum() > 0) {
+                FooterRow("Total Liabilities", formatIndianCurrency(analytics.totalLiabilities), color = DriftOff)
+            }
             FooterRow("Total Invested", formatIndianCurrency(analytics.totalInvested))
             FooterRow("Total SIP", formatIndianCurrency(analytics.totalSip))
             FooterRow("% of Earnings", formatPercent(analytics.percentOfEarnings))
             FooterRow("Investment value", formatIndianCurrency(analytics.investmentValue))
-            FooterRow("Fixed Return total",
-                formatIndianCurrency(analytics.byAssetClass.getValue(AssetClass.FIXED_RETURN).current))
             val deltaAbs = analytics.deltaAbsolute
             val deltaPct = analytics.deltaPercent
             if (deltaAbs != null && deltaPct != null) {
@@ -255,11 +247,15 @@ private fun FooterRow(
     bold: Boolean = false,
     color: Color = MaterialTheme.colorScheme.onSurface,
 ) {
-    Row(modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween) {
-        Text(label,
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text(
+            label,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant)
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
         Text(
             value,
             style = MaterialTheme.typography.bodyMedium,
@@ -273,62 +269,83 @@ private fun FooterRow(
 private fun BreakdownCard(title: String, rows: List<HoldingDetailRow>) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(12.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
-            HorizontalDivider(modifier = Modifier.padding(vertical = 6.dp),
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
-            rows.forEach { row -> HoldingLine(row) }
-        }
-    }
-}
-
-@Composable
-private fun FixedReturnBreakdownCard(
-    rows: List<HoldingDetailRow>,
-    savingsRollup: BigDecimal,
-) {
-    val nonBank = rows.filter { !it.isBank }
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            Text("Fixed Return", style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
-            HorizontalDivider(modifier = Modifier.padding(vertical = 6.dp),
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
-            nonBank.forEach { row -> HoldingLine(row) }
-            // Spec §4.6: synthetic "Savings (Banks)" row inside Fixed Return card.
-            if (savingsRollup.signum() > 0) {
-                Spacer(Modifier.height(4.dp))
-                Row(modifier = Modifier.fillMaxWidth()
-                    .clip(RoundedCornerShape(6.dp))
-                    .background(MaterialTheme.colorScheme.surfaceContainer)
-                    .padding(horizontal = 8.dp, vertical = 6.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("Savings (Banks)", style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium)
-                    Text(formatIndianCurrency(savingsRollup),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.SemiBold)
+            Text(
+                title,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.SemiBold,
+            )
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 6.dp),
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+            )
+            // Group inside the card by sub-bucket so the user sees the v3 hierarchy.
+            val bySub = rows.groupBy { it.subBucketName }
+            for (subName in rows.map { it.subBucketName }.distinct()) {
+                val sbRows = bySub[subName].orEmpty()
+                if (sbRows.isEmpty()) continue
+                if (rows.map { it.subBucketName }.distinct().size > 1) {
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        subName,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 4.dp, bottom = 2.dp),
+                    )
                 }
+                sbRows.forEach { row -> HoldingLine(row) }
             }
         }
     }
 }
 
 @Composable
-private fun BanksCard(rows: List<HoldingDetailRow>) {
+private fun LoansCard(rows: List<LoanDetailRow>, totalLiabilities: java.math.BigDecimal) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(12.dp)) {
-            Text("Banks", style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
-            HorizontalDivider(modifier = Modifier.padding(vertical = 6.dp),
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+            Text(
+                "Loans",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.SemiBold,
+            )
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 6.dp),
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+            )
             rows.forEach { row ->
-                Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(row.name, style = MaterialTheme.typography.bodyMedium)
-                    Text(formatIndianCurrency(row.current), style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.SemiBold)
+                Column(modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
+                    Row(modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text(row.name, style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium)
+                        Text(formatIndianCurrency(row.outstanding),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = DriftOff)
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(top = 2.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        MetaChip("Original", formatIndianCurrency(row.originalAmount))
+                        MetaChip("EMI", formatIndianCurrency(row.monthlyEmi))
+                        MetaChip("Taken", row.takenDate.toString())
+                    }
                 }
+            }
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 6.dp),
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+            )
+            Row(modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween) {
+                Text("Total Liabilities", fontWeight = FontWeight.SemiBold)
+                Text(
+                    formatIndianCurrency(totalLiabilities),
+                    fontWeight = FontWeight.SemiBold,
+                    color = DriftOff,
+                )
             }
         }
     }
@@ -345,11 +362,11 @@ private fun HoldingLine(row: HoldingDetailRow) {
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold)
         }
-        Row(modifier = Modifier.fillMaxWidth().padding(top = 2.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            row.invested?.let { v ->
-                MetaChip("Invested", formatIndianCurrency(v))
-            }
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(top = 2.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            row.invested?.let { v -> MetaChip("Invested", formatIndianCurrency(v)) }
             row.sip?.takeIf { it.signum() > 0 }?.let { v ->
                 MetaChip("SIP", formatIndianCurrency(v))
             }
@@ -363,8 +380,7 @@ private fun MetaChip(label: String, value: String) {
         onClick = {},
         label = {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(label,
-                    style = MaterialTheme.typography.labelSmall,
+                Text(label, style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(Modifier.width(6.dp))
                 Text(value, style = MaterialTheme.typography.labelMedium)
@@ -381,3 +397,11 @@ private fun DriftBand.toColor(): Color = when (this) {
     DriftBand.WARN -> DriftWarn
     DriftBand.OFF -> DriftOff
 }
+
+// Avoid an unused-import warning if someone builds without RoundedCornerShape ref.
+@Suppress("unused")
+private val ROUNDED_REF = RoundedCornerShape(0.dp)
+
+// Keep `background` import live for future refactors.
+@Suppress("unused")
+private val BG_REF = Modifier.background(Color.Transparent)

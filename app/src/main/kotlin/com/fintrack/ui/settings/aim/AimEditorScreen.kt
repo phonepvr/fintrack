@@ -12,9 +12,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,35 +42,41 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.fintrack.data.db.entities.UserSettingsEntity
-import com.fintrack.data.repo.UserSettingsRepository
+import com.fintrack.data.db.entities.AimAllocationEntity
+import com.fintrack.data.db.entities.AssetClassEntity
+import com.fintrack.data.repo.AimAllocationRepository
+import com.fintrack.data.repo.TaxonomyRepository
 import com.fintrack.domain.UserScope
-import com.fintrack.domain.model.AssetClass
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Inject
+
+data class AimRowState(
+    val assetClassId: UUID,
+    val assetClassName: String,
+    val percent: Int,
+)
 
 data class AimEditorUiState(
     val loading: Boolean = true,
-    val mfNps: Int = 55,
-    val equity: Int = 15,
-    val fixedReturn: Int = 25,
-    val crypto: Int = 5,
+    val rows: List<AimRowState> = emptyList(),
     val saving: Boolean = false,
     val saved: Boolean = false,
     val error: String? = null,
 ) {
-    val sum: Int get() = mfNps + equity + fixedReturn + crypto
-    val canSave: Boolean get() = sum == 100 && !saving
+    val sum: Int get() = rows.sumOf { it.percent }
+    val canSave: Boolean get() = sum == 100 && !saving && rows.isNotEmpty()
 }
 
 @HiltViewModel
 class AimEditorViewModel @Inject constructor(
-    private val userSettingsRepository: UserSettingsRepository,
+    private val aimRepository: AimAllocationRepository,
+    private val taxonomyRepository: TaxonomyRepository,
     private val userScope: UserScope,
 ) : ViewModel() {
 
@@ -82,41 +90,54 @@ class AimEditorViewModel @Inject constructor(
                 _state.update { it.copy(loading = false, error = "No active profile") }
                 return@launch
             }
-            val s = userSettingsRepository.getOrDefault(activeUser)
-            _state.update {
-                it.copy(
-                    loading = false,
-                    mfNps = s.aimPctMfNps,
-                    equity = s.aimPctEquity,
-                    fixedReturn = s.aimPctFixedReturn,
-                    crypto = s.aimPctCrypto,
+            val classes: List<AssetClassEntity> = taxonomyRepository.getActiveAssetClasses()
+            val existing = aimRepository.getOrDefault(activeUser).associateBy { it.assetClassId }
+            val rows = classes.map { ac ->
+                AimRowState(
+                    assetClassId = ac.id,
+                    assetClassName = ac.name,
+                    percent = existing[ac.id]?.aimPercent ?: 0,
                 )
+            }
+            _state.update { it.copy(loading = false, rows = rows) }
+        }
+    }
+
+    fun setPercent(assetClassId: UUID, value: Int) {
+        val coerced = value.coerceIn(0, 100)
+        _state.update { ui ->
+            ui.copy(rows = ui.rows.map { if (it.assetClassId == assetClassId) it.copy(percent = coerced) else it })
+        }
+    }
+
+    fun distributeEvenly() {
+        _state.update { ui ->
+            if (ui.rows.isEmpty()) ui
+            else {
+                val per = 100 / ui.rows.size
+                val remainder = 100 - per * ui.rows.size
+                val rows = ui.rows.mapIndexed { idx, r ->
+                    r.copy(percent = if (idx == 0) per + remainder else per)
+                }
+                ui.copy(rows = rows)
             }
         }
     }
 
-    fun setMfNps(v: Int) = _state.update { it.copy(mfNps = v.coerceIn(0, 100)) }
-    fun setEquity(v: Int) = _state.update { it.copy(equity = v.coerceIn(0, 100)) }
-    fun setFixedReturn(v: Int) = _state.update { it.copy(fixedReturn = v.coerceIn(0, 100)) }
-    fun setCrypto(v: Int) = _state.update { it.copy(crypto = v.coerceIn(0, 100)) }
-
     fun save() {
         val s = _state.value
         if (!s.canSave) {
-            _state.update { it.copy(error = "Aim percentages must sum to exactly 100 (currently ${s.sum})") }
+            _state.update { it.copy(error = "Aim percentages must sum to 100 (currently ${s.sum})") }
             return
         }
         val activeUser = userScope.activeUserId.value ?: return
         _state.update { it.copy(saving = true, error = null) }
         viewModelScope.launch {
             runCatching {
-                userSettingsRepository.update(UserSettingsEntity(
+                aimRepository.replace(
                     userId = activeUser,
-                    aimPctMfNps = s.mfNps,
-                    aimPctEquity = s.equity,
-                    aimPctFixedReturn = s.fixedReturn,
-                    aimPctCrypto = s.crypto,
-                ))
+                    rows = s.rows.map { AimAllocationEntity(activeUser, it.assetClassId, it.percent) },
+                )
             }.fold(
                 onSuccess = { _state.update { it.copy(saving = false, saved = true) } },
                 onFailure = { e -> _state.update { it.copy(saving = false, error = e.message ?: "Save failed") } },
@@ -155,6 +176,7 @@ fun AimEditorRoute(
                     }
                 },
                 actions = {
+                    TextButton(onClick = viewModel::distributeEvenly) { Text("Distribute") }
                     TextButton(onClick = viewModel::save, enabled = state.canSave) {
                         Text(if (state.saving) "Saving…" else "Save")
                     }
@@ -176,32 +198,17 @@ fun AimEditorRoute(
         ) {
             item {
                 Text(
-                    "Set per-class aim percentages for the active profile. The Snapshot Detail's drift colours compare against these.",
+                    "Set aim percentages for each active asset class. The Snapshot Detail's drift colours compare against these.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             item { SumPill(sum = state.sum) }
-            item {
-                AimSlider("MF + NPS (Moderate)", state.mfNps, viewModel::setMfNps)
-            }
-            item {
-                AimSlider("Equity (Aggressive)", state.equity, viewModel::setEquity)
-            }
-            item {
-                AimSlider("Fixed Return (Safe)", state.fixedReturn, viewModel::setFixedReturn)
-            }
-            item {
-                AimSlider("Crypto (Very Aggressive)", state.crypto, viewModel::setCrypto)
-            }
-            item {
-                Text(
-                    "Defaults: MF + NPS ${AssetClass.MF_NPS.defaultAimPct}, " +
-                        "Equity ${AssetClass.EQUITY.defaultAimPct}, " +
-                        "Fixed ${AssetClass.FIXED_RETURN.defaultAimPct}, " +
-                        "Crypto ${AssetClass.CRYPTO.defaultAimPct}.",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+            items(state.rows, key = { it.assetClassId }) { row ->
+                AimSlider(
+                    label = row.assetClassName,
+                    value = row.percent,
+                    onChange = { viewModel.setPercent(row.assetClassId, it) },
                 )
             }
         }
@@ -212,13 +219,15 @@ fun AimEditorRoute(
 private fun SumPill(sum: Int) {
     val ok = sum == 100
     Card(
-        colors = androidx.compose.material3.CardDefaults.cardColors(
+        colors = CardDefaults.cardColors(
             containerColor = if (ok) MaterialTheme.colorScheme.primaryContainer
                              else MaterialTheme.colorScheme.errorContainer,
         ),
     ) {
-        Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp).fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp).fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
             Text("Total", fontWeight = FontWeight.SemiBold)
             Text(if (ok) "100% ✓" else "$sum% (must be 100)", fontWeight = FontWeight.SemiBold)
         }
@@ -228,8 +237,10 @@ private fun SumPill(sum: Int) {
 @Composable
 private fun AimSlider(label: String, value: Int, onChange: (Int) -> Unit) {
     Column {
-        Row(modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
             Text(label, style = MaterialTheme.typography.bodyMedium)
             Text("$value%", fontWeight = FontWeight.SemiBold)
         }

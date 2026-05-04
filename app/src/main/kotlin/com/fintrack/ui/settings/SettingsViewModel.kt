@@ -2,13 +2,13 @@ package com.fintrack.ui.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.fintrack.data.db.entities.AimAllocationEntity
 import com.fintrack.data.db.entities.GlobalSettingsEntity
 import com.fintrack.data.db.entities.UserEntity
-import com.fintrack.data.db.entities.UserSettingsEntity
+import com.fintrack.data.repo.AimAllocationRepository
 import com.fintrack.data.repo.GlobalSettingsRepository
 import com.fintrack.data.repo.HoldingRepository
 import com.fintrack.data.repo.UserRepository
-import com.fintrack.data.repo.UserSettingsRepository
 import com.fintrack.domain.UserScope
 import com.fintrack.security.InactivityTracker
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,7 +24,7 @@ import javax.inject.Inject
 
 data class SettingsTabUiState(
     val activeUser: UserEntity? = null,
-    val activeUserSettings: UserSettingsEntity? = null,
+    val activeUserAim: List<AimAllocationEntity> = emptyList(),
     val global: GlobalSettingsEntity? = null,
     val activeHoldingCount: Int = 0,
     val totalHoldingCount: Int = 0,
@@ -35,7 +35,7 @@ data class SettingsTabUiState(
 @HiltViewModel
 class SettingsTabViewModel @Inject constructor(
     private val userRepository: UserRepository,
-    private val userSettingsRepository: UserSettingsRepository,
+    private val aimAllocationRepository: AimAllocationRepository,
     private val globalSettingsRepository: GlobalSettingsRepository,
     private val holdingRepository: HoldingRepository,
     private val userScope: UserScope,
@@ -47,15 +47,16 @@ class SettingsTabViewModel @Inject constructor(
             if (id == null) flowOf<UserEntity?>(null) else userRepository.observeUser(id)
         },
         userScope.activeUserId.flatMapLatest { id ->
-            if (id == null) flowOf<UserSettingsEntity?>(null) else userSettingsRepository.observe(id)
+            if (id == null) flowOf<List<AimAllocationEntity>>(emptyList())
+            else aimAllocationRepository.observeForUser(id)
         },
         globalSettingsRepository.observe(),
         holdingRepository.observeAll(),
         userRepository.observeActiveUsers(),
-    ) { user, settings, global, allHoldings, users ->
+    ) { user, aim, global, allHoldings, users ->
         SettingsTabUiState(
             activeUser = user,
-            activeUserSettings = settings,
+            activeUserAim = aim,
             global = global,
             activeHoldingCount = allHoldings.count { it.isActive },
             totalHoldingCount = allHoldings.size,

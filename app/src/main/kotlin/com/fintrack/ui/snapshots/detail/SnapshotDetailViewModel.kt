@@ -3,9 +3,11 @@ package com.fintrack.ui.snapshots.detail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.fintrack.data.repo.AimAllocationRepository
 import com.fintrack.data.repo.HoldingRepository
+import com.fintrack.data.repo.LoanRepository
 import com.fintrack.data.repo.SnapshotRepository
-import com.fintrack.data.repo.UserSettingsRepository
+import com.fintrack.data.repo.TaxonomyRepository
 import com.fintrack.domain.UserScope
 import com.fintrack.domain.analytics.SnapshotAnalytics
 import com.fintrack.domain.analytics.SnapshotAnalyticsCalculator
@@ -30,7 +32,9 @@ data class SnapshotDetailUiState(
 class SnapshotDetailViewModel @Inject constructor(
     private val snapshotRepository: SnapshotRepository,
     private val holdingRepository: HoldingRepository,
-    private val userSettingsRepository: UserSettingsRepository,
+    private val taxonomyRepository: TaxonomyRepository,
+    private val aimRepository: AimAllocationRepository,
+    private val loanRepository: LoanRepository,
     private val userScope: UserScope,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -59,20 +63,31 @@ class SnapshotDetailViewModel @Inject constructor(
         }
         val values = snapshotRepository.getValuesForSnapshot(activeUser, snapshotId)
         val catalog = holdingRepository.observeAll().first()
-        val settings = userSettingsRepository.getOrDefault(activeUser)
+        val subBuckets = taxonomyRepository.observeSubBuckets().first()
+        val assetClasses = taxonomyRepository.observeAssetClasses().first()
+        val aim = aimRepository.getOrDefault(activeUser)
+        val loans = loanRepository.observeLoansForUser(activeUser).first()
+        val loanValues = loanRepository.getValuesForSnapshot(activeUser, snapshotId)
 
         val previousSnapshot = snapshotRepository.previousForUser(activeUser, snapshot.snapshotDate)
-        val previousTotal: BigDecimal? = previousSnapshot?.let { prev ->
-            snapshotRepository.getValuesForSnapshot(activeUser, prev.id)
+        val previousNetWorth: BigDecimal? = previousSnapshot?.let { prev ->
+            val prevAssets = snapshotRepository.getValuesForSnapshot(activeUser, prev.id)
                 .fold(BigDecimal.ZERO) { acc, v -> acc + v.current }
+            val prevLiabilities = loanRepository.getValuesForSnapshot(activeUser, prev.id)
+                .fold(BigDecimal.ZERO) { acc, v -> acc + v.outstanding }
+            prevAssets.subtract(prevLiabilities)
         }
 
         val analytics = SnapshotAnalyticsCalculator.compute(
             snapshot = snapshot,
             values = values,
             catalog = catalog,
-            settings = settings,
-            previousTotalPortfolio = previousTotal,
+            subBuckets = subBuckets,
+            assetClasses = assetClasses,
+            aimAllocations = aim,
+            loans = loans,
+            loanValues = loanValues,
+            previousNetWorth = previousNetWorth,
         )
         _state.update { it.copy(loading = false, analytics = analytics, error = null) }
     }

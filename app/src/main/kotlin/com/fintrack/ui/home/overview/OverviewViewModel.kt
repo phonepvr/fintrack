@@ -2,14 +2,16 @@ package com.fintrack.ui.home.overview
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.fintrack.data.repo.AimAllocationRepository
 import com.fintrack.data.repo.HoldingRepository
+import com.fintrack.data.repo.LoanRepository
 import com.fintrack.data.repo.SnapshotRepository
-import com.fintrack.data.repo.UserSettingsRepository
+import com.fintrack.data.repo.TaxonomyRepository
+import com.fintrack.data.db.seed.SeedData
 import com.fintrack.domain.UserScope
 import com.fintrack.domain.analytics.DriftBand
 import com.fintrack.domain.analytics.SnapshotAnalytics
 import com.fintrack.domain.analytics.SnapshotAnalyticsCalculator
-import com.fintrack.domain.model.AssetClass
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,12 +50,12 @@ data class HistoryRow(
     val analytics: SnapshotAnalytics,
     val fixedReturn: BigDecimal,
     val investmentValue: BigDecimal,
-    val total: BigDecimal,
+    val netWorth: BigDecimal,
     val deltaTotal: BigDecimal?,
 )
 
 data class HeadlineCard(
-    val totalPortfolio: BigDecimal,
+    val netWorth: BigDecimal,
     val deltaAbsolute: BigDecimal?,
     val deltaPercent: BigDecimal?,
     val percentOfEarnings: BigDecimal,
@@ -66,7 +68,9 @@ data class HeadlineCard(
 class OverviewViewModel @Inject constructor(
     private val snapshotRepository: SnapshotRepository,
     private val holdingRepository: HoldingRepository,
-    private val userSettingsRepository: UserSettingsRepository,
+    private val taxonomyRepository: TaxonomyRepository,
+    private val aimRepository: AimAllocationRepository,
+    private val loanRepository: LoanRepository,
     private val userScope: UserScope,
 ) : ViewModel() {
 
@@ -82,34 +86,65 @@ class OverviewViewModel @Inject constructor(
     /**
      * Computed analytics for every snapshot in the active user's history,
      * sorted ascending by date so deltas align with chart x-positions.
+     *
+     * v3: now also pulls the AssetClass + SubBucket taxonomy + AimAllocations
+     * + Loan/LoanValue rows for the user; analytics keys/maps are UUID-driven.
      */
     val allAnalytics: StateFlow<List<SnapshotAnalytics>> = userScope.activeUserId
         .flatMapLatest { userId ->
             if (userId == null) flowOf(emptyList())
-            else combine(
-                snapshotRepository.observeForUser(userId),
-                snapshotRepository.observeAllValuesForUser(userId),
-                holdingRepository.observeAll(),
-                userSettingsRepository.observe(userId),
-            ) { snapshots, allValues, catalog, settings ->
-                val byId = allValues.groupBy { it.snapshotId }
-                val chrono = snapshots.sortedBy { it.snapshotDate }
-                val list = mutableListOf<SnapshotAnalytics>()
-                var prevTotal: BigDecimal? = null
-                for (snap in chrono) {
-                    val a = SnapshotAnalyticsCalculator.compute(
-                        snapshot = snap,
-                        values = byId[snap.id].orEmpty(),
-                        catalog = catalog,
-                        settings = settings,
-                        previousTotalPortfolio = prevTotal,
-                    )
-                    list += a
-                    prevTotal = a.totalPortfolio
-                }
-                list.toList()
-            }
+            else combineAnalyticsInputs(userId)
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    private fun combineAnalyticsInputs(userId: java.util.UUID) = combine(
+        snapshotRepository.observeForUser(userId),
+        snapshotRepository.observeAllValuesForUser(userId),
+        holdingRepository.observeAll(),
+        taxonomyRepository.observeSubBuckets(),
+        taxonomyRepository.observeAssetClasses(),
+        aimRepository.observeForUser(userId),
+        loanRepository.observeLoansForUser(userId),
+        loanRepository.observeAllValuesForUser(userId),
+    ) { values: Array<Any?> ->
+        @Suppress("UNCHECKED_CAST")
+        val snapshots = values[0] as List<com.fintrack.data.db.entities.SnapshotEntity>
+        @Suppress("UNCHECKED_CAST")
+        val allValues = values[1] as List<com.fintrack.data.db.entities.HoldingValueEntity>
+        @Suppress("UNCHECKED_CAST")
+        val catalog = values[2] as List<com.fintrack.data.db.entities.HoldingEntity>
+        @Suppress("UNCHECKED_CAST")
+        val subBuckets = values[3] as List<com.fintrack.data.db.entities.SubBucketEntity>
+        @Suppress("UNCHECKED_CAST")
+        val assetClasses = values[4] as List<com.fintrack.data.db.entities.AssetClassEntity>
+        @Suppress("UNCHECKED_CAST")
+        val aim = values[5] as List<com.fintrack.data.db.entities.AimAllocationEntity>
+        @Suppress("UNCHECKED_CAST")
+        val loans = values[6] as List<com.fintrack.data.db.entities.LoanEntity>
+        @Suppress("UNCHECKED_CAST")
+        val loanValues = values[7] as List<com.fintrack.data.db.entities.LoanValueEntity>
+
+        val hvBySnap = allValues.groupBy { it.snapshotId }
+        val lvBySnap = loanValues.groupBy { it.snapshotId }
+        val chrono = snapshots.sortedBy { it.snapshotDate }
+        val list = mutableListOf<SnapshotAnalytics>()
+        var prevNetWorth: BigDecimal? = null
+        for (snap in chrono) {
+            val a = SnapshotAnalyticsCalculator.compute(
+                snapshot = snap,
+                values = hvBySnap[snap.id].orEmpty(),
+                catalog = catalog,
+                subBuckets = subBuckets,
+                assetClasses = assetClasses,
+                aimAllocations = aim,
+                loans = loans,
+                loanValues = lvBySnap[snap.id].orEmpty(),
+                previousNetWorth = prevNetWorth,
+            )
+            list += a
+            prevNetWorth = a.netWorth
+        }
+        list.toList()
+    }
 
     val filteredAnalytics: StateFlow<List<SnapshotAnalytics>> =
         combine(allAnalytics, _period) { all, p ->
@@ -127,9 +162,9 @@ class OverviewViewModel @Inject constructor(
             list.map { a ->
                 HistoryRow(
                     analytics = a,
-                    fixedReturn = a.byAssetClass.getValue(AssetClass.FIXED_RETURN).current,
+                    fixedReturn = a.byAssetClass[SeedData.FIXED_RETURN_ID]?.current ?: BigDecimal.ZERO,
                     investmentValue = a.investmentValue,
-                    total = a.totalPortfolio,
+                    netWorth = a.netWorth,
                     deltaTotal = a.deltaAbsolute,
                 )
             }.reversed()
@@ -137,12 +172,12 @@ class OverviewViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     private fun buildHeadline(latest: SnapshotAnalytics): HeadlineCard = HeadlineCard(
-        totalPortfolio = latest.totalPortfolio,
+        netWorth = latest.netWorth,
         deltaAbsolute = latest.deltaAbsolute,
         deltaPercent = latest.deltaPercent,
         percentOfEarnings = latest.percentOfEarnings,
         classesWithinTarget = latest.byAssetClass.values.count { it.driftBand == DriftBand.WITHIN },
-        totalClasses = AssetClass.entries.size,
+        totalClasses = latest.byAssetClass.size,
     )
 
     private fun today(): LocalDate =

@@ -5,43 +5,44 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import kotlinx.datetime.Instant
 import java.util.UUID
 
 @Entity(
-    tableName = "holdings",
+    tableName = "sub_buckets",
     foreignKeys = [
         ForeignKey(
-            entity = SubBucketEntity::class,
+            entity = AssetClassEntity::class,
             parentColumns = ["id"],
-            childColumns = ["sub_bucket_id"],
+            childColumns = ["asset_class_id"],
             onDelete = ForeignKey.RESTRICT,
         ),
     ],
     indices = [
-        Index(value = ["sub_bucket_id"]),
-        Index(value = ["sub_bucket_id", "name"], unique = true),
+        Index(value = ["asset_class_id"]),
+        Index(value = ["asset_class_id", "name"], unique = true),
     ],
 )
-data class HoldingEntity(
+data class SubBucketEntity(
     @PrimaryKey
     @ColumnInfo(name = "id")
     val id: UUID,
 
-    @ColumnInfo(name = "sub_bucket_id")
-    val subBucketId: UUID,
+    @ColumnInfo(name = "asset_class_id")
+    val assetClassId: UUID,
 
     @ColumnInfo(name = "name")
     val name: String,
 
-    @ColumnInfo(name = "track_invested", defaultValue = "0")
-    val trackInvested: Boolean,
+    @ColumnInfo(name = "display_order", defaultValue = "0")
+    val displayOrder: Int,
 
-    @ColumnInfo(name = "track_sip", defaultValue = "0")
-    val trackSip: Boolean,
+    @ColumnInfo(name = "is_seeded", defaultValue = "0")
+    val isSeeded: Boolean,
 
     @ColumnInfo(name = "is_active", defaultValue = "1")
     val isActive: Boolean = true,
 
-    @ColumnInfo(name = "display_order", defaultValue = "0")
-    val displayOrder: Int = 0,
+    @ColumnInfo(name = "created_at")
+    val createdAt: Instant,
 )
