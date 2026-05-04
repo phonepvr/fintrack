@@ -1,31 +1,20 @@
-# Build summary (run 25299406551, sha e7d0ef19d52f7a6fbd6839a650065f86b32a3985)
+# Build summary (run 25299923348, sha 7191ebc48138a771e6d1894bacc6a4f46c337b44)
 
 | Step | Outcome |
 |---|---|
-| compile | failure |
-| assemble | skipped |
-| tests | skipped |
-| detekt | skipped |
-| locate APK | skipped |
+| compile | success |
+| assemble | success |
+| tests | failure |
+| detekt | success |
+| locate APK | success |
 
 ## compile.log — error/warning lines
 
 ```
-2308:e: file:///home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/picker/ProfilePickerScreen.kt:158:14 This foundation API is experimental and is likely to change or be removed in the future.
-2309:e: file:///home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:57:8 Unresolved reference 'BigDecimal'.
-2310:e: file:///home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:79:24 Cannot infer type for this parameter. Specify it explicitly.
-2311:e: file:///home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:79:24 Not enough information to infer type argument for 'T'.
-2312:e: file:///home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:80:20 Cannot infer type for this parameter. Specify it explicitly.
-2313:e: file:///home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:80:20 Not enough information to infer type argument for 'R'.
-2314:e: file:///home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:80:25 Unresolved reference 'BigDecimal'.
-2315:e: file:///home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:80:44 Cannot infer type for this parameter. Specify it explicitly.
-2316:e: file:///home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:343:36 Unresolved reference 'BigDecimal'.
-2323:FAILURE: Build failed with an exception.
-2368:Caused by: org.gradle.workers.internal.DefaultWorkerExecutor$WorkExecutionException: A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
-2497:Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilation error. See log for more details
+2429:w: file:///home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/di/DatabaseModule.kt:83:17 Type argument for reified type parameter 'T' was inferred to the intersection of ['Comparable<*>' & 'Serializable']. Reification of an intersection type results in the common supertype being used. This may lead to subtle issues and an explicit type argument is encouraged. This will become an error in a future release.
 ```
 
-## compile.log — full log (2531 lines)
+## compile.log — full log (2436 lines)
 
 ```
 [truncated to first 200 + last 400 lines]
@@ -34,8 +23,8 @@ Initialized jansi services in: /home/runner/.gradle/native
 To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.11.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
 Starting process 'Gradle build daemon'. Working directory: /home/runner/.gradle/daemon/8.11.1 Command: /usr/lib/jvm/temurin-17-jdk-amd64/bin/java --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED --add-opens=java.base/java.nio.charset=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED --add-opens=java.xml/javax.xml.namespace=ALL-UNNAMED -XX:+UseParallelGC -Xmx4g -Dfile.encoding=UTF-8 -Duser.country -Duser.language=en -Duser.variant -cp /home/runner/.gradle/wrapper/dists/gradle-8.11.1-bin/bpt9gzteqjrbo1mjrsomdt32c/gradle-8.11.1/lib/gradle-daemon-main-8.11.1.jar -javaagent:/home/runner/.gradle/wrapper/dists/gradle-8.11.1-bin/bpt9gzteqjrbo1mjrsomdt32c/gradle-8.11.1/lib/agents/gradle-instrumentation-agent-8.11.1.jar org.gradle.launcher.daemon.bootstrap.GradleDaemon 8.11.1
 Successfully started process 'Gradle build daemon'
-An attempt to start the daemon took 1.115 secs.
-The client will now receive all logging from the daemon (pid: 2506). The daemon log file: /home/runner/.gradle/daemon/8.11.1/daemon-2506.out.log
+An attempt to start the daemon took 1.193 secs.
+The client will now receive all logging from the daemon (pid: 2507). The daemon log file: /home/runner/.gradle/daemon/8.11.1/daemon-2507.out.log
 Daemon will be stopped at the end of the build 
 Using 4 worker leases.
 Received JVM installation metadata from '/usr/lib/jvm/temurin-17-jdk-amd64': {JAVA_HOME=/usr/lib/jvm/temurin-17-jdk-amd64, JAVA_VERSION=17.0.18, JAVA_VENDOR=Eclipse Adoptium, RUNTIME_NAME=OpenJDK Runtime Environment, RUNTIME_VERSION=17.0.18+8, VM_NAME=OpenJDK 64-Bit Server VM, VM_VERSION=17.0.18+8, VM_VENDOR=Eclipse Adoptium, OS_ARCH=amd64}
@@ -230,8 +219,103 @@ Transforming android-test-plugin-host-emulator-control-proto-31.7.3.jar (com.and
 Transforming android-test-plugin-host-emulator-control-proto-31.7.3.jar (com.android.tools.utp:android-test-plugin-host-emulator-control-proto:31.7.3) with MergeInstrumentationAnalysisTransform
 Transforming android-test-plugin-host-retention-proto-31.7.3.jar (com.android.tools.utp:android-test-plugin-host-retention-proto:31.7.3) with InstrumentationAnalysisTransform
 
-... (1931 lines elided) ...
+... (1836 lines elided) ...
 
+Transforming kotlinx-serialization-json-jvm-1.7.3.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming security-crypto-1.1.0-alpha06-api.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming versionedparcelable-1.1.1-api.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming core-runtime-2.2.0-api.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming core-common-2.2.0.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming collection-jvm-1.4.4.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming annotation-jvm-1.9.1.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming kotlin-stdlib-jdk8-1.8.22.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming kotlin-stdlib-jdk7-1.8.22.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming kotlin-stdlib-2.1.20.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming sqlcipher-android-4.6.1-api.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming compose-2.0.2-api.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming core-2.0.2-api.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming annotations-23.0.0.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming startup-runtime-1.1.1-api.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming hilt-core-2.54.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming dagger-2.54.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming jakarta.inject-api-2.0.1.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming javax.inject-1.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming jspecify-1.0.0.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming dagger-lint-aar-2.54-api.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming jsr305-3.0.2.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming android.jar with StructureTransformAction
+Transforming core-lambda-stubs.jar with StructureTransformAction
+Transforming R.jar with StructureTransformAction
+Transforming hilt-navigation-compose-1.2.0-api.jar with StructureTransformAction
+Transforming hilt-navigation-1.2.0-api.jar with StructureTransformAction
+Transforming navigation-common-2.8.5-api.jar with StructureTransformAction
+Transforming navigation-runtime-2.8.5-api.jar with StructureTransformAction
+Transforming navigation-common-ktx-2.8.5-api.jar with StructureTransformAction
+Transforming navigation-runtime-ktx-2.8.5-api.jar with StructureTransformAction
+Transforming navigation-compose-2.8.5-api.jar with StructureTransformAction
+Transforming hilt-android-2.54-api.jar with StructureTransformAction
+Transforming biometric-ktx-1.2.0-alpha05-api.jar with StructureTransformAction
+Transforming biometric-1.2.0-alpha05-api.jar with StructureTransformAction
+Transforming fragment-1.5.4-api.jar with StructureTransformAction
+Transforming loader-1.0.0-api.jar with StructureTransformAction
+Transforming viewpager-1.0.0-api.jar with StructureTransformAction
+Transforming customview-1.0.0-api.jar with StructureTransformAction
+Transforming core-1.15.0-api.jar with StructureTransformAction
+Transforming lifecycle-livedata-core-ktx-2.8.7-api.jar with StructureTransformAction
+Transforming lifecycle-livedata-2.8.7-api.jar with StructureTransformAction
+Transforming lifecycle-runtime-ktx-release-api.jar with StructureTransformAction
+Transforming lifecycle-livedata-core-2.8.7-api.jar with StructureTransformAction
+Transforming lifecycle-common-jvm-2.8.7.jar with StructureTransformAction
+Transforming lifecycle-runtime-release-api.jar with StructureTransformAction
+Transforming lifecycle-viewmodel-2.8.7-api.jar with StructureTransformAction
+Transforming lifecycle-viewmodel-release-api.jar with StructureTransformAction
+Transforming lifecycle-viewmodel-ktx-2.8.7-api.jar with StructureTransformAction
+Transforming lifecycle-viewmodel-savedstate-2.8.7-api.jar with StructureTransformAction
+Transforming lifecycle-runtime-compose-release-api.jar with StructureTransformAction
+Transforming lifecycle-process-2.8.7-api.jar with StructureTransformAction
+Transforming lifecycle-viewmodel-compose-release-api.jar with StructureTransformAction
+Transforming material3-release-api.jar with StructureTransformAction
+Transforming foundation-layout-release-api.jar with StructureTransformAction
+Transforming material-ripple-release-api.jar with StructureTransformAction
+Transforming foundation-release-api.jar with StructureTransformAction
+Transforming animation-core-release-api.jar with StructureTransformAction
+Transforming animation-release-api.jar with StructureTransformAction
+Transforming ui-util-release-api.jar with StructureTransformAction
+Transforming ui-unit-release-api.jar with StructureTransformAction
+Transforming ui-text-release-api.jar with StructureTransformAction
+Transforming ui-geometry-release-api.jar with StructureTransformAction
+Transforming ui-tooling-data-release-api.jar with StructureTransformAction
+Transforming ui-tooling-preview-release-api.jar with StructureTransformAction
+Transforming ui-graphics-release-api.jar with StructureTransformAction
+Transforming material-icons-extended-release-api.jar with StructureTransformAction
+Transforming material-icons-core-release-api.jar with StructureTransformAction
+Transforming ui-release-api.jar with StructureTransformAction
+Transforming ui-tooling-release-api.jar with StructureTransformAction
+Transforming ui-test-manifest-1.7.6-api.jar with StructureTransformAction
+Transforming activity-1.9.3-api.jar with StructureTransformAction
+Transforming activity-compose-1.9.3-api.jar with StructureTransformAction
+Transforming activity-ktx-1.9.3-api.jar with StructureTransformAction
+Transforming core-ktx-1.15.0-api.jar with StructureTransformAction
+Transforming room-common-2.6.1.jar with StructureTransformAction
+Transforming room-runtime-2.6.1-api.jar with StructureTransformAction
+Transforming room-ktx-2.6.1-api.jar with StructureTransformAction
+Transforming sqlite-framework-2.4.0-api.jar with StructureTransformAction
+Transforming sqlite-2.4.0-api.jar with StructureTransformAction
+Transforming sqlite-ktx-2.4.0-api.jar with StructureTransformAction
+Transforming compose-m3-2.0.2-api.jar with StructureTransformAction
+Transforming runtime-saveable-release-api.jar with StructureTransformAction
+Transforming runtime-release-api.jar with StructureTransformAction
+Transforming annotation-experimental-1.4.1-api.jar with StructureTransformAction
+Transforming savedstate-ktx-1.2.1-api.jar with StructureTransformAction
+Transforming savedstate-1.2.1-api.jar with StructureTransformAction
+Transforming kotlinx-coroutines-core-jvm-1.10.1.jar with StructureTransformAction
+Transforming kotlinx-coroutines-android-1.10.1.jar with StructureTransformAction
+Transforming kotlinx-datetime-jvm-0.6.1.jar with StructureTransformAction
+Transforming kotlinx-serialization-core-jvm-1.7.3.jar with StructureTransformAction
+Transforming kotlinx-serialization-json-jvm-1.7.3.jar with StructureTransformAction
+Transforming security-crypto-1.1.0-alpha06-api.jar with StructureTransformAction
+Transforming versionedparcelable-1.1.1-api.jar with StructureTransformAction
+Transforming core-runtime-2.2.0-api.jar with StructureTransformAction
 Transforming core-common-2.2.0.jar with StructureTransformAction
 Transforming collection-jvm-1.4.4.jar with StructureTransformAction
 Transforming annotation-jvm-1.9.1.jar with StructureTransformAction
@@ -255,10 +339,133 @@ file or directory '/home/runner/work/fintrack/fintrack/app/src/debug/java', not 
 file or directory '/home/runner/work/fintrack/fintrack/app/src/main/java', not found
 file or directory '/home/runner/work/fintrack/fintrack/app/src/main/java', not found
 file or directory '/home/runner/work/fintrack/fintrack/app/src/debug/java', not found
-Build cache key for task ':app:kspDebugKotlin' is 44ce64821289aa8ce4c030cc7439767b
+Build cache key for task ':app:kspDebugKotlin' is b6c3f46f4e4f153c400363a42a236600
 Task ':app:kspDebugKotlin' is not up-to-date because:
   No history is available.
-Loaded cache entry for task ':app:kspDebugKotlin' with cache key 44ce64821289aa8ce4c030cc7439767b
+The input changes require a full rebuild for incremental task ':app:kspDebugKotlin'.
+file or directory '/home/runner/work/fintrack/fintrack/app/src/debug/kotlin', not found
+file or directory '/home/runner/work/fintrack/fintrack/app/src/debug/java', not found
+file or directory '/home/runner/work/fintrack/fintrack/app/src/main/java', not found
+file or directory '/home/runner/work/fintrack/fintrack/app/src/main/java', not found
+file or directory '/home/runner/work/fintrack/fintrack/app/src/debug/java', not found
+file or directory '/home/runner/work/fintrack/fintrack/app/src/debug/kotlin', not found
+file or directory '/home/runner/work/fintrack/fintrack/app/src/debug/java', not found
+file or directory '/home/runner/work/fintrack/fintrack/app/src/debug/kotlin', not found
+file or directory '/home/runner/work/fintrack/fintrack/app/src/debug/java', not found
+file or directory '/home/runner/work/fintrack/fintrack/app/src/main/java', not found
+file or directory '/home/runner/work/fintrack/fintrack/app/src/main/java', not found
+file or directory '/home/runner/work/fintrack/fintrack/app/src/debug/java', not found
+file or directory '/home/runner/work/fintrack/fintrack/app/src/debug/kotlin', not found
+file or directory '/home/runner/work/fintrack/fintrack/app/src/debug/java', not found
+file or directory '/home/runner/work/fintrack/fintrack/app/src/main/java', not found
+file or directory '/home/runner/work/fintrack/fintrack/app/src/main/java', not found
+file or directory '/home/runner/work/fintrack/fintrack/app/src/debug/java', not found
+file or directory '/home/runner/work/fintrack/fintrack/app/src/debug/kotlin', not found
+file or directory '/home/runner/work/fintrack/fintrack/app/src/debug/java', not found
+file or directory '/home/runner/work/fintrack/fintrack/app/src/main/java', not found
+file or directory '/home/runner/work/fintrack/fintrack/app/src/main/java', not found
+file or directory '/home/runner/work/fintrack/fintrack/app/src/debug/java', not found
+Kotlin source files: /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/MainActivity.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/lock/LockScreen.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/lock/BiometricUnavailableScreen.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/AppViewModel.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/picker/ProfilePickerViewModel.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/picker/ProfilePickerScreen.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryViewModel.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/AmountParsing.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailViewModel.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/navigation/AppNavGraph.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/home/snapshots/SnapshotsListViewModel.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/home/snapshots/SnapshotsTab.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/home/HomeScreen.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/theme/Color.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/theme/Theme.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/onboarding/CreateFirstProfileScreen.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/domain/util/CurrencyFormatting.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/domain/UserScope.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/domain/analytics/SnapshotAnalytics.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/domain/model/AssetClass.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/FintrackApp.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/di/DatabaseModule.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/security/BiometricAuthenticator.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/security/KeystorePassphraseStore.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/security/InactivityTracker.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/repo/HoldingRepository.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/repo/UserSettingsRepository.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/repo/GlobalSettingsRepository.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/repo/SnapshotRepository.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/repo/UserRepository.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/entities/HoldingEntity.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/entities/UserEntity.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/entities/GlobalSettingsEntity.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/entities/UserSettingsEntity.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/entities/HoldingValueEntity.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/entities/SnapshotEntity.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/seed/DevSeedRunner.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/seed/DevSeedData.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/seed/SeedData.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/dao/SnapshotDao.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/dao/GlobalSettingsDao.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/dao/UserDao.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/dao/HoldingValueDao.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/dao/UserSettingsDao.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/dao/HoldingDao.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/Converters.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/FintrackDatabase.kt
+Java source files: /home/runner/work/fintrack/fintrack/app/build/generated/source/buildConfig/debug/com/fintrack/BuildConfig.java
+Script source files: 
+Script file extensions: 
+Transforming android.jar with StructureTransformAction
+Transforming core-lambda-stubs.jar with StructureTransformAction
+Transforming R.jar with StructureTransformAction
+Transforming hilt-navigation-compose-1.2.0-api.jar with StructureTransformAction
+Transforming hilt-navigation-1.2.0-api.jar with StructureTransformAction
+Transforming navigation-common-2.8.5-api.jar with StructureTransformAction
+Transforming navigation-runtime-2.8.5-api.jar with StructureTransformAction
+Transforming navigation-common-ktx-2.8.5-api.jar with StructureTransformAction
+Transforming navigation-runtime-ktx-2.8.5-api.jar with StructureTransformAction
+Transforming navigation-compose-2.8.5-api.jar with StructureTransformAction
+Transforming hilt-android-2.54-api.jar with StructureTransformAction
+Transforming biometric-ktx-1.2.0-alpha05-api.jar with StructureTransformAction
+Transforming biometric-1.2.0-alpha05-api.jar with StructureTransformAction
+Transforming fragment-1.5.4-api.jar with StructureTransformAction
+Transforming loader-1.0.0-api.jar with StructureTransformAction
+Transforming viewpager-1.0.0-api.jar with StructureTransformAction
+Transforming customview-1.0.0-api.jar with StructureTransformAction
+Transforming core-1.15.0-api.jar with StructureTransformAction
+Transforming lifecycle-livedata-core-ktx-2.8.7-api.jar with StructureTransformAction
+Transforming lifecycle-livedata-2.8.7-api.jar with StructureTransformAction
+Transforming lifecycle-runtime-ktx-release-api.jar with StructureTransformAction
+Transforming lifecycle-livedata-core-2.8.7-api.jar with StructureTransformAction
+Transforming lifecycle-common-jvm-2.8.7.jar with StructureTransformAction
+Transforming lifecycle-runtime-release-api.jar with StructureTransformAction
+Transforming lifecycle-viewmodel-2.8.7-api.jar with StructureTransformAction
+Transforming lifecycle-viewmodel-release-api.jar with StructureTransformAction
+Transforming lifecycle-viewmodel-ktx-2.8.7-api.jar with StructureTransformAction
+Transforming lifecycle-viewmodel-savedstate-2.8.7-api.jar with StructureTransformAction
+Transforming lifecycle-runtime-compose-release-api.jar with StructureTransformAction
+Transforming lifecycle-process-2.8.7-api.jar with StructureTransformAction
+Transforming lifecycle-viewmodel-compose-release-api.jar with StructureTransformAction
+Transforming material3-release-api.jar with StructureTransformAction
+Transforming foundation-layout-release-api.jar with StructureTransformAction
+Transforming material-ripple-release-api.jar with StructureTransformAction
+Transforming foundation-release-api.jar with StructureTransformAction
+Transforming animation-core-release-api.jar with StructureTransformAction
+Transforming animation-release-api.jar with StructureTransformAction
+Transforming ui-util-release-api.jar with StructureTransformAction
+Transforming ui-unit-release-api.jar with StructureTransformAction
+Transforming ui-text-release-api.jar with StructureTransformAction
+Transforming ui-geometry-release-api.jar with StructureTransformAction
+Transforming ui-tooling-data-release-api.jar with StructureTransformAction
+Transforming ui-tooling-preview-release-api.jar with StructureTransformAction
+Transforming ui-graphics-release-api.jar with StructureTransformAction
+Transforming material-icons-extended-release-api.jar with StructureTransformAction
+Transforming material-icons-core-release-api.jar with StructureTransformAction
+Transforming ui-release-api.jar with StructureTransformAction
+Transforming ui-tooling-release-api.jar with StructureTransformAction
+Transforming ui-test-manifest-1.7.6-api.jar with StructureTransformAction
+Transforming activity-1.9.3-api.jar with StructureTransformAction
+Transforming activity-compose-1.9.3-api.jar with StructureTransformAction
+Transforming activity-ktx-1.9.3-api.jar with StructureTransformAction
+Transforming core-ktx-1.15.0-api.jar with StructureTransformAction
+Transforming room-common-2.6.1.jar with StructureTransformAction
+Transforming room-runtime-2.6.1-api.jar with StructureTransformAction
+Transforming room-ktx-2.6.1-api.jar with StructureTransformAction
+Transforming sqlite-framework-2.4.0-api.jar with StructureTransformAction
+Transforming sqlite-2.4.0-api.jar with StructureTransformAction
+Transforming sqlite-ktx-2.4.0-api.jar with StructureTransformAction
+Transforming compose-m3-2.0.2-api.jar with StructureTransformAction
+Transforming runtime-saveable-release-api.jar with StructureTransformAction
+Transforming runtime-release-api.jar with StructureTransformAction
+Transforming annotation-experimental-1.4.1-api.jar with StructureTransformAction
+Transforming savedstate-ktx-1.2.1-api.jar with StructureTransformAction
+Transforming savedstate-1.2.1-api.jar with StructureTransformAction
+Transforming kotlinx-coroutines-core-jvm-1.10.1.jar with StructureTransformAction
+Transforming kotlinx-coroutines-android-1.10.1.jar with StructureTransformAction
+Transforming kotlinx-datetime-jvm-0.6.1.jar with StructureTransformAction
+Transforming kotlinx-serialization-core-jvm-1.7.3.jar with StructureTransformAction
+Transforming kotlinx-serialization-json-jvm-1.7.3.jar with StructureTransformAction
+Transforming security-crypto-1.1.0-alpha06-api.jar with StructureTransformAction
+Transforming versionedparcelable-1.1.1-api.jar with StructureTransformAction
+Transforming core-runtime-2.2.0-api.jar with StructureTransformAction
+Transforming core-common-2.2.0.jar with StructureTransformAction
+Transforming collection-jvm-1.4.4.jar with StructureTransformAction
+Transforming annotation-jvm-1.9.1.jar with StructureTransformAction
+Transforming kotlin-stdlib-jdk8-1.8.22.jar with StructureTransformAction
+Transforming kotlin-stdlib-jdk7-1.8.22.jar with StructureTransformAction
+Transforming kotlin-stdlib-2.1.20.jar with StructureTransformAction
+Transforming sqlcipher-android-4.6.1-api.jar with StructureTransformAction
+Transforming compose-2.0.2-api.jar with StructureTransformAction
+Transforming core-2.0.2-api.jar with StructureTransformAction
+Transforming annotations-23.0.0.jar with StructureTransformAction
+Transforming startup-runtime-1.1.1-api.jar with StructureTransformAction
+Transforming hilt-core-2.54.jar with StructureTransformAction
+Transforming dagger-2.54.jar with StructureTransformAction
+Transforming jakarta.inject-api-2.0.1.jar with StructureTransformAction
+Transforming javax.inject-1.jar with StructureTransformAction
+Transforming jspecify-1.0.0.jar with StructureTransformAction
+Transforming dagger-lint-aar-2.54-api.jar with StructureTransformAction
+Transforming jsr305-3.0.2.jar with StructureTransformAction
+[KOTLIN] Kotlin compilation 'jdkHome' argument: null
+i: starting the daemon as: /usr/lib/jvm/temurin-17-jdk-amd64/bin/java -cp /home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-compiler-embeddable/2.1.20/4ef56b3316798316bfac7a0ae443391c9e900ea1/kotlin-compiler-embeddable-2.1.20.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/2.1.20/aa8ca79cd50578314f6d1180c47cbe14c0fee567/kotlin-stdlib-2.1.20.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-script-runtime/2.1.20/f7c623d7f7bdb01f5ccd6b437bc0a937fcd7c57e/kotlin-script-runtime-2.1.20.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-reflect/1.6.10/1cbe9c92c12a94eea200d23c2bbaedaf3daf5132/kotlin-reflect-1.6.10.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-daemon-embeddable/2.1.20/95670fce77befd02a70a0bc3abe8ee4533521334/kotlin-daemon-embeddable-2.1.20.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.intellij.deps/trove4j/1.0.20200330/3afb14d5f9ceb459d724e907a21145e8ff394f02/trove4j-1.0.20200330.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-coroutines-core-jvm/1.8.0/ac1dc37a30a93150b704022f8d895ee1bd3a36b3/kotlinx-coroutines-core-jvm-1.8.0.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar -Djava.awt.headless=true -Djava.rmi.server.hostname=127.0.0.1 -Xmx4g -XX:ReservedCodeCacheSize=320m -Dkotlin.environment.keepalive -ea -XX:+UseCodeCacheFlushing -XX:+UseParallelGC -Dkotlin.daemon.initiator.marker.file=/tmp/kotlin-compiler-in-fintrack-15317774116309297498.alive --add-exports java.base/sun.nio.ch=ALL-UNNAMED org.jetbrains.kotlin.daemon.KotlinCompileDaemon --daemon-runFilesPath /home/runner/.kotlin/daemon --daemon-autoshutdownIdleSeconds=7200 --daemon-compilerClasspath /home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-compiler-embeddable/2.1.20/4ef56b3316798316bfac7a0ae443391c9e900ea1/kotlin-compiler-embeddable-2.1.20.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/2.1.20/aa8ca79cd50578314f6d1180c47cbe14c0fee567/kotlin-stdlib-2.1.20.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-script-runtime/2.1.20/f7c623d7f7bdb01f5ccd6b437bc0a937fcd7c57e/kotlin-script-runtime-2.1.20.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-reflect/1.6.10/1cbe9c92c12a94eea200d23c2bbaedaf3daf5132/kotlin-reflect-1.6.10.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-daemon-embeddable/2.1.20/95670fce77befd02a70a0bc3abe8ee4533521334/kotlin-daemon-embeddable-2.1.20.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.intellij.deps/trove4j/1.0.20200330/3afb14d5f9ceb459d724e907a21145e8ff394f02/trove4j-1.0.20200330.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-coroutines-core-jvm/1.8.0/ac1dc37a30a93150b704022f8d895ee1bd3a36b3/kotlinx-coroutines-core-jvm-1.8.0.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar
+i: #1 retrying connecting to the daemon 
+i: [ksp] loaded provider(s): [dagger.hilt.processor.internal.uninstallmodules.KspUninstallModulesProcessor$Provider, dagger.hilt.processor.internal.definecomponent.KspDefineComponentProcessor$Provider, dagger.hilt.android.processor.internal.androidentrypoint.KspAndroidEntryPointProcessor$Provider, dagger.hilt.processor.internal.root.KspRootProcessor$Provider, dagger.hilt.android.processor.internal.viewmodel.KspViewModelProcessor$Provider, dagger.hilt.android.processor.internal.bindvalue.KspBindValueProcessor$Provider, dagger.hilt.processor.internal.root.KspComponentTreeDepsProcessor$Provider, dagger.hilt.processor.internal.aliasof.KspAliasOfProcessor$Provider, dagger.hilt.processor.internal.generatesrootinput.KspGeneratesRootInputProcessor$Provider, dagger.hilt.processor.internal.originatingelement.KspOriginatingElementProcessor$Provider, dagger.hilt.processor.internal.earlyentrypoint.KspEarlyEntryPointProcessor$Provider, dagger.hilt.android.processor.internal.customtestapplication.KspCustomTestApplicationProcessor$Provider, dagger.hilt.processor.internal.aggregateddeps.KspAggregatedDepsProcessor$Provider, androidx.room.RoomKspProcessor$Provider, dagger.internal.codegen.KspComponentProcessor$Provider]
+Finished executing kotlin compiler using DAEMON strategy
+Stored cache entry for task ':app:kspDebugKotlin' with cache key b6c3f46f4e4f153c400363a42a236600
 Resolve mutations for :app:compileDebugKotlin (Thread[Execution worker Thread 3,5,main]) started.
 :app:compileDebugKotlin (Thread[Execution worker Thread 3,5,main]) started.
 
@@ -354,7 +561,7 @@ Transforming javax.inject-1.jar with BuildToolsApiClasspathEntrySnapshotTransfor
 Transforming jspecify-1.0.0.jar with BuildToolsApiClasspathEntrySnapshotTransform
 Transforming dagger-lint-aar-2.54-api.jar with BuildToolsApiClasspathEntrySnapshotTransform
 Transforming jsr305-3.0.2.jar with BuildToolsApiClasspathEntrySnapshotTransform
-Build cache key for task ':app:compileDebugKotlin' is 1a99fe54d0248754fcd436c7928a92f1
+Build cache key for task ':app:compileDebugKotlin' is 046d5e6220cc97a5367577401e28e5ef
 Task ':app:compileDebugKotlin' is not up-to-date because:
   No history is available.
 The input changes require a full rebuild for incremental task ':app:compileDebugKotlin'.
@@ -399,44 +606,191 @@ file or directory '/home/runner/work/fintrack/fintrack/app/src/main/java', not f
 file or directory '/home/runner/work/fintrack/fintrack/app/src/main/java', not found
 file or directory '/home/runner/work/fintrack/fintrack/app/src/main/java', not found
 file or directory '/home/runner/work/fintrack/fintrack/app/src/debug/java', not found
-Kotlin source files: /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/kotlin/com/fintrack/data/db/dao/SnapshotDao_Impl.kt, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/kotlin/com/fintrack/data/db/dao/HoldingValueDao_Impl.kt, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/kotlin/com/fintrack/data/db/dao/GlobalSettingsDao_Impl.kt, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/kotlin/com/fintrack/data/db/dao/HoldingDao_Impl.kt, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/kotlin/com/fintrack/data/db/dao/UserSettingsDao_Impl.kt, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/kotlin/com/fintrack/data/db/dao/UserDao_Impl.kt, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/kotlin/com/fintrack/data/db/FintrackDatabase_Impl.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/MainActivity.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/lock/LockScreen.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/lock/BiometricUnavailableScreen.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/AppViewModel.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/picker/ProfilePickerViewModel.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/picker/ProfilePickerScreen.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryViewModel.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/AmountParsing.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/navigation/AppNavGraph.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/home/snapshots/SnapshotsListViewModel.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/home/snapshots/SnapshotsTab.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/home/HomeScreen.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/theme/Color.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/theme/Theme.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/onboarding/CreateFirstProfileScreen.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/domain/util/CurrencyFormatting.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/domain/UserScope.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/domain/model/AssetClass.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/FintrackApp.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/di/DatabaseModule.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/security/BiometricAuthenticator.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/security/KeystorePassphraseStore.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/security/InactivityTracker.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/repo/HoldingRepository.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/repo/GlobalSettingsRepository.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/repo/SnapshotRepository.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/repo/UserRepository.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/entities/HoldingEntity.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/entities/UserEntity.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/entities/GlobalSettingsEntity.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/entities/UserSettingsEntity.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/entities/HoldingValueEntity.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/entities/SnapshotEntity.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/seed/DevSeedRunner.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/seed/DevSeedData.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/seed/SeedData.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/dao/SnapshotDao.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/dao/GlobalSettingsDao.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/dao/UserDao.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/dao/HoldingValueDao.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/dao/UserSettingsDao.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/dao/HoldingDao.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/Converters.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/FintrackDatabase.kt
-Java source files: /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/MainActivity_GeneratedInjector.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/AppViewModel_HiltModules_KeyModule_Provide_LazyMapKey.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/AppViewModel_HiltModules_KeyModule_ProvideFactory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/picker/ProfilePickerViewModel_HiltModules.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/picker/ProfilePickerViewModel_HiltModules_BindsModule_Binds_LazyMapKey.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/picker/ProfilePickerViewModel_HiltModules_KeyModule_ProvideFactory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/picker/ProfilePickerViewModel_HiltModules_KeyModule_Provide_LazyMapKey.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/picker/ProfilePickerViewModel_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/snapshots/entry/SnapshotEntryViewModel_HiltModules.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/snapshots/entry/SnapshotEntryViewModel_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/snapshots/entry/SnapshotEntryViewModel_HiltModules_KeyModule_Provide_LazyMapKey.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/snapshots/entry/SnapshotEntryViewModel_HiltModules_KeyModule_ProvideFactory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/snapshots/entry/SnapshotEntryViewModel_HiltModules_BindsModule_Binds_LazyMapKey.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/home/HomeViewModel_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/home/HomeViewModel_HiltModules_KeyModule_Provide_LazyMapKey.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/home/HomeViewModel_HiltModules.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/home/snapshots/SnapshotsListViewModel_HiltModules_BindsModule_Binds_LazyMapKey.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/home/snapshots/SnapshotsListViewModel_HiltModules_KeyModule_ProvideFactory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/home/snapshots/SnapshotsListViewModel_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/home/snapshots/SnapshotsListViewModel_HiltModules.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/home/snapshots/SnapshotsListViewModel_HiltModules_KeyModule_Provide_LazyMapKey.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/home/HomeViewModel_HiltModules_KeyModule_ProvideFactory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/home/HomeViewModel_HiltModules_BindsModule_Binds_LazyMapKey.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/AppViewModel_HiltModules.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/AppViewModel_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/onboarding/OnboardingViewModel_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/onboarding/OnboardingViewModel_HiltModules_BindsModule_Binds_LazyMapKey.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/onboarding/OnboardingViewModel_HiltModules_KeyModule_ProvideFactory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/onboarding/OnboardingViewModel_HiltModules.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/onboarding/OnboardingViewModel_HiltModules_KeyModule_Provide_LazyMapKey.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/AppViewModel_HiltModules_BindsModule_Binds_LazyMapKey.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/MainActivity_MembersInjector.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/domain/UserScope_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/di/DatabaseModule_ProvideHoldingValueDaoFactory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/di/DatabaseModule_ProvideFintrackDatabaseFactory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/di/DatabaseModule_ProvideGlobalSettingsDaoFactory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/di/DatabaseModule_ProvideUserSettingsDaoFactory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/di/DatabaseModule_ProvideHoldingDaoFactory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/di/DatabaseModule_ProvideUserDaoFactory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/di/DatabaseModule_ProvideSnapshotDaoFactory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/Hilt_MainActivity.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/FintrackApp_MembersInjector.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/FintrackApp_GeneratedInjector.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/security/BiometricAuthenticator_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/security/KeystorePassphraseStore_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/security/InactivityTracker_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/data/repo/HoldingRepository_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/data/repo/UserRepository_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/data/repo/SnapshotRepository_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/data/repo/GlobalSettingsRepository_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/data/db/seed/DevSeedRunner_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_ui_snapshots_entry_SnapshotEntryViewModel_HiltModules_BindsModule.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_ui_home_snapshots_SnapshotsListViewModel_HiltModules_BindsModule.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_ui_snapshots_entry_SnapshotEntryViewModel_HiltModules_KeyModule.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_ui_home_HomeViewModel_HiltModules_KeyModule.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_ui_home_HomeViewModel_HiltModules_BindsModule.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_ui_onboarding_OnboardingViewModel_HiltModules_KeyModule.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_ui_AppViewModel_HiltModules_BindsModule.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_ui_home_snapshots_SnapshotsListViewModel_HiltModules_KeyModule.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_MainActivity_GeneratedInjector.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_ui_AppViewModel_HiltModules_KeyModule.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_FintrackApp_GeneratedInjector.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_ui_onboarding_OnboardingViewModel_HiltModules_BindsModule.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_ui_picker_ProfilePickerViewModel_HiltModules_KeyModule.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_ui_picker_ProfilePickerViewModel_HiltModules_BindsModule.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_di_DatabaseModule.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/dagger/hilt/internal/aggregatedroot/codegen/_com_fintrack_FintrackApp.java, /home/runner/work/fintrack/fintrack/app/build/generated/source/buildConfig/debug/com/fintrack/BuildConfig.java
+Kotlin source files: /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/kotlin/com/fintrack/data/db/dao/SnapshotDao_Impl.kt, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/kotlin/com/fintrack/data/db/dao/HoldingValueDao_Impl.kt, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/kotlin/com/fintrack/data/db/dao/GlobalSettingsDao_Impl.kt, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/kotlin/com/fintrack/data/db/dao/HoldingDao_Impl.kt, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/kotlin/com/fintrack/data/db/dao/UserSettingsDao_Impl.kt, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/kotlin/com/fintrack/data/db/dao/UserDao_Impl.kt, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/kotlin/com/fintrack/data/db/FintrackDatabase_Impl.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/MainActivity.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/lock/LockScreen.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/lock/BiometricUnavailableScreen.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/AppViewModel.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/picker/ProfilePickerViewModel.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/picker/ProfilePickerScreen.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryViewModel.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/AmountParsing.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailViewModel.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/navigation/AppNavGraph.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/home/snapshots/SnapshotsListViewModel.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/home/snapshots/SnapshotsTab.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/home/HomeScreen.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/theme/Color.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/theme/Theme.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/onboarding/CreateFirstProfileScreen.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/domain/util/CurrencyFormatting.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/domain/UserScope.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/domain/analytics/SnapshotAnalytics.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/domain/model/AssetClass.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/FintrackApp.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/di/DatabaseModule.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/security/BiometricAuthenticator.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/security/KeystorePassphraseStore.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/security/InactivityTracker.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/repo/HoldingRepository.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/repo/UserSettingsRepository.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/repo/GlobalSettingsRepository.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/repo/SnapshotRepository.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/repo/UserRepository.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/entities/HoldingEntity.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/entities/UserEntity.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/entities/GlobalSettingsEntity.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/entities/UserSettingsEntity.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/entities/HoldingValueEntity.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/entities/SnapshotEntity.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/seed/DevSeedRunner.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/seed/DevSeedData.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/seed/SeedData.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/dao/SnapshotDao.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/dao/GlobalSettingsDao.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/dao/UserDao.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/dao/HoldingValueDao.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/dao/UserSettingsDao.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/dao/HoldingDao.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/Converters.kt, /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/FintrackDatabase.kt
+Java source files: /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/MainActivity_GeneratedInjector.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/AppViewModel_HiltModules_KeyModule_Provide_LazyMapKey.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/AppViewModel_HiltModules_KeyModule_ProvideFactory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/picker/ProfilePickerViewModel_HiltModules.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/picker/ProfilePickerViewModel_HiltModules_BindsModule_Binds_LazyMapKey.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/picker/ProfilePickerViewModel_HiltModules_KeyModule_ProvideFactory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/picker/ProfilePickerViewModel_HiltModules_KeyModule_Provide_LazyMapKey.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/picker/ProfilePickerViewModel_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/snapshots/entry/SnapshotEntryViewModel_HiltModules.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/snapshots/entry/SnapshotEntryViewModel_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/snapshots/entry/SnapshotEntryViewModel_HiltModules_KeyModule_Provide_LazyMapKey.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/snapshots/entry/SnapshotEntryViewModel_HiltModules_KeyModule_ProvideFactory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/snapshots/entry/SnapshotEntryViewModel_HiltModules_BindsModule_Binds_LazyMapKey.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/snapshots/detail/SnapshotDetailViewModel_HiltModules.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/snapshots/detail/SnapshotDetailViewModel_HiltModules_BindsModule_Binds_LazyMapKey.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/snapshots/detail/SnapshotDetailViewModel_HiltModules_KeyModule_Provide_LazyMapKey.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/snapshots/detail/SnapshotDetailViewModel_HiltModules_KeyModule_ProvideFactory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/snapshots/detail/SnapshotDetailViewModel_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/home/HomeViewModel_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/home/HomeViewModel_HiltModules_KeyModule_Provide_LazyMapKey.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/home/HomeViewModel_HiltModules.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/home/snapshots/SnapshotsListViewModel_HiltModules_BindsModule_Binds_LazyMapKey.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/home/snapshots/SnapshotsListViewModel_HiltModules_KeyModule_ProvideFactory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/home/snapshots/SnapshotsListViewModel_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/home/snapshots/SnapshotsListViewModel_HiltModules.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/home/snapshots/SnapshotsListViewModel_HiltModules_KeyModule_Provide_LazyMapKey.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/home/HomeViewModel_HiltModules_KeyModule_ProvideFactory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/home/HomeViewModel_HiltModules_BindsModule_Binds_LazyMapKey.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/AppViewModel_HiltModules.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/AppViewModel_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/onboarding/OnboardingViewModel_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/onboarding/OnboardingViewModel_HiltModules_BindsModule_Binds_LazyMapKey.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/onboarding/OnboardingViewModel_HiltModules_KeyModule_ProvideFactory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/onboarding/OnboardingViewModel_HiltModules.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/onboarding/OnboardingViewModel_HiltModules_KeyModule_Provide_LazyMapKey.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/ui/AppViewModel_HiltModules_BindsModule_Binds_LazyMapKey.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/MainActivity_MembersInjector.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/domain/UserScope_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/di/DatabaseModule_ProvideHoldingValueDaoFactory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/di/DatabaseModule_ProvideFintrackDatabaseFactory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/di/DatabaseModule_ProvideGlobalSettingsDaoFactory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/di/DatabaseModule_ProvideUserSettingsDaoFactory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/di/DatabaseModule_ProvideHoldingDaoFactory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/di/DatabaseModule_ProvideUserDaoFactory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/di/DatabaseModule_ProvideSnapshotDaoFactory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/Hilt_MainActivity.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/FintrackApp_MembersInjector.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/FintrackApp_GeneratedInjector.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/security/BiometricAuthenticator_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/security/KeystorePassphraseStore_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/security/InactivityTracker_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/data/repo/HoldingRepository_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/data/repo/UserRepository_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/data/repo/SnapshotRepository_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/data/repo/GlobalSettingsRepository_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/data/repo/UserSettingsRepository_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/com/fintrack/data/db/seed/DevSeedRunner_Factory.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_ui_snapshots_entry_SnapshotEntryViewModel_HiltModules_BindsModule.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_ui_home_snapshots_SnapshotsListViewModel_HiltModules_BindsModule.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_ui_snapshots_entry_SnapshotEntryViewModel_HiltModules_KeyModule.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_ui_home_HomeViewModel_HiltModules_KeyModule.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_ui_home_HomeViewModel_HiltModules_BindsModule.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_ui_onboarding_OnboardingViewModel_HiltModules_KeyModule.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_ui_AppViewModel_HiltModules_BindsModule.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_ui_snapshots_detail_SnapshotDetailViewModel_HiltModules_KeyModule.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_ui_home_snapshots_SnapshotsListViewModel_HiltModules_KeyModule.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_MainActivity_GeneratedInjector.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_ui_AppViewModel_HiltModules_KeyModule.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_FintrackApp_GeneratedInjector.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_ui_onboarding_OnboardingViewModel_HiltModules_BindsModule.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_ui_picker_ProfilePickerViewModel_HiltModules_KeyModule.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_ui_picker_ProfilePickerViewModel_HiltModules_BindsModule.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_ui_snapshots_detail_SnapshotDetailViewModel_HiltModules_BindsModule.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/hilt_aggregated_deps/_com_fintrack_di_DatabaseModule.java, /home/runner/work/fintrack/fintrack/app/build/generated/ksp/debug/java/dagger/hilt/internal/aggregatedroot/codegen/_com_fintrack_FintrackApp.java, /home/runner/work/fintrack/fintrack/app/build/generated/source/buildConfig/debug/com/fintrack/BuildConfig.java
 Script source files: 
 Script file extensions: 
 Using Kotlin/JVM incremental compilation
 [KOTLIN] Kotlin compilation 'jdkHome' argument: null
-i: starting the daemon as: /usr/lib/jvm/temurin-17-jdk-amd64/bin/java -cp /home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-compiler-embeddable/2.1.20/4ef56b3316798316bfac7a0ae443391c9e900ea1/kotlin-compiler-embeddable-2.1.20.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/2.1.20/aa8ca79cd50578314f6d1180c47cbe14c0fee567/kotlin-stdlib-2.1.20.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-script-runtime/2.1.20/f7c623d7f7bdb01f5ccd6b437bc0a937fcd7c57e/kotlin-script-runtime-2.1.20.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-reflect/1.6.10/1cbe9c92c12a94eea200d23c2bbaedaf3daf5132/kotlin-reflect-1.6.10.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-daemon-embeddable/2.1.20/95670fce77befd02a70a0bc3abe8ee4533521334/kotlin-daemon-embeddable-2.1.20.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.intellij.deps/trove4j/1.0.20200330/3afb14d5f9ceb459d724e907a21145e8ff394f02/trove4j-1.0.20200330.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-coroutines-core-jvm/1.8.0/ac1dc37a30a93150b704022f8d895ee1bd3a36b3/kotlinx-coroutines-core-jvm-1.8.0.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar -Djava.awt.headless=true -Djava.rmi.server.hostname=127.0.0.1 -Xmx4g -XX:ReservedCodeCacheSize=320m -Dkotlin.environment.keepalive -ea -XX:+UseCodeCacheFlushing -XX:+UseParallelGC -Dkotlin.daemon.initiator.marker.file=/tmp/kotlin-compiler-in-fintrack-7303448297796062996.alive --add-exports java.base/sun.nio.ch=ALL-UNNAMED org.jetbrains.kotlin.daemon.KotlinCompileDaemon --daemon-runFilesPath /home/runner/.kotlin/daemon --daemon-autoshutdownIdleSeconds=7200 --daemon-compilerClasspath /home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-compiler-embeddable/2.1.20/4ef56b3316798316bfac7a0ae443391c9e900ea1/kotlin-compiler-embeddable-2.1.20.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/2.1.20/aa8ca79cd50578314f6d1180c47cbe14c0fee567/kotlin-stdlib-2.1.20.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-script-runtime/2.1.20/f7c623d7f7bdb01f5ccd6b437bc0a937fcd7c57e/kotlin-script-runtime-2.1.20.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-reflect/1.6.10/1cbe9c92c12a94eea200d23c2bbaedaf3daf5132/kotlin-reflect-1.6.10.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-daemon-embeddable/2.1.20/95670fce77befd02a70a0bc3abe8ee4533521334/kotlin-daemon-embeddable-2.1.20.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.intellij.deps/trove4j/1.0.20200330/3afb14d5f9ceb459d724e907a21145e8ff394f02/trove4j-1.0.20200330.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-coroutines-core-jvm/1.8.0/ac1dc37a30a93150b704022f8d895ee1bd3a36b3/kotlinx-coroutines-core-jvm-1.8.0.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar
-i: #1 retrying connecting to the daemon 
-Options for KOTLIN DAEMON: IncrementalCompilationOptions(super=CompilationOptions(compilerMode=INCREMENTAL_COMPILER, targetPlatform=JVM, reportCategories=[0, 3], reportSeverity=2, requestedCompilationResults=[0], kotlinScriptExtensions=[]), sourceChanges=org.jetbrains.kotlin.buildtools.api.SourcesChanges$Unknown@d514333, classpathChanges=NotAvailableForNonIncrementalRun, workingDir=/home/runner/work/fintrack/fintrack/app/build/kotlin/compileDebugKotlin/cacheable, multiModuleICSettings=MultiModuleICSettings(buildHistoryFile=/home/runner/work/fintrack/fintrack/app/build/kotlin/compileDebugKotlin/local-state/build-history.bin, useModuleDetection=true), usePreciseJavaTracking=true, icFeatures=IncrementalCompilationFeatures(withAbiSnapshot=false, preciseCompilationResultsBackup=true, keepIncrementalCompilationCachesInMemory=true, enableUnsafeIncrementalCompilationForMultiplatform=false, enableMonotonousIncrementalCompileSetExpansion=true), outputFiles=[/home/runner/work/fintrack/fintrack/app/build/tmp/kotlin-classes/debug, /home/runner/work/fintrack/fintrack/app/build/kotlin/compileDebugKotlin/cacheable, /home/runner/work/fintrack/fintrack/app/build/kotlin/compileDebugKotlin/local-state])
-e: file:///home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/picker/ProfilePickerScreen.kt:158:14 This foundation API is experimental and is likely to change or be removed in the future.
-e: file:///home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:57:8 Unresolved reference 'BigDecimal'.
-e: file:///home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:79:24 Cannot infer type for this parameter. Specify it explicitly.
-e: file:///home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:79:24 Not enough information to infer type argument for 'T'.
-e: file:///home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:80:20 Cannot infer type for this parameter. Specify it explicitly.
-e: file:///home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:80:20 Not enough information to infer type argument for 'R'.
-e: file:///home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:80:25 Unresolved reference 'BigDecimal'.
-e: file:///home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:80:44 Cannot infer type for this parameter. Specify it explicitly.
-e: file:///home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:343:36 Unresolved reference 'BigDecimal'.
+Options for KOTLIN DAEMON: IncrementalCompilationOptions(super=CompilationOptions(compilerMode=INCREMENTAL_COMPILER, targetPlatform=JVM, reportCategories=[0, 3], reportSeverity=2, requestedCompilationResults=[0], kotlinScriptExtensions=[]), sourceChanges=org.jetbrains.kotlin.buildtools.api.SourcesChanges$Unknown@4f324a5, classpathChanges=NotAvailableForNonIncrementalRun, workingDir=/home/runner/work/fintrack/fintrack/app/build/kotlin/compileDebugKotlin/cacheable, multiModuleICSettings=MultiModuleICSettings(buildHistoryFile=/home/runner/work/fintrack/fintrack/app/build/kotlin/compileDebugKotlin/local-state/build-history.bin, useModuleDetection=true), usePreciseJavaTracking=true, icFeatures=IncrementalCompilationFeatures(withAbiSnapshot=false, preciseCompilationResultsBackup=true, keepIncrementalCompilationCachesInMemory=true, enableUnsafeIncrementalCompilationForMultiplatform=false, enableMonotonousIncrementalCompileSetExpansion=true), outputFiles=[/home/runner/work/fintrack/fintrack/app/build/tmp/kotlin-classes/debug, /home/runner/work/fintrack/fintrack/app/build/kotlin/compileDebugKotlin/cacheable, /home/runner/work/fintrack/fintrack/app/build/kotlin/compileDebugKotlin/local-state])
+w: file:///home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/di/DatabaseModule.kt:83:17 Type argument for reified type parameter 'T' was inferred to the intersection of ['Comparable<*>' & 'Serializable']. Reification of an intersection type results in the common supertype being used. This may lead to subtle issues and an explicit type argument is encouraged. This will become an error in a future release.
 Finished executing kotlin compiler using DAEMON strategy
+Stored cache entry for task ':app:compileDebugKotlin' with cache key 046d5e6220cc97a5367577401e28e5ef
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/compile-1777866219237.json
+Build df4681bc-d3cd-41e0-8a90-75c6bc2ec492 is closed
 
-> Task :app:compileDebugKotlin FAILED
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/compile-1777864978679.json
-Build b4062336-f19e-43da-963d-f258e787b6c7 is closed
+BUILD SUCCESSFUL in 43s
+16 actionable tasks: 5 executed, 11 from cache
+```
+
+## assemble.log — error/warning lines
+
+```
+```
+
+## assemble.log — full log (57 lines)
+
+```
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.11.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:kspDebugKotlin UP-TO-DATE
+> Task :app:compileDebugKotlin UP-TO-DATE
+> Task :app:javaPreCompileDebug FROM-CACHE
+> Task :app:compileDebugJavaWithJavac
+> Task :app:mergeDebugShaders
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets
+> Task :app:compressDebugAssets FROM-CACHE
+> Task :app:desugarDebugFileDependencies FROM-CACHE
+> Task :app:hiltAggregateDepsDebug
+> Task :app:checkDebugDuplicateClasses
+> Task :app:hiltJavaCompileDebug
+> Task :app:processDebugJavaRes
+> Task :app:mergeExtDexDebug FROM-CACHE
+> Task :app:transformDebugClassesWithAsm
+> Task :app:mergeLibDexDebug FROM-CACHE
+> Task :app:mergeDebugJavaResource
+> Task :app:dexBuilderDebug
+> Task :app:mergeDebugGlobalSynthetics FROM-CACHE
+> Task :app:mergeDebugJniLibFolders
+> Task :app:mergeDebugNativeLibs
+> Task :app:mergeProjectDexDebug
+> Task :app:validateSigningDebug
+> Task :app:writeDebugAppMetadata
+> Task :app:writeDebugSigningConfigVersions
+
+> Task :app:stripDebugDebugSymbols
+Unable to strip the following libraries, packaging them as they are: libandroidx.graphics.path.so, libsqlcipher.so.
+
+> Task :app:packageDebug
+> Task :app:createDebugApkListingFileRedirect
+> Task :app:assembleDebug
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/assemble-1777866261564.json
+
+BUILD SUCCESSFUL in 24s
+41 actionable tasks: 19 executed, 6 from cache, 16 up-to-date
+```
+
+## tests.log — error/warning lines
+
+```
+41:e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:91:38 Unresolved reference 'isEqualByComparingTo'.
+42:e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:92:37 Unresolved reference 'isEqualByComparingTo'.
+43:e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:93:32 Unresolved reference 'isEqualByComparingTo'.
+44:e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:94:41 Unresolved reference 'isEqualByComparingTo'.
+45:e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:98:73 Unresolved reference 'isEqualByComparingTo'.
+46:e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:99:73 Unresolved reference 'isEqualByComparingTo'.
+47:e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:100:79 Unresolved reference 'isEqualByComparingTo'.
+48:e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:101:73 Unresolved reference 'isEqualByComparingTo'.
+49:e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:118:37 Unresolved reference 'isEqualByComparingTo'.
+50:e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:119:78 Unresolved reference 'isEqualByComparingTo'.
+51:e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:139:39 Unresolved reference 'isEqualByComparingTo'.
+52:e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:141:38 Unresolved reference 'isEqualByComparingTo'.
+53:e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:168:37 Unresolved reference 'isEqualByComparingTo'.
+54:e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:170:36 Unresolved reference 'isEqualByComparingTo'.
+55:e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:200:41 Unresolved reference 'isEqualByComparingTo'.
+56:e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:219:38 Unresolved reference 'isEqualByComparingTo'.
+57:e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:220:37 Unresolved reference 'isEqualByComparingTo'.
+60:FAILURE: Build failed with an exception.
+105:Caused by: org.gradle.workers.internal.DefaultWorkerExecutor$WorkExecutionException: A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+234:Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilation error. See log for more details
+```
+
+## tests.log — full log (268 lines)
+
+```
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.11.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:kspDebugKotlin UP-TO-DATE
+> Task :app:compileDebugKotlin UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:compileDebugJavaWithJavac UP-TO-DATE
+> Task :app:hiltAggregateDepsDebug UP-TO-DATE
+> Task :app:hiltJavaCompileDebug UP-TO-DATE
+> Task :app:transformDebugClassesWithAsm UP-TO-DATE
+> Task :app:mergeDebugShaders UP-TO-DATE
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:preDebugUnitTestBuild UP-TO-DATE
+> Task :app:packageDebugUnitTestForUnitTest
+> Task :app:bundleDebugClassesToRuntimeJar
+> Task :app:processDebugJavaRes UP-TO-DATE
+> Task :app:generateDebugUnitTestConfig
+> Task :app:javaPreCompileDebugUnitTest FROM-CACHE
+> Task :app:bundleDebugClassesToCompileJar
+> Task :app:kspDebugUnitTestKotlin
+
+> Task :app:compileDebugUnitTestKotlin FAILED
+e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:91:38 Unresolved reference 'isEqualByComparingTo'.
+e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:92:37 Unresolved reference 'isEqualByComparingTo'.
+e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:93:32 Unresolved reference 'isEqualByComparingTo'.
+e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:94:41 Unresolved reference 'isEqualByComparingTo'.
+e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:98:73 Unresolved reference 'isEqualByComparingTo'.
+e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:99:73 Unresolved reference 'isEqualByComparingTo'.
+e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:100:79 Unresolved reference 'isEqualByComparingTo'.
+e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:101:73 Unresolved reference 'isEqualByComparingTo'.
+e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:118:37 Unresolved reference 'isEqualByComparingTo'.
+e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:119:78 Unresolved reference 'isEqualByComparingTo'.
+e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:139:39 Unresolved reference 'isEqualByComparingTo'.
+e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:141:38 Unresolved reference 'isEqualByComparingTo'.
+e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:168:37 Unresolved reference 'isEqualByComparingTo'.
+e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:170:36 Unresolved reference 'isEqualByComparingTo'.
+e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:200:41 Unresolved reference 'isEqualByComparingTo'.
+e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:219:38 Unresolved reference 'isEqualByComparingTo'.
+e: file:///home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:220:37 Unresolved reference 'isEqualByComparingTo'.
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/tests-1777866286580.json
 
 FAILURE: Build failed with an exception.
 
 * What went wrong:
-Execution failed for task ':app:compileDebugKotlin'.
+Execution failed for task ':app:compileDebugUnitTestKotlin'.
 > A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
    > Compilation error. See log for more details
 
 * Try:
-> Run with --debug option to get more log output.
+> Run with --info or --debug option to get more log output.
 > Run with --scan to get full insights.
 > Get more help at https://help.gradle.org.
 
 * Exception is:
-org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':app:compileDebugKotlin'.
+org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':app:compileDebugUnitTestKotlin'.
 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.lambda$executeIfValid$1(ExecuteActionsTaskExecuter.java:130)
 	at org.gradle.internal.Try$Failure.ifSuccessfulOrElse(Try.java:293)
 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:128)
@@ -630,7 +984,625 @@ Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilat
 	... 2 more
 
 
-BUILD FAILED in 24s
-16 actionable tasks: 4 executed, 12 from cache
+BUILD FAILED in 20s
+31 actionable tasks: 6 executed, 1 from cache, 24 up-to-date
+```
+
+## detekt.log — error/warning lines
+
+```
+647:FAILURE: Build failed with an exception.
+720:Caused by: org.gradle.api.GradleException: Analysis failed with 201 weighted issues.
+877:Caused by: java.lang.reflect.InvocationTargetException
+883:Caused by: io.github.detekt.tooling.api.MaxIssuesReached: Analysis failed with 201 weighted issues.
+```
+
+## detekt.log — full log (896 lines)
+
+```
+[truncated to first 200 + last 400 lines]
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.11.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+
+> Task :detekt
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:128:30: The function SnapshotEntryForm(state: SnapshotEntryUiState, onSetDate: (LocalDate) -> Unit, onSetEarnings: (String) -> Unit, onSetInvested: (UUID, String) -> Unit, onSetCurrent: (UUID, String) -> Unit, onSetSip: (UUID, String) -> Unit, onSetNotes: (String) -> Unit, modifier: Modifier) has too many parameters. The current threshold is set to 8. [LongParameterList]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:1:1: File '/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt' with '14' functions detected. Defined threshold inside files is set to '11' [TooManyFunctions]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/home/snapshots/SnapshotsTab.kt:100:13: The function SnapshotRow is too long (97). The maximum length is 80. [LongMethod]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/onboarding/CreateFirstProfileScreen.kt:73:5: The function CreateFirstProfileRoute is too long (91). The maximum length is 80. [LongMethod]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/domain/analytics/SnapshotAnalytics.kt:87:9: The function compute is too long (88). The maximum length is 80. [LongMethod]
+/home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/privacy/MoneyTypesTest.kt:23:9: Function noFloatingPointInMoneyLayers is nested too deeply. [NestedBlockDepth]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/MainActivity.kt:3:1: Imports must be ordered in lexicographic order without any empty lines in-between with "java", "javax", "kotlin" and aliases in the end [ImportOrdering]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/picker/ProfilePickerScreen.kt:3:1: Imports must be ordered in lexicographic order without any empty lines in-between with "java", "javax", "kotlin" and aliases in the end [ImportOrdering]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/picker/ProfilePickerScreen.kt:282:66: Missing { ... } [MultiLineIfElse]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/picker/ProfilePickerScreen.kt:283:42: Missing { ... } [MultiLineIfElse]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/picker/ProfilePickerScreen.kt:50:1: Unused import [NoUnusedImports]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryViewModel.kt:97:28: Missing { ... } [MultiLineIfElse]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryViewModel.kt:97:37: Missing { ... } [MultiLineIfElse]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryViewModel.kt:3:1: Imports must be ordered in lexicographic order without any empty lines in-between with "java", "javax", "kotlin" and aliases in the end [ImportOrdering]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:211:32: Missing { ... } [MultiLineIfElse]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:212:25: Missing { ... } [MultiLineIfElse]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:212:1: Unexpected indentation (19) (should be 4) [Indentation]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:146:30: Missing newline after "(" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:147:78: Missing newline before ")" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:236:23: Missing newline after "(" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:237:102: Missing newline before ")" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:258:9: Missing newline after "(" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:259:56: Missing newline before ")" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:260:14: Missing newline after "(" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:262:62: Missing newline before ")" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:276:18: Missing newline after "(" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:277:91: Missing newline before ")" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:278:31: Missing newline after "(" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:279:76: Missing newline before ")" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:293:18: Missing newline after "(" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:294:91: Missing newline before ")" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:295:31: Missing newline after "(" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:296:76: Missing newline before ")" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:301:21: Missing newline after "(" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:305:68: Missing newline before ")" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:306:26: Missing newline after "(" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:307:54: Missing newline before ")" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:308:26: Missing newline after "(" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:310:56: Missing newline before ")" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:321:18: Missing newline after "(" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:322:91: Missing newline before ")" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:323:31: Missing newline after "(" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:324:76: Missing newline before ")" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:326:21: Missing newline after "(" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:327:68: Missing newline before ")" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:329:26: Missing newline after "(" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:330:56: Missing newline before ")" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:340:13: Missing newline after "(" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:341:60: Missing newline before ")" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:342:18: Missing newline after "(" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:343:46: Missing newline before ")" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:344:18: Missing newline after "(" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:346:48: Missing newline before ")" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:348:13: Missing newline after "(" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:349:63: Missing newline before ")" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:366:22: Missing newline after "(" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:368:70: Missing newline before ")" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:146:30: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:146:39: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:147:79: Missing newline before ")" [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:236:23: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:237:103: Missing newline before ")" [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:258:9: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:259:57: Missing newline before ")" [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:260:14: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:262:63: Missing newline before ")" [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:276:18: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:276:25: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:277:60: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:277:92: Missing newline before ")" [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:278:31: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:279:77: Missing newline before ")" [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:293:18: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:293:34: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:294:60: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:294:92: Missing newline before ")" [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:295:31: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:296:77: Missing newline before ")" [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:301:21: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:305:69: Missing newline before ")" [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:306:26: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:306:45: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:307:55: Missing newline before ")" [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:308:26: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:310:57: Missing newline before ")" [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:321:18: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:321:27: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:322:60: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:322:92: Missing newline before ")" [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:323:31: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:324:77: Missing newline before ")" [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:326:21: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:327:69: Missing newline before ")" [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:329:26: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:329:61: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:330:57: Missing newline before ")" [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:340:13: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:341:61: Missing newline before ")" [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:342:18: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:342:28: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:343:47: Missing newline before ")" [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:344:18: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:346:49: Missing newline before ")" [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:348:13: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:349:64: Missing newline before ")" [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:366:22: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:368:71: Missing newline before ")" [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/home/snapshots/SnapshotsListViewModel.kt:58:1: Unexpected indentation (24) (should be 28) [Indentation]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/home/HomeScreen.kt:10:1: Unused import [NoUnusedImports]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/home/HomeScreen.kt:3:1: Imports must be ordered in lexicographic order without any empty lines in-between with "java", "javax", "kotlin" and aliases in the end [ImportOrdering]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/theme/Color.kt:14:46: Unnecessary long whitespace [NoMultipleSpaces]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/theme/Color.kt:15:44: Unnecessary long whitespace [NoMultipleSpaces]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/theme/Color.kt:16:43: Unnecessary long whitespace [NoMultipleSpaces]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/onboarding/CreateFirstProfileScreen.kt:142:1: Unexpected indentation (44) (should be 36) [Indentation]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/onboarding/CreateFirstProfileScreen.kt:8:1: Unused import [NoUnusedImports]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/onboarding/CreateFirstProfileScreen.kt:31:1: Unused import [NoUnusedImports]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/onboarding/CreateFirstProfileScreen.kt:141:61: Missing { ... } [MultiLineIfElse]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/onboarding/CreateFirstProfileScreen.kt:142:50: Missing { ... } [MultiLineIfElse]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/FintrackApp.kt:17:1: Declarations and declarations with annotations should have an empty space between. [SpacingBetweenDeclarationsWithAnnotations]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/di/DatabaseModule.kt:98:1: Declarations and declarations with annotations should have an empty space between. [SpacingBetweenDeclarationsWithAnnotations]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/di/DatabaseModule.kt:99:1: Declarations and declarations with annotations should have an empty space between. [SpacingBetweenDeclarationsWithAnnotations]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/di/DatabaseModule.kt:100:1: Declarations and declarations with annotations should have an empty space between. [SpacingBetweenDeclarationsWithAnnotations]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/di/DatabaseModule.kt:101:1: Declarations and declarations with annotations should have an empty space between. [SpacingBetweenDeclarationsWithAnnotations]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/di/DatabaseModule.kt:102:1: Declarations and declarations with annotations should have an empty space between. [SpacingBetweenDeclarationsWithAnnotations]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/repo/UserSettingsRepository.kt:26:17: Missing newline after "(" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/repo/UserSettingsRepository.kt:27:69: Missing newline before ")" [Wrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/dao/GlobalSettingsDao.kt:26:12: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/dao/GlobalSettingsDao.kt:26:123: Missing newline before ")" [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/dao/GlobalSettingsDao.kt:29:12: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/dao/GlobalSettingsDao.kt:29:124: Missing newline before ")" [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/dao/HoldingDao.kt:26:12: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/dao/HoldingDao.kt:26:123: Missing newline before ")" [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/Converters.kt:23:1: Declarations and declarations with annotations should have an empty space between. [SpacingBetweenDeclarationsWithAnnotations]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/Converters.kt:26:1: Declarations and declarations with annotations should have an empty space between. [SpacingBetweenDeclarationsWithAnnotations]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/Converters.kt:29:1: Declarations and declarations with annotations should have an empty space between. [SpacingBetweenDeclarationsWithAnnotations]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/Converters.kt:32:1: Declarations and declarations with annotations should have an empty space between. [SpacingBetweenDeclarationsWithAnnotations]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/Converters.kt:35:1: Declarations and declarations with annotations should have an empty space between. [SpacingBetweenDeclarationsWithAnnotations]
+/home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:21:33: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:21:53: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:22:31: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:22:48: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:25:33: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:25:47: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:26:32: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:26:49: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:29:33: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:29:48: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:30:32: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:30:50: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:33:33: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:33:51: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:34:31: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:34:49: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:37:33: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:37:50: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:38:31: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:38:49: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:215:27: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:215:44: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:216:41: Argument should be on a separate line (unless all arguments can fit a single line) [ArgumentListWrapping]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/lock/LockScreen.kt:31:5: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/lock/BiometricUnavailableScreen.kt:27:5: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/picker/ProfilePickerScreen.kt:58:5: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/picker/ProfilePickerScreen.kt:145:13: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/picker/ProfilePickerScreen.kt:203:13: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/picker/ProfilePickerScreen.kt:239:13: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/picker/ProfilePickerScreen.kt:303:13: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:61:5: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:128:13: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:219:13: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:235:13: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:263:13: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:278:13: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:289:13: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:326:13: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:343:13: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:59:5: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:109:13: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:158:13: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:178:13: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:190:13: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:207:22: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:225:13: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:252:13: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:273:13: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:286:13: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:318:13: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:338:13: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:361:13: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/navigation/AppNavGraph.kt:34:5: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/navigation/AppNavGraph.kt:66:13: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/navigation/AppNavGraph.kt:103:13: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/home/snapshots/SnapshotsTab.kt:55:5: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/home/snapshots/SnapshotsTab.kt:100:13: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/home/snapshots/SnapshotsTab.kt:207:13: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+/home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/home/HomeScreen.kt:78:5: Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$ [FunctionNaming]
+
+... (296 lines elided) ...
+
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:236:23[0m
+	[33mArgumentListWrapping - [Missing newline before ")"] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:237:103[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:258:9[0m
+	[33mArgumentListWrapping - [Missing newline before ")"] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:259:57[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:260:14[0m
+	[33mArgumentListWrapping - [Missing newline before ")"] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:262:63[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:276:18[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:276:25[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:277:60[0m
+	[33mArgumentListWrapping - [Missing newline before ")"] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:277:92[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:278:31[0m
+	[33mArgumentListWrapping - [Missing newline before ")"] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:279:77[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:293:18[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:293:34[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:294:60[0m
+	[33mArgumentListWrapping - [Missing newline before ")"] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:294:92[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:295:31[0m
+	[33mArgumentListWrapping - [Missing newline before ")"] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:296:77[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:301:21[0m
+	[33mArgumentListWrapping - [Missing newline before ")"] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:305:69[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:306:26[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:306:45[0m
+	[33mArgumentListWrapping - [Missing newline before ")"] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:307:55[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:308:26[0m
+	[33mArgumentListWrapping - [Missing newline before ")"] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:310:57[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:321:18[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:321:27[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:322:60[0m
+	[33mArgumentListWrapping - [Missing newline before ")"] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:322:92[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:323:31[0m
+	[33mArgumentListWrapping - [Missing newline before ")"] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:324:77[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:326:21[0m
+	[33mArgumentListWrapping - [Missing newline before ")"] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:327:69[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:329:26[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:329:61[0m
+	[33mArgumentListWrapping - [Missing newline before ")"] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:330:57[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:340:13[0m
+	[33mArgumentListWrapping - [Missing newline before ")"] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:341:61[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:342:18[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:342:28[0m
+	[33mArgumentListWrapping - [Missing newline before ")"] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:343:47[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:344:18[0m
+	[33mArgumentListWrapping - [Missing newline before ")"] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:346:49[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:348:13[0m
+	[33mArgumentListWrapping - [Missing newline before ")"] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:349:64[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:366:22[0m
+	[33mArgumentListWrapping - [Missing newline before ")"] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:368:71[0m
+	[33mIndentation - [Unexpected indentation (24) (should be 28)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/home/snapshots/SnapshotsListViewModel.kt:58:1[0m
+	[33mNoUnusedImports - [Unused import] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/home/HomeScreen.kt:10:1[0m
+	[33mImportOrdering - [Imports must be ordered in lexicographic order without any empty lines in-betwee(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/home/HomeScreen.kt:3:1[0m
+	[33mNoMultipleSpaces - [Unnecessary long whitespace] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/theme/Color.kt:14:46[0m
+	[33mNoMultipleSpaces - [Unnecessary long whitespace] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/theme/Color.kt:15:44[0m
+	[33mNoMultipleSpaces - [Unnecessary long whitespace] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/theme/Color.kt:16:43[0m
+	[33mIndentation - [Unexpected indentation (44) (should be 36)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/onboarding/CreateFirstProfileScreen.kt:142:1[0m
+	[33mNoUnusedImports - [Unused import] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/onboarding/CreateFirstProfileScreen.kt:8:1[0m
+	[33mNoUnusedImports - [Unused import] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/onboarding/CreateFirstProfileScreen.kt:31:1[0m
+	[33mMultiLineIfElse - [Missing { ... }] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/onboarding/CreateFirstProfileScreen.kt:141:61[0m
+	[33mMultiLineIfElse - [Missing { ... }] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/onboarding/CreateFirstProfileScreen.kt:142:50[0m
+	[33mSpacingBetweenDeclarationsWithAnnotations - [Declarations and declarations with annotations should have an empty space betwee(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/FintrackApp.kt:17:1[0m
+	[33mSpacingBetweenDeclarationsWithAnnotations - [Declarations and declarations with annotations should have an empty space betwee(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/di/DatabaseModule.kt:98:1[0m
+	[33mSpacingBetweenDeclarationsWithAnnotations - [Declarations and declarations with annotations should have an empty space betwee(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/di/DatabaseModule.kt:99:1[0m
+	[33mSpacingBetweenDeclarationsWithAnnotations - [Declarations and declarations with annotations should have an empty space betwee(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/di/DatabaseModule.kt:100:1[0m
+	[33mSpacingBetweenDeclarationsWithAnnotations - [Declarations and declarations with annotations should have an empty space betwee(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/di/DatabaseModule.kt:101:1[0m
+	[33mSpacingBetweenDeclarationsWithAnnotations - [Declarations and declarations with annotations should have an empty space betwee(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/di/DatabaseModule.kt:102:1[0m
+	[33mWrapping - [Missing newline after "("] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/repo/UserSettingsRepository.kt:26:17[0m
+	[33mWrapping - [Missing newline before ")"] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/repo/UserSettingsRepository.kt:27:69[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/dao/GlobalSettingsDao.kt:26:12[0m
+	[33mArgumentListWrapping - [Missing newline before ")"] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/dao/GlobalSettingsDao.kt:26:123[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/dao/GlobalSettingsDao.kt:29:12[0m
+	[33mArgumentListWrapping - [Missing newline before ")"] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/dao/GlobalSettingsDao.kt:29:124[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/dao/HoldingDao.kt:26:12[0m
+	[33mArgumentListWrapping - [Missing newline before ")"] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/dao/HoldingDao.kt:26:123[0m
+	[33mSpacingBetweenDeclarationsWithAnnotations - [Declarations and declarations with annotations should have an empty space betwee(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/Converters.kt:23:1[0m
+	[33mSpacingBetweenDeclarationsWithAnnotations - [Declarations and declarations with annotations should have an empty space betwee(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/Converters.kt:26:1[0m
+	[33mSpacingBetweenDeclarationsWithAnnotations - [Declarations and declarations with annotations should have an empty space betwee(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/Converters.kt:29:1[0m
+	[33mSpacingBetweenDeclarationsWithAnnotations - [Declarations and declarations with annotations should have an empty space betwee(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/Converters.kt:32:1[0m
+	[33mSpacingBetweenDeclarationsWithAnnotations - [Declarations and declarations with annotations should have an empty space betwee(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/data/db/Converters.kt:35:1[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:21:33[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:21:53[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:22:31[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:22:48[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:25:33[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:25:47[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:26:32[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:26:49[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:29:33[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:29:48[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:30:32[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:30:50[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:33:33[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:33:51[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:34:31[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:34:49[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:37:33[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:37:50[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:38:31[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:38:49[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:215:27[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:215:44[0m
+	[33mArgumentListWrapping - [Argument should be on a separate line (unless all arguments can fit a single lin(...)] at /home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/domain/analytics/SnapshotAnalyticsTest.kt:216:41[0m
+naming - 3h 20min debt
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/lock/LockScreen.kt:31:5[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/lock/BiometricUnavailableScreen.kt:27:5[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/picker/ProfilePickerScreen.kt:58:5[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/picker/ProfilePickerScreen.kt:145:13[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/picker/ProfilePickerScreen.kt:203:13[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/picker/ProfilePickerScreen.kt:239:13[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/picker/ProfilePickerScreen.kt:303:13[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:61:5[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:128:13[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:219:13[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:235:13[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:263:13[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:278:13[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:289:13[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:326:13[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/entry/SnapshotEntryScreen.kt:343:13[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:59:5[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:109:13[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:158:13[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:178:13[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:190:13[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:207:22[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:225:13[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:252:13[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:273:13[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:286:13[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:318:13[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:338:13[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/snapshots/detail/SnapshotDetailScreen.kt:361:13[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/navigation/AppNavGraph.kt:34:5[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/navigation/AppNavGraph.kt:66:13[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/navigation/AppNavGraph.kt:103:13[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/home/snapshots/SnapshotsTab.kt:55:5[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/home/snapshots/SnapshotsTab.kt:100:13[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/home/snapshots/SnapshotsTab.kt:207:13[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/home/HomeScreen.kt:78:5[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/home/HomeScreen.kt:154:13[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/theme/Theme.kt:35:5[0m
+	[33mMatchingDeclarationName - [The file name 'CreateFirstProfileScreen' does not match the name of the single t(...)] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/onboarding/CreateFirstProfileScreen.kt:48:7[0m
+	[33mFunctionNaming - [Function names should match the pattern: ^([a-z$][a-zA-Z$0-9]*)|(`.*`)$] at /home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/ui/onboarding/CreateFirstProfileScreen.kt:73:5[0m
+style - 10min debt
+	[33mLoopWithTooManyJumpStatements - [The loop contains more than one break or continue statement. The code should be (...)] at /home/runner/work/fintrack/fintrack/app/src/test/kotlin/com/fintrack/privacy/SnapshotDaoUserScopedTest.kt:47:9[0m
+
+Overall debt: 18h 20min
+
+
+> Task :detekt FAILED
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/detekt-1777866307936.json
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':detekt'.
+> Analysis failed with 201 weighted issues.
+
+* Try:
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+* Exception is:
+org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':detekt'.
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.lambda$executeIfValid$1(ExecuteActionsTaskExecuter.java:130)
+	at org.gradle.internal.Try$Failure.ifSuccessfulOrElse(Try.java:293)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:128)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.execute(ExecuteActionsTaskExecuter.java:116)
+	at org.gradle.api.internal.tasks.execution.FinalizePropertiesTaskExecuter.execute(FinalizePropertiesTaskExecuter.java:46)
+	at org.gradle.api.internal.tasks.execution.ResolveTaskExecutionModeExecuter.execute(ResolveTaskExecutionModeExecuter.java:51)
+	at org.gradle.api.internal.tasks.execution.SkipTaskWithNoActionsExecuter.execute(SkipTaskWithNoActionsExecuter.java:57)
+	at org.gradle.api.internal.tasks.execution.SkipOnlyIfTaskExecuter.execute(SkipOnlyIfTaskExecuter.java:74)
+	at org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:36)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.executeTask(EventFiringTaskExecuter.java:77)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:55)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:52)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter.execute(EventFiringTaskExecuter.java:52)
+	at org.gradle.execution.plan.LocalTaskNodeExecutor.execute(LocalTaskNodeExecutor.java:42)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:331)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:318)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:314)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:85)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:314)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:459)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
+	at org.gradle.execution.plan.DefaultPlanExecutor.process(DefaultPlanExecutor.java:111)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.executeWithServices(DefaultTaskExecutionGraph.java:138)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.execute(DefaultTaskExecutionGraph.java:123)
+	at org.gradle.execution.SelectedTaskExecutionAction.execute(SelectedTaskExecutionAction.java:35)
+	at org.gradle.execution.DryRunBuildExecutionAction.execute(DryRunBuildExecutionAction.java:51)
+	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:54)
+	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:43)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor.execute(BuildOperationFiringBuildWorkerExecutor.java:40)
+	at org.gradle.internal.build.DefaultBuildLifecycleController.lambda$executeTasks$10(DefaultBuildLifecycleController.java:313)
+	at org.gradle.internal.model.StateTransitionController.doTransition(StateTransitionController.java:266)
+	at org.gradle.internal.model.StateTransitionController.lambda$tryTransition$8(StateTransitionController.java:177)
+	at org.gradle.internal.work.DefaultSynchronizer.withLock(DefaultSynchronizer.java:46)
+	at org.gradle.internal.model.StateTransitionController.tryTransition(StateTransitionController.java:177)
+	at org.gradle.internal.build.DefaultBuildLifecycleController.executeTasks(DefaultBuildLifecycleController.java:304)
+	at org.gradle.internal.build.DefaultBuildWorkGraphController$DefaultBuildWorkGraph.runWork(DefaultBuildWorkGraphController.java:220)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:263)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:127)
+	at org.gradle.composite.internal.DefaultBuildController.doRun(DefaultBuildController.java:181)
+	at org.gradle.composite.internal.DefaultBuildController.access$000(DefaultBuildController.java:50)
+	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.lambda$run$0(DefaultBuildController.java:198)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:85)
+	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.run(DefaultBuildController.java:198)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
+Caused by: org.gradle.api.GradleException: Analysis failed with 201 weighted issues.
+	at io.gitlab.arturbosch.detekt.invoke.DefaultCliInvoker.invokeCli(DetektInvoker.kt:102)
+	at io.gitlab.arturbosch.detekt.Detekt.check(Detekt.kt:269)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at org.gradle.internal.reflect.JavaMethod.invoke(JavaMethod.java:125)
+	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.doExecute(StandardTaskAction.java:58)
+	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.execute(StandardTaskAction.java:51)
+	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.execute(StandardTaskAction.java:29)
+	at org.gradle.api.internal.tasks.execution.TaskExecution$3.run(TaskExecution.java:244)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:29)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:26)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.run(DefaultBuildOperationRunner.java:47)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeAction(TaskExecution.java:229)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeActions(TaskExecution.java:212)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeWithPreviousOutputFiles(TaskExecution.java:195)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.execute(TaskExecution.java:162)
+	at org.gradle.internal.execution.steps.ExecuteStep.executeInternal(ExecuteStep.java:105)
+	at org.gradle.internal.execution.steps.ExecuteStep.access$000(ExecuteStep.java:44)
+	at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:59)
+	at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:56)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.internal.execution.steps.ExecuteStep.execute(ExecuteStep.java:56)
+	at org.gradle.internal.execution.steps.ExecuteStep.execute(ExecuteStep.java:44)
+	at org.gradle.internal.execution.steps.CancelExecutionStep.execute(CancelExecutionStep.java:42)
+	at org.gradle.internal.execution.steps.TimeoutStep.executeWithoutTimeout(TimeoutStep.java:75)
+	at org.gradle.internal.execution.steps.TimeoutStep.execute(TimeoutStep.java:55)
+	at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:50)
+	at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:28)
+	at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.execute(RemovePreviousOutputsStep.java:67)
+	at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.execute(RemovePreviousOutputsStep.java:37)
+	at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:61)
+	at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:26)
+	at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:69)
+	at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:46)
+	at org.gradle.internal.execution.steps.ResolveInputChangesStep.execute(ResolveInputChangesStep.java:40)
+	at org.gradle.internal.execution.steps.ResolveInputChangesStep.execute(ResolveInputChangesStep.java:29)
+	at org.gradle.internal.execution.steps.BuildCacheStep.executeWithoutCache(BuildCacheStep.java:189)
+	at org.gradle.internal.execution.steps.BuildCacheStep.executeAndStoreInCache(BuildCacheStep.java:145)
+	at org.gradle.internal.execution.steps.BuildCacheStep.lambda$executeWithCache$4(BuildCacheStep.java:101)
+	at org.gradle.internal.execution.steps.BuildCacheStep.lambda$executeWithCache$5(BuildCacheStep.java:101)
+	at org.gradle.internal.Try$Success.map(Try.java:175)
+	at org.gradle.internal.execution.steps.BuildCacheStep.executeWithCache(BuildCacheStep.java:85)
+	at org.gradle.internal.execution.steps.BuildCacheStep.lambda$execute$0(BuildCacheStep.java:74)
+	at org.gradle.internal.Either$Left.fold(Either.java:115)
+	at org.gradle.internal.execution.caching.CachingState.fold(CachingState.java:62)
+	at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:73)
+	at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:48)
+	at org.gradle.internal.execution.steps.StoreExecutionStateStep.execute(StoreExecutionStateStep.java:46)
+	at org.gradle.internal.execution.steps.StoreExecutionStateStep.execute(StoreExecutionStateStep.java:35)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.executeBecause(SkipUpToDateStep.java:75)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.lambda$execute$2(SkipUpToDateStep.java:53)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:53)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:35)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:37)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:27)
+	at org.gradle.internal.execution.steps.ResolveIncrementalCachingStateStep.executeDelegate(ResolveIncrementalCachingStateStep.java:49)
+	at org.gradle.internal.execution.steps.ResolveIncrementalCachingStateStep.executeDelegate(ResolveIncrementalCachingStateStep.java:27)
+	at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:71)
+	at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:39)
+	at org.gradle.internal.execution.steps.ResolveChangesStep.execute(ResolveChangesStep.java:65)
+	at org.gradle.internal.execution.steps.ResolveChangesStep.execute(ResolveChangesStep.java:36)
+	at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:107)
+	at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:56)
+	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:64)
+	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:43)
+	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.executeWithNonEmptySources(AbstractSkipEmptyWorkStep.java:125)
+	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:61)
+	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:36)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsStartedStep.execute(MarkSnapshottingInputsStartedStep.java:38)
+	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:36)
+	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:23)
+	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:75)
+	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:41)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.lambda$execute$0(AssignMutableWorkspaceStep.java:35)
+	at org.gradle.api.internal.tasks.execution.TaskExecution$4.withWorkspace(TaskExecution.java:289)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:31)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:22)
+	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:40)
+	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:23)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$2(ExecuteWorkBuildOperationFiringStep.java:67)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:67)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:39)
+	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:46)
+	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:34)
+	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:48)
+	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:35)
+	at org.gradle.internal.execution.impl.DefaultExecutionEngine$1.execute(DefaultExecutionEngine.java:61)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:127)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.execute(ExecuteActionsTaskExecuter.java:116)
+	at org.gradle.api.internal.tasks.execution.FinalizePropertiesTaskExecuter.execute(FinalizePropertiesTaskExecuter.java:46)
+	at org.gradle.api.internal.tasks.execution.ResolveTaskExecutionModeExecuter.execute(ResolveTaskExecutionModeExecuter.java:51)
+	at org.gradle.api.internal.tasks.execution.SkipTaskWithNoActionsExecuter.execute(SkipTaskWithNoActionsExecuter.java:57)
+	at org.gradle.api.internal.tasks.execution.SkipOnlyIfTaskExecuter.execute(SkipOnlyIfTaskExecuter.java:74)
+	at org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:36)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.executeTask(EventFiringTaskExecuter.java:77)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:55)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:52)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter.execute(EventFiringTaskExecuter.java:52)
+	at org.gradle.execution.plan.LocalTaskNodeExecutor.execute(LocalTaskNodeExecutor.java:42)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:331)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:318)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:314)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:85)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:314)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:459)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
+	at org.gradle.execution.plan.DefaultPlanExecutor.process(DefaultPlanExecutor.java:111)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.executeWithServices(DefaultTaskExecutionGraph.java:138)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.execute(DefaultTaskExecutionGraph.java:123)
+	at org.gradle.execution.SelectedTaskExecutionAction.execute(SelectedTaskExecutionAction.java:35)
+	at org.gradle.execution.DryRunBuildExecutionAction.execute(DryRunBuildExecutionAction.java:51)
+	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:54)
+	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:43)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor.execute(BuildOperationFiringBuildWorkerExecutor.java:40)
+	at org.gradle.internal.build.DefaultBuildLifecycleController.lambda$executeTasks$10(DefaultBuildLifecycleController.java:313)
+	at org.gradle.internal.model.StateTransitionController.doTransition(StateTransitionController.java:266)
+	at org.gradle.internal.model.StateTransitionController.lambda$tryTransition$8(StateTransitionController.java:177)
+	at org.gradle.internal.work.DefaultSynchronizer.withLock(DefaultSynchronizer.java:46)
+	at org.gradle.internal.model.StateTransitionController.tryTransition(StateTransitionController.java:177)
+	at org.gradle.internal.build.DefaultBuildLifecycleController.executeTasks(DefaultBuildLifecycleController.java:304)
+	at org.gradle.internal.build.DefaultBuildWorkGraphController$DefaultBuildWorkGraph.runWork(DefaultBuildWorkGraphController.java:220)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:263)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:127)
+	at org.gradle.composite.internal.DefaultBuildController.doRun(DefaultBuildController.java:181)
+	at org.gradle.composite.internal.DefaultBuildController.access$000(DefaultBuildController.java:50)
+	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.lambda$run$0(DefaultBuildController.java:198)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:85)
+	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.run(DefaultBuildController.java:198)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
+Caused by: java.lang.reflect.InvocationTargetException
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at io.gitlab.arturbosch.detekt.invoke.DefaultCliInvoker.invokeCli(DetektInvoker.kt:96)
+	... 155 more
+Caused by: io.github.detekt.tooling.api.MaxIssuesReached: Analysis failed with 201 weighted issues.
+	at io.gitlab.arturbosch.detekt.core.config.MaxIssueCheck.check(MaxIssueCheck.kt:36)
+	at io.gitlab.arturbosch.detekt.core.tooling.AnalysisFacade.checkMaxIssuesReachedReturningErrors(AnalysisFacade.kt:66)
+	at io.gitlab.arturbosch.detekt.core.tooling.AnalysisFacade.runAnalysis$lambda$8(AnalysisFacade.kt:52)
+	at io.gitlab.arturbosch.detekt.core.tooling.ProcessingSpecSettingsBridgeKt.withSettings(ProcessingSpecSettingsBridge.kt:26)
+	at io.gitlab.arturbosch.detekt.core.tooling.AnalysisFacade.runAnalysis$detekt_core(AnalysisFacade.kt:47)
+	at io.gitlab.arturbosch.detekt.core.tooling.AnalysisFacade.run(AnalysisFacade.kt:25)
+	at io.gitlab.arturbosch.detekt.cli.runners.Runner.call(Runner.kt:33)
+	at io.gitlab.arturbosch.detekt.cli.runners.Runner.execute(Runner.kt:23)
+	... 159 more
+
+
+BUILD FAILED in 14s
+1 actionable task: 1 executed
 ```
 
