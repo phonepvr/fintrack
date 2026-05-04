@@ -19,21 +19,18 @@ import javax.inject.Inject
 /**
  * Top-level state machine for the lock + onboarding gate.
  *
- *   Loading  →  Locked  ─unlock─▶  needsFirstProfile? ──yes─▶ NeedsFirstProfile
- *                                          │
- *                                         no
- *                                          ▼
- *                                       Ready(activeUserId)
+ *   Loading → Locked → (no users? NeedsFirstProfile : ShowingPicker | Ready)
  *
- * State transitions are pure: the [combine] block has no side effects.
- * Activating a profile after unlock happens in [onUnlocked]/[onProfileCreated]
- * — never as a side effect of state observation.
+ * The combine block is pure — side effects (auto-activating a single user,
+ * persisting active user id) live in [onUnlocked] / [onProfileCreated] /
+ * [activateUser] / [requestSwitchUser].
  */
 sealed interface AppState {
     data object Loading : AppState
     data object Locked : AppState
     data object BiometricUnavailable : AppState
     data object NeedsFirstProfile : AppState
+    data object ShowingPicker : AppState
     data class Ready(val activeUserId: UUID) : AppState
 }
 
@@ -59,9 +56,7 @@ class AppViewModel @Inject constructor(
             users.isEmpty() -> AppState.NeedsFirstProfile
             activeUserId != null && users.any { it.id == activeUserId } ->
                 AppState.Ready(activeUserId)
-            // No active user yet but users exist — onUnlocked auto-activates the
-            // single-user case; this branch shows Loading until that completes.
-            else -> AppState.Loading
+            else -> AppState.ShowingPicker
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AppState.Loading)
 
@@ -81,14 +76,16 @@ class AppViewModel @Inject constructor(
     }
 
     /**
-     * Called by the lock screen after BiometricPrompt succeeds. Marks the
-     * session unlocked and, if exactly one user exists, auto-activates them.
-     * Zero-user case routes to the onboarding form via [AppState.NeedsFirstProfile].
+     * Called by the lock screen after BiometricPrompt succeeds.
+     * Auto-activates the only user when the picker-skip preference is on
+     * and exactly one user exists; otherwise leaves activation to the picker.
      */
     fun onUnlocked() {
         inactivityTracker.markUnlocked()
         viewModelScope.launch {
-            if (userScope.activeUserId.value == null && userRepository.activeUserCount() == 1) {
+            if (userScope.activeUserId.value != null) return@launch
+            val settings = globalSettingsRepository.get()
+            if (!settings.alwaysShowProfilePicker && userRepository.activeUserCount() == 1) {
                 userRepository.firstActiveUser()?.let { user ->
                     userScope.setActiveUser(user.id)
                     globalSettingsRepository.setActiveUserId(user.id)
@@ -108,6 +105,14 @@ class AppViewModel @Inject constructor(
         viewModelScope.launch {
             userScope.setActiveUser(userId)
             globalSettingsRepository.setActiveUserId(userId)
+        }
+    }
+
+    /** "Switch user" affordance: clear active user without re-locking biometric. */
+    fun requestSwitchUser() {
+        viewModelScope.launch {
+            userScope.clear()
+            globalSettingsRepository.setActiveUserId(null)
         }
     }
 

@@ -9,6 +9,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.fintrack.security.BiometricAuthenticator
 import com.fintrack.ui.AppState
 import com.fintrack.ui.AppViewModel
@@ -16,11 +19,14 @@ import com.fintrack.ui.home.HomeRoute
 import com.fintrack.ui.lock.BiometricUnavailableScreen
 import com.fintrack.ui.lock.LockRoute
 import com.fintrack.ui.onboarding.CreateFirstProfileRoute
+import com.fintrack.ui.picker.ProfilePickerRoute
+import com.fintrack.ui.snapshots.entry.SnapshotEntryViewModel
+import com.fintrack.ui.snapshots.entry.SnapshotEntryRoute
 
 /**
- * Phase 1 has no NavController-driven navigation. The state machine in
- * [AppViewModel] decides what to render. Phase 2 will add a NavHost when the
- * snapshot list / detail / entry screens land.
+ * Top-level layout: AppViewModel state machine decides which gate is shown,
+ * and inside `Ready` we run a NavController for sub-routes (home, snapshot
+ * new/edit). Phases 3+ add routes to this NavHost without touching the gate.
  */
 @Composable
 fun FintrackApp(
@@ -46,13 +52,36 @@ fun FintrackApp(
             onProfileCreated = appViewModel::onProfileCreated,
         )
 
-        is AppState.Ready -> HomeRoute(
-            onSwitchUser = {
-                // Phase 1: no profile picker. Phase 2 wires this up.
-            },
+        AppState.ShowingPicker -> ProfilePickerRoute(
+            onUserPicked = appViewModel::activateUser,
         )
+
+        is AppState.Ready -> AuthenticatedNavHost(appViewModel = appViewModel)
     }
 }
+
+@Composable
+private fun AuthenticatedNavHost(appViewModel: AppViewModel) {
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = HOME_ROUTE) {
+        composable(HOME_ROUTE) {
+            HomeRoute(
+                onSwitchUser = appViewModel::requestSwitchUser,
+                onNewSnapshot = { navController.navigate(SNAPSHOT_NEW_ROUTE) },
+                onEditSnapshot = { id -> navController.navigate("snapshot/edit/$id") },
+            )
+        }
+        composable(SNAPSHOT_NEW_ROUTE) {
+            SnapshotEntryRoute(onDone = { navController.popBackStack() })
+        }
+        composable("snapshot/edit/{${SnapshotEntryViewModel.ARG_SNAPSHOT_ID}}") {
+            SnapshotEntryRoute(onDone = { navController.popBackStack() })
+        }
+    }
+}
+
+private const val HOME_ROUTE = "home"
+private const val SNAPSHOT_NEW_ROUTE = "snapshot/new"
 
 @Composable
 private fun Loading() {

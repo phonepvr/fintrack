@@ -41,7 +41,9 @@ import androidx.lifecycle.viewModelScope
 import com.fintrack.R
 import com.fintrack.data.repo.UserRepository
 import com.fintrack.domain.UserScope
+import com.fintrack.ui.home.snapshots.SnapshotsTab
 import com.fintrack.ui.onboarding.parseHex
+import java.util.UUID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -75,6 +77,8 @@ private enum class HomeTab(val labelRes: Int) {
 @Composable
 fun HomeRoute(
     onSwitchUser: () -> Unit,
+    onNewSnapshot: () -> Unit,
+    onEditSnapshot: (UUID) -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val activeUser by viewModel.activeUser.collectAsState()
@@ -127,9 +131,9 @@ fun HomeRoute(
                 }
             }
             when (HomeTab.entries[selectedTab]) {
-                HomeTab.Snapshots -> EmptyPlaceholder(
-                    title = stringResource(R.string.snapshots_empty_title),
-                    message = stringResource(R.string.snapshots_empty_message),
+                HomeTab.Snapshots -> SnapshotsTab(
+                    onNewSnapshot = onNewSnapshot,
+                    onEditSnapshot = onEditSnapshot,
                 )
                 HomeTab.Overview -> EmptyPlaceholder(
                     title = stringResource(R.string.overview_empty_title),
