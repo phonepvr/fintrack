@@ -54,6 +54,7 @@ import java.util.UUID
 @Composable
 fun SnapshotsTab(
     onNewSnapshot: () -> Unit,
+    onSnapshotDetail: (UUID) -> Unit,
     onEditSnapshot: (UUID) -> Unit,
     viewModel: SnapshotsListViewModel = hiltViewModel(),
 ) {
@@ -80,7 +81,7 @@ fun SnapshotsTab(
                 items(items, key = { it.id }) { item ->
                     SnapshotRow(
                         item = item,
-                        onTap = { onEditSnapshot(item.id) },
+                        onTap = { onSnapshotDetail(item.id) },
                         onEdit = { onEditSnapshot(item.id) },
                         onDuplicate = {
                             viewModel.duplicateSnapshot(item.id, todayLocal())

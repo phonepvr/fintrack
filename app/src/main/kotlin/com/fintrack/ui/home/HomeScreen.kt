@@ -78,6 +78,7 @@ private enum class HomeTab(val labelRes: Int) {
 fun HomeRoute(
     onSwitchUser: () -> Unit,
     onNewSnapshot: () -> Unit,
+    onSnapshotDetail: (UUID) -> Unit,
     onEditSnapshot: (UUID) -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -133,6 +134,7 @@ fun HomeRoute(
             when (HomeTab.entries[selectedTab]) {
                 HomeTab.Snapshots -> SnapshotsTab(
                     onNewSnapshot = onNewSnapshot,
+                    onSnapshotDetail = onSnapshotDetail,
                     onEditSnapshot = onEditSnapshot,
                 )
                 HomeTab.Overview -> EmptyPlaceholder(

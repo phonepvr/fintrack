@@ -20,8 +20,10 @@ import com.fintrack.ui.lock.BiometricUnavailableScreen
 import com.fintrack.ui.lock.LockRoute
 import com.fintrack.ui.onboarding.CreateFirstProfileRoute
 import com.fintrack.ui.picker.ProfilePickerRoute
-import com.fintrack.ui.snapshots.entry.SnapshotEntryViewModel
+import com.fintrack.ui.snapshots.detail.SnapshotDetailRoute
+import com.fintrack.ui.snapshots.detail.SnapshotDetailViewModel
 import com.fintrack.ui.snapshots.entry.SnapshotEntryRoute
+import com.fintrack.ui.snapshots.entry.SnapshotEntryViewModel
 
 /**
  * Top-level layout: AppViewModel state machine decides which gate is shown,
@@ -68,6 +70,7 @@ private fun AuthenticatedNavHost(appViewModel: AppViewModel) {
             HomeRoute(
                 onSwitchUser = appViewModel::requestSwitchUser,
                 onNewSnapshot = { navController.navigate(SNAPSHOT_NEW_ROUTE) },
+                onSnapshotDetail = { id -> navController.navigate("snapshot/detail/$id") },
                 onEditSnapshot = { id -> navController.navigate("snapshot/edit/$id") },
             )
         }
@@ -76,6 +79,19 @@ private fun AuthenticatedNavHost(appViewModel: AppViewModel) {
         }
         composable("snapshot/edit/{${SnapshotEntryViewModel.ARG_SNAPSHOT_ID}}") {
             SnapshotEntryRoute(onDone = { navController.popBackStack() })
+        }
+        composable("snapshot/detail/{${SnapshotDetailViewModel.ARG_SNAPSHOT_ID}}") { backStack ->
+            val id = backStack.arguments?.getString(SnapshotDetailViewModel.ARG_SNAPSHOT_ID)
+            SnapshotDetailRoute(
+                onBack = { navController.popBackStack() },
+                onEdit = {
+                    if (id != null) {
+                        navController.navigate("snapshot/edit/$id") {
+                            popUpTo("snapshot/detail/$id") { inclusive = true }
+                        }
+                    }
+                },
+            )
         }
     }
 }
