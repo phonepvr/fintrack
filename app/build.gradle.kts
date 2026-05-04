@@ -1,4 +1,3 @@
-import File
 import java.util.Properties
 
 plugins {
@@ -26,7 +25,7 @@ val keystoreProps = Properties().apply {
     if (keystorePropsFile.exists()) keystorePropsFile.inputStream().use(::load)
 }
 val releaseSigningEnabled = keystoreProps.getProperty("storeFile")
-    ?.let { File(it).exists() } == true
+    ?.let { rootProject.file(it).exists() } == true
 
 android {
     namespace = "com.fintrack"
@@ -52,7 +51,7 @@ android {
     if (releaseSigningEnabled) {
         signingConfigs {
             create("release") {
-                storeFile = File(keystoreProps.getProperty("storeFile"))
+                storeFile = rootProject.file(keystoreProps.getProperty("storeFile"))
                 storePassword = keystoreProps.getProperty("storePassword")
                 keyAlias = keystoreProps.getProperty("keyAlias")
                 keyPassword = keystoreProps.getProperty("keyPassword")
