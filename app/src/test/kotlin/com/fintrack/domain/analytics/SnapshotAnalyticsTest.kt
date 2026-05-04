@@ -88,17 +88,17 @@ class SnapshotAnalyticsTest {
             previousTotalPortfolio = null,
         )
 
-        assertThat(a.totalPortfolio).isEqualByComparingTo(BigDecimal.ZERO)
-        assertThat(a.totalInvested).isEqualByComparingTo(BigDecimal.ZERO)
-        assertThat(a.totalSip).isEqualByComparingTo(BigDecimal.ZERO)
-        assertThat(a.percentOfEarnings).isEqualByComparingTo(BigDecimal.ZERO)
+        assertThat(a.totalPortfolio).isEqualToIgnoringScale(BigDecimal.ZERO)
+        assertThat(a.totalInvested).isEqualToIgnoringScale(BigDecimal.ZERO)
+        assertThat(a.totalSip).isEqualToIgnoringScale(BigDecimal.ZERO)
+        assertThat(a.percentOfEarnings).isEqualToIgnoringScale(BigDecimal.ZERO)
         assertThat(a.deltaAbsolute).isNull()
         assertThat(a.deltaPercent).isNull()
         // No portfolio yet → 0% of every class → drift = -aim%
-        assertThat(a.byAssetClass.getValue(AssetClass.MF_NPS).driftPct).isEqualByComparingTo(BigDecimal("-55"))
-        assertThat(a.byAssetClass.getValue(AssetClass.EQUITY).driftPct).isEqualByComparingTo(BigDecimal("-15"))
-        assertThat(a.byAssetClass.getValue(AssetClass.FIXED_RETURN).driftPct).isEqualByComparingTo(BigDecimal("-25"))
-        assertThat(a.byAssetClass.getValue(AssetClass.CRYPTO).driftPct).isEqualByComparingTo(BigDecimal("-5"))
+        assertThat(a.byAssetClass.getValue(AssetClass.MF_NPS).driftPct).isEqualToIgnoringScale(BigDecimal("-55"))
+        assertThat(a.byAssetClass.getValue(AssetClass.EQUITY).driftPct).isEqualToIgnoringScale(BigDecimal("-15"))
+        assertThat(a.byAssetClass.getValue(AssetClass.FIXED_RETURN).driftPct).isEqualToIgnoringScale(BigDecimal("-25"))
+        assertThat(a.byAssetClass.getValue(AssetClass.CRYPTO).driftPct).isEqualToIgnoringScale(BigDecimal("-5"))
     }
 
     @Test
@@ -115,8 +115,8 @@ class SnapshotAnalyticsTest {
             settings = defaultSettings,
             previousTotalPortfolio = null,
         )
-        assertThat(a.savingsRollup).isEqualByComparingTo(BigDecimal("100000"))
-        assertThat(a.byAssetClass.getValue(AssetClass.FIXED_RETURN).current).isEqualByComparingTo(BigDecimal("400000"))
+        assertThat(a.savingsRollup).isEqualToIgnoringScale(BigDecimal("100000"))
+        assertThat(a.byAssetClass.getValue(AssetClass.FIXED_RETURN).current).isEqualToIgnoringScale(BigDecimal("400000"))
     }
 
     @Test
@@ -136,9 +136,9 @@ class SnapshotAnalyticsTest {
             previousTotalPortfolio = null,
         )
         // 120k + 60k + 11k = 191000
-        assertThat(a.investmentValue).isEqualByComparingTo(BigDecimal("191000"))
+        assertThat(a.investmentValue).isEqualToIgnoringScale(BigDecimal("191000"))
         // total includes the 9k bank
-        assertThat(a.totalPortfolio).isEqualByComparingTo(BigDecimal("200000"))
+        assertThat(a.totalPortfolio).isEqualToIgnoringScale(BigDecimal("200000"))
     }
 
     @Test
@@ -164,10 +164,11 @@ class SnapshotAnalyticsTest {
             settings = defaultSettings,
             previousTotalPortfolio = BigDecimal("1000000"),
         )
-        assertThat(a.deltaAbsolute).isNotNull()
-        assertThat(a.deltaAbsolute).isEqualByComparingTo(BigDecimal("100000"))
+        val absDelta = requireNotNull(a.deltaAbsolute)
+        val pctDelta = requireNotNull(a.deltaPercent)
+        assertThat(absDelta).isEqualToIgnoringScale(BigDecimal("100000"))
         // 100000 / 1000000 = 0.1 → 10%
-        assertThat(a.deltaPercent).isEqualByComparingTo(BigDecimal("10"))
+        assertThat(pctDelta).isEqualToIgnoringScale(BigDecimal("10"))
     }
 
     @Test
@@ -197,7 +198,7 @@ class SnapshotAnalyticsTest {
             previousTotalPortfolio = null,
         )
         // 8530000 / 40000000 = 0.21325 → 21.33%
-        assertThat(a.percentOfEarnings).isEqualByComparingTo(BigDecimal("21.33"))
+        assertThat(a.percentOfEarnings).isEqualToIgnoringScale(BigDecimal("21.33"))
     }
 
     @Test
@@ -216,7 +217,7 @@ class SnapshotAnalyticsTest {
             settings = defaultSettings, previousTotalPortfolio = null,
         )
         // 3250000 + 1100000 + 400000 + 100000 + 110000 = 4960000 (subset of full snapshot)
-        assertThat(a.totalPortfolio).isEqualByComparingTo(BigDecimal("4960000"))
-        assertThat(a.savingsRollup).isEqualByComparingTo(BigDecimal("100000"))
+        assertThat(a.totalPortfolio).isEqualToIgnoringScale(BigDecimal("4960000"))
+        assertThat(a.savingsRollup).isEqualToIgnoringScale(BigDecimal("100000"))
     }
 }
