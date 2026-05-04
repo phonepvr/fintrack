@@ -5,6 +5,7 @@ import android.view.WindowManager
 import androidx.activity.compose.setContent
 import androidx.fragment.app.FragmentActivity
 import com.fintrack.security.BiometricAuthenticator
+import com.fintrack.security.PrivacyOverlay
 import com.fintrack.ui.navigation.FintrackApp as FintrackAppRoot
 import com.fintrack.ui.theme.FintrackTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,7 +33,9 @@ class MainActivity : FragmentActivity() {
         )
         setContent {
             FintrackTheme {
-                FintrackAppRoot(biometricAuthenticator = biometricAuthenticator)
+                PrivacyOverlay {
+                    FintrackAppRoot(biometricAuthenticator = biometricAuthenticator)
+                }
             }
         }
     }
