@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -59,11 +60,16 @@ import com.fintrack.data.db.entities.AssetClassEntity
 import com.fintrack.data.db.entities.HoldingEntity
 import com.fintrack.data.db.entities.SubBucketEntity
 import com.fintrack.data.repo.HoldingRepository
+import com.fintrack.data.repo.MilestoneRepository
+import com.fintrack.data.repo.StreakRepository
 import com.fintrack.data.repo.TaxonomyRepository
+import com.fintrack.domain.UserScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -99,13 +105,30 @@ sealed interface ManagementMessage {
     data class Plain(override val text: String) : ManagementMessage
 }
 
+/**
+ * Snapshot of "what's about to be deleted" surfaced to the confirm dialog.
+ * `valueCount` is the number of HoldingValue rows referencing this holding
+ * across every snapshot of every user — non-zero means the cascade will
+ * also wipe historical values on those snapshots.
+ */
+data class DeleteHoldingPrompt(
+    val holdingId: UUID,
+    val name: String,
+    val valueCount: Int,
+)
+
 @HiltViewModel
 class HoldingsManagementViewModel @Inject constructor(
     private val taxonomyRepository: TaxonomyRepository,
     private val holdingRepository: HoldingRepository,
+    private val streakRepository: StreakRepository,
+    private val milestoneRepository: MilestoneRepository,
+    private val userScope: UserScope,
 ) : ViewModel() {
 
     private val message = MutableSharedFlow<ManagementMessage>(extraBufferCapacity = 4)
+    private val _deletePrompt = MutableStateFlow<DeleteHoldingPrompt?>(null)
+    val deletePrompt: StateFlow<DeleteHoldingPrompt?> = _deletePrompt.asStateFlow()
 
     val state: StateFlow<HoldingsListUiState> = combine(
         taxonomyRepository.observeAssetClasses(),
@@ -215,6 +238,32 @@ class HoldingsManagementViewModel @Inject constructor(
             .onFailure { message.tryEmit(ManagementMessage.Plain(it.message ?: "Could not add holding")) }
     }
 
+    fun requestDeleteHolding(holdingId: UUID, name: String) = viewModelScope.launch {
+        val count = holdingRepository.valueCountForHolding(holdingId)
+        _deletePrompt.value = DeleteHoldingPrompt(holdingId, name, count)
+    }
+
+    fun dismissDeletePrompt() {
+        _deletePrompt.value = null
+    }
+
+    fun confirmDeleteHolding() {
+        val target = _deletePrompt.value ?: return
+        _deletePrompt.value = null
+        viewModelScope.launch {
+            holdingRepository.deleteHolding(target.holdingId)
+            // Recompute streak + milestones for the active user. Streak
+            // is keyed off snapshot dates and won't change, but milestone
+            // detection re-evaluates net-worth thresholds against the
+            // newly-recomputed historical totals.
+            userScope.activeUserId.value?.let { uid ->
+                streakRepository.recompute(uid)
+                milestoneRepository.detectAndPersist(uid)
+            }
+            message.tryEmit(ManagementMessage.Plain("Deleted \"${target.name}\"."))
+        }
+    }
+
     private fun reorderInList(
         ids: List<UUID>,
         target: UUID,
@@ -320,6 +369,9 @@ fun HoldingsManagementRoute(
                     onHoldingRename = { h ->
                         renameTarget = RenameTarget.Holding(h.id, h.name)
                     },
+                    onHoldingDelete = { h ->
+                        viewModel.requestDeleteHolding(h.id, h.name)
+                    },
                 )
             }
         }
@@ -370,6 +422,60 @@ fun HoldingsManagementRoute(
         )
     }
 
+    val deletePrompt by viewModel.deletePrompt.collectAsState()
+    deletePrompt?.let { prompt ->
+        DeleteHoldingDialog(
+            prompt = prompt,
+            onConfirm = viewModel::confirmDeleteHolding,
+            onDismiss = viewModel::dismissDeletePrompt,
+        )
+    }
+}
+
+@Composable
+private fun DeleteHoldingDialog(
+    prompt: DeleteHoldingPrompt,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Delete \"${prompt.name}\"?") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (prompt.valueCount == 0) {
+                    Text(
+                        "This holding has no snapshot history. It will be " +
+                            "removed from the catalog.",
+                    )
+                } else {
+                    Text(
+                        "This holding appears in ${prompt.valueCount} historical " +
+                            "snapshot " +
+                            if (prompt.valueCount == 1) "value." else "values.",
+                    )
+                    Text(
+                        "Deleting it will also remove those values. Net worth on " +
+                            "the affected snapshots will recalculate without this " +
+                            "holding. This cannot be undone.",
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+                Text(
+                    "The holdings catalog is shared across all profiles on this " +
+                        "device — every profile will lose this holding.",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm) { Text("Delete") }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Cancel") }
+        },
+    )
 }
 
 private sealed interface RenameTarget {
@@ -398,6 +504,7 @@ private fun AssetClassCard(
     onHoldingMoveDown: (UUID, UUID) -> Unit,
     onHoldingToggleActive: (UUID, Boolean) -> Unit,
     onHoldingRename: (HoldingEntity) -> Unit,
+    onHoldingDelete: (HoldingEntity) -> Unit,
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -445,6 +552,7 @@ private fun AssetClassCard(
                             onHoldingMoveDown = { hId -> onHoldingMoveDown(bucket.subBucket.id, hId) },
                             onHoldingToggleActive = onHoldingToggleActive,
                             onHoldingRename = onHoldingRename,
+                            onHoldingDelete = onHoldingDelete,
                         )
                         HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
                     }
@@ -471,6 +579,7 @@ private fun SubBucketBlock(
     onHoldingMoveDown: (UUID) -> Unit,
     onHoldingToggleActive: (UUID, Boolean) -> Unit,
     onHoldingRename: (HoldingEntity) -> Unit,
+    onHoldingDelete: (HoldingEntity) -> Unit,
 ) {
     Column(modifier = Modifier.padding(vertical = 4.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
@@ -502,6 +611,7 @@ private fun SubBucketBlock(
                     onMoveDown = { onHoldingMoveDown(h.id) },
                     onToggleActive = { onHoldingToggleActive(h.id, it) },
                     onRename = { onHoldingRename(h) },
+                    onDelete = { onHoldingDelete(h) },
                 )
             }
             TextButton(onClick = onAddHolding) {
@@ -520,6 +630,7 @@ private fun HoldingRow(
     onMoveDown: () -> Unit,
     onToggleActive: (Boolean) -> Unit,
     onRename: () -> Unit,
+    onDelete: () -> Unit,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
@@ -550,6 +661,14 @@ private fun HoldingRow(
         ReorderButtons(onUp = onMoveUp, onDown = onMoveDown)
         IconButton(onClick = onRename) {
             Icon(Icons.Filled.Edit, contentDescription = "Rename", modifier = Modifier.size(18.dp))
+        }
+        IconButton(onClick = onDelete) {
+            Icon(
+                Icons.Filled.Delete,
+                contentDescription = "Delete",
+                modifier = Modifier.size(18.dp),
+                tint = MaterialTheme.colorScheme.error,
+            )
         }
         Switch(checked = holding.isActive, onCheckedChange = onToggleActive)
     }

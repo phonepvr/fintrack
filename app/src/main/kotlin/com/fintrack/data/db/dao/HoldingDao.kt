@@ -48,4 +48,7 @@ interface HoldingDao {
 
     @Query("UPDATE holdings SET is_active = :active WHERE id = :holdingId")
     suspend fun setActive(holdingId: UUID, active: Boolean)
+
+    @Query("DELETE FROM holdings WHERE id = :holdingId")
+    suspend fun deleteById(holdingId: UUID)
 }

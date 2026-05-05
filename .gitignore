@@ -32,6 +32,10 @@ Thumbs.db
 *.keystore
 release-keystore.properties
 keystore.properties
+# Exception: stable Android debug keystore. Public by design (standard
+# debug identity, not a release/Play Store key); committed so every CI run
+# signs with the same key and updates install over the previous version.
+!app/keystore/debug.keystore
 
 # Logs
 *.log

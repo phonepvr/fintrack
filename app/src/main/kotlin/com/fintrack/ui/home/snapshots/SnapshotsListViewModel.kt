@@ -3,15 +3,19 @@ package com.fintrack.ui.home.snapshots
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fintrack.data.db.entities.SnapshotEntity
+import com.fintrack.data.db.seed.SeedData
+import com.fintrack.data.repo.HoldingRepository
 import com.fintrack.data.repo.LoanRepository
 import com.fintrack.data.repo.MilestoneRepository
 import com.fintrack.data.repo.SnapshotRepository
 import com.fintrack.data.repo.StreakRepository
+import com.fintrack.data.repo.TaxonomyRepository
 import com.fintrack.domain.UserScope
 import com.fintrack.domain.snapshots.SnapshotDeleteImpact
 import com.fintrack.domain.snapshots.SnapshotDeleteImpactAnalyzer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -41,6 +45,11 @@ data class SnapshotListItem(
     val netWorth: BigDecimal,
     val invested: BigDecimal,
     val percentOfEarnings: BigDecimal,
+    /** Sum of current values of holdings in the seeded "Fixed Return" asset class. */
+    val fixedReturns: BigDecimal,
+    /** Earnings field captured on this snapshot, in crores. Used by the
+     *  inline "is X% of Earnings (₹Y Cr)" subtitle next to Net Worth. */
+    val earningsInCr: BigDecimal,
     val deltaAbsolute: BigDecimal?,
     val deltaPercent: BigDecimal?,
     val isLatest: Boolean,
@@ -53,11 +62,34 @@ class SnapshotsListViewModel @Inject constructor(
     private val loanRepository: LoanRepository,
     private val streakRepository: StreakRepository,
     private val milestoneRepository: MilestoneRepository,
+    private val taxonomyRepository: TaxonomyRepository,
+    private val holdingRepository: HoldingRepository,
     private val userScope: UserScope,
 ) : ViewModel() {
 
     private val crore = BigDecimal("10000000")
     private val hundred = BigDecimal("100")
+
+    /**
+     * Set of holding ids that belong to the seeded "Fixed Return" asset
+     * class — used to compute the per-snapshot Fixed Returns total surfaced
+     * in the bottom-right metric cell. Mirrors the fallback at
+     * SnapshotAnalyticsCalculator.kt:189-192 so list and detail report the
+     * same number even if the user has renamed/replaced the seeded class.
+     */
+    private val fixedReturnHoldingIds: Flow<Set<UUID>> = combine(
+        taxonomyRepository.observeAssetClasses(),
+        taxonomyRepository.observeSubBuckets(),
+        holdingRepository.observeAll(),
+    ) { classes, buckets, holdings ->
+        val fixedClass = classes.firstOrNull { it.id == SeedData.FIXED_RETURN_ID }
+            ?: classes.firstOrNull { it.name.startsWith("Fixed", ignoreCase = true) }
+            ?: return@combine emptySet()
+        val fixedBucketIds = buckets.filter { it.assetClassId == fixedClass.id }
+            .map { it.id }
+            .toSet()
+        holdings.filter { it.subBucketId in fixedBucketIds }.map { it.id }.toSet()
+    }
 
     val items: StateFlow<List<SnapshotListItem>> = userScope.activeUserId
         .flatMapLatest { userId ->
@@ -68,7 +100,8 @@ class SnapshotsListViewModel @Inject constructor(
                     snapshotRepository.observeForUser(userId),
                     snapshotRepository.observeAllValuesForUser(userId),
                     loanRepository.observeAllValuesForUser(userId),
-                ) { snapshots, holdingValues, loanValues ->
+                    fixedReturnHoldingIds,
+                ) { snapshots, holdingValues, loanValues, fixedHoldingIds ->
                     val holdingsBySnapshot = holdingValues.groupBy { it.snapshotId }
                     val loansBySnapshot = loanValues.groupBy { it.snapshotId }
                     val chrono = snapshots.sortedBy { it.snapshotDate }
@@ -80,7 +113,9 @@ class SnapshotsListViewModel @Inject constructor(
                         val invested = hvs.fold(BigDecimal.ZERO) { acc, v ->
                             acc + (v.invested ?: BigDecimal.ZERO)
                         }
-                        Triple(snap, assets - liabilities, Quad(assets, liabilities, invested, snap))
+                        val fixedReturns = hvs.filter { it.holdingId in fixedHoldingIds }
+                            .fold(BigDecimal.ZERO) { acc, v -> acc + v.current }
+                        Triple(snap, assets - liabilities, Quad(assets, liabilities, invested, fixedReturns))
                     }
                     perSnapshot.mapIndexed { index, (snap, netWorth, q) ->
                         val previousNet = if (index > 0) perSnapshot[index - 1].second else null
@@ -104,6 +139,8 @@ class SnapshotsListViewModel @Inject constructor(
                             netWorth = netWorth,
                             invested = q.invested,
                             percentOfEarnings = percentOfEarnings,
+                            fixedReturns = q.fixedReturns,
+                            earningsInCr = snap.earningsInCr,
                             deltaAbsolute = deltaAbs,
                             deltaPercent = deltaPct,
                             isLatest = index == perSnapshot.lastIndex,
@@ -174,7 +211,7 @@ class SnapshotsListViewModel @Inject constructor(
         val assets: BigDecimal,
         val liabilities: BigDecimal,
         val invested: BigDecimal,
-        val snap: com.fintrack.data.db.entities.SnapshotEntity,
+        val fixedReturns: BigDecimal,
     )
 }
 

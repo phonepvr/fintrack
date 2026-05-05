@@ -56,4 +56,10 @@ interface HoldingValueDao {
 
     @Query("DELETE FROM holding_values WHERE snapshot_id = :snapshotId")
     suspend fun deleteAllForSnapshot(snapshotId: UUID)
+
+    @Query("DELETE FROM holding_values WHERE holding_id = :holdingId")
+    suspend fun deleteAllForHolding(holdingId: UUID)
+
+    @Query("SELECT COUNT(*) FROM holding_values WHERE holding_id = :holdingId")
+    suspend fun countForHolding(holdingId: UUID): Int
 }

@@ -35,8 +35,8 @@ android {
         applicationId = "com.fintrack"
         minSdk = 26
         targetSdk = 35
-        versionCode = 5
-        versionName = "3.2.0"
+        versionCode = 6
+        versionName = "3.2.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
@@ -59,11 +59,27 @@ android {
         }
     }
 
+    // Stable debug keystore committed to the repo so every CI runner signs
+    // with the same key. Without this, GitHub Actions' ephemeral ~/.android
+    // generates a fresh key per run and Android refuses to upgrade across
+    // builds ("package conflicts with an existing package"). The key inside
+    // app/keystore/debug.keystore is the standard Android debug identity —
+    // public by design, not a release/Play Store signing key.
+    signingConfigs {
+        create("debug") {
+            storeFile = rootProject.file("app/keystore/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
         debug {
             isMinifyEnabled = false
             applicationIdSuffix = ".debug"
             isDebuggable = true
+            signingConfig = signingConfigs.getByName("debug")
         }
         release {
             isMinifyEnabled = true

@@ -257,13 +257,29 @@ private fun FooterChips(analytics: SnapshotAnalytics) {
     ) {
         Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             FooterRow("Net Worth", formatIndianCurrency(analytics.netWorth), bold = true)
+            if (analytics.earningsInCr.signum() != 0) {
+                Text(
+                    "is ${formatPercent(analytics.percentOfEarnings)} of " +
+                        "Earnings (${formatIndianCurrency(
+                            analytics.earningsInCr.multiply(java.math.BigDecimal("10000000")),
+                        )})",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
             FooterRow("Total Assets", formatIndianCurrency(analytics.totalAssets))
             if (analytics.totalLiabilities.signum() > 0) {
                 FooterRow("Total Liabilities", formatIndianCurrency(analytics.totalLiabilities), color = DriftOff)
             }
             FooterRow("Total Invested", formatIndianCurrency(analytics.totalInvested))
             FooterRow("Total SIP", formatIndianCurrency(analytics.totalSip))
-            FooterRow("% of Earnings", formatPercent(analytics.percentOfEarnings))
+            val fixedReturns = analytics.byAssetClass[com.fintrack.data.db.seed.SeedData.FIXED_RETURN_ID]?.current
+                ?: analytics.byAssetClass.entries.firstOrNull {
+                    it.value.assetClassName.startsWith("Fixed", ignoreCase = true)
+                }?.value?.current
+                ?: java.math.BigDecimal.ZERO
+            FooterRow("Fixed Returns", formatIndianCurrency(fixedReturns))
             FooterRow("Investment value", formatIndianCurrency(analytics.investmentValue))
             val deltaAbs = analytics.deltaAbsolute
             val deltaPct = analytics.deltaPercent

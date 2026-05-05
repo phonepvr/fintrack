@@ -134,7 +134,7 @@ private fun SnapshotRow(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Column {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         item.date.formatted(),
                         style = MaterialTheme.typography.bodyMedium,
@@ -150,6 +150,16 @@ private fun SnapshotRow(
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
+                    if (item.earningsInCr.signum() != 0) {
+                        Text(
+                            "is ${formatPercent(item.percentOfEarnings)} of " +
+                                "Earnings (${formatIndianCurrency(
+                                    item.earningsInCr.multiply(CRORE_RUPEES),
+                                )})",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
                 Column(horizontalAlignment = Alignment.End) {
                     if (item.isLatest) {
@@ -211,8 +221,8 @@ private fun SnapshotRow(
                     Modifier.weight(1f),
                 )
                 MetricCell(
-                    "% of earnings",
-                    formatPercent(item.percentOfEarnings),
+                    "Fixed Returns",
+                    formatIndianCurrency(item.fixedReturns),
                     Modifier.weight(1f),
                 )
             }
@@ -360,3 +370,7 @@ private fun EmptyState(modifier: Modifier = Modifier) {
 
 internal fun todayLocal(): LocalDate =
     Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+
+/** 1 crore in rupees — earningsInCr * this gives the absolute rupee value
+ *  for `formatIndianCurrency` to render as "₹X Cr" / "₹Y L". */
+private val CRORE_RUPEES: java.math.BigDecimal = java.math.BigDecimal("10000000")

@@ -1,5 +1,6 @@
 package com.fintrack.data.repo
 
+import androidx.room.withTransaction
 import com.fintrack.data.db.FintrackDatabase
 import com.fintrack.data.db.entities.HoldingEntity
 import kotlinx.coroutines.flow.Flow
@@ -12,6 +13,7 @@ class HoldingRepository @Inject constructor(
     private val database: FintrackDatabase,
 ) {
     private val dao get() = database.holdingDao()
+    private val valueDao get() = database.holdingValueDao()
 
     fun observeAll(): Flow<List<HoldingEntity>> = dao.observeAll()
     fun observeActive(): Flow<List<HoldingEntity>> = dao.observeActive()
@@ -53,6 +55,25 @@ class HoldingRepository @Inject constructor(
             if (existing.displayOrder != index) {
                 dao.update(existing.copy(displayOrder = index))
             }
+        }
+    }
+
+    suspend fun get(holdingId: UUID): HoldingEntity? = dao.get(holdingId)
+
+    suspend fun valueCountForHolding(holdingId: UUID): Int =
+        valueDao.countForHolding(holdingId)
+
+    /**
+     * Cascade delete: removes all HoldingValue rows that reference this
+     * holding (across every snapshot of every user), then the holding row
+     * itself. Wrapped in a transaction so a partial delete can't leave
+     * orphaned values violating the RESTRICT FK. Caller is responsible for
+     * triggering streak/milestone recompute on the active user afterwards.
+     */
+    suspend fun deleteHolding(holdingId: UUID) {
+        database.withTransaction {
+            valueDao.deleteAllForHolding(holdingId)
+            dao.deleteById(holdingId)
         }
     }
 }
