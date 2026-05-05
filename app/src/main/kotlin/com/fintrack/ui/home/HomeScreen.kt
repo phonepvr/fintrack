@@ -88,6 +88,7 @@ fun HomeRoute(
     onGoals: () -> Unit,
     onManageUsers: () -> Unit,
     onBackup: () -> Unit,
+    onExcel: () -> Unit,
     onAbout: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -154,6 +155,7 @@ fun HomeRoute(
                     onGoals = onGoals,
                     onManageUsers = onManageUsers,
                     onBackup = onBackup,
+                    onExcel = onExcel,
                     onAbout = onAbout,
                 )
             }

@@ -44,6 +44,7 @@ fun SettingsTab(
     onGoals: () -> Unit,
     onManageUsers: () -> Unit,
     onBackup: () -> Unit,
+    onExcel: () -> Unit,
     onAbout: () -> Unit,
     viewModel: SettingsTabViewModel = hiltViewModel(),
 ) {
@@ -93,6 +94,13 @@ fun SettingsTab(
             )
         }
         item("backup") { LinkRow(label = "Backup", subtitle = "Export / import data", onClick = onBackup) }
+        item("excel") {
+            LinkRow(
+                label = "Excel template",
+                subtitle = "Download · fill offline · import",
+                onClick = onExcel,
+            )
+        }
         item("about") { LinkRow(label = "About", subtitle = "Version, privacy guarantees", onClick = onAbout) }
     }
 }

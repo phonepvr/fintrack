@@ -24,6 +24,7 @@ import com.fintrack.ui.settings.about.AboutRoute
 import com.fintrack.ui.settings.about.ManifestViewerRoute
 import com.fintrack.ui.settings.aim.AimEditorRoute
 import com.fintrack.ui.settings.backup.BackupRoute
+import com.fintrack.ui.settings.excel.ExcelRoute
 import com.fintrack.ui.settings.goals.GoalsManagementRoute
 import com.fintrack.ui.settings.holdings.HoldingsManagementRoute
 import com.fintrack.ui.settings.loans.LoansManagementRoute
@@ -91,6 +92,7 @@ private fun AuthenticatedNavHost(appViewModel: AppViewModel) {
                 onGoals = { navController.navigate("settings/goals") },
                 onManageUsers = { navController.navigate("settings/users") },
                 onBackup = { navController.navigate("settings/backup") },
+                onExcel = { navController.navigate("settings/excel") },
                 onAbout = { navController.navigate("settings/about") },
             )
         }
@@ -114,6 +116,9 @@ private fun AuthenticatedNavHost(appViewModel: AppViewModel) {
         }
         composable("settings/backup") {
             BackupRoute(onBack = { navController.popBackStack() })
+        }
+        composable("settings/excel") {
+            ExcelRoute(onBack = { navController.popBackStack() })
         }
         composable("settings/about") {
             AboutRoute(
