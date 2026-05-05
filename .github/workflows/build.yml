@@ -104,6 +104,40 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+      - name: Stage APK for release
+        if: |
+          steps.locate.outcome == 'success' &&
+          steps.tests.outcome == 'success'
+        id: stage_release
+        run: |
+          mkdir -p release_staging
+          # Versioned filename so each release page shows what build it's from.
+          DEST="release_staging/fintrack-debug-${{ github.run_number }}-${GITHUB_SHA:0:7}.apk"
+          cp "${{ steps.locate.outputs.apk_path }}" "$DEST"
+          echo "dest=$DEST" >> "$GITHUB_OUTPUT"
+          ls -la release_staging
+
+      - name: Publish GitHub release
+        # Only publish when the full pipeline (compile + assemble + tests) was green,
+        # so the latest release is always installable without surprise.
+        if: |
+          steps.locate.outcome == 'success' &&
+          steps.tests.outcome == 'success'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v3.0.0-build${{ github.run_number }}
+          name: v3.0.0 (build ${{ github.run_number }})
+          body: |
+            FinTrack v3.0.0 debug build.
+
+            Commit: ${{ github.sha }}
+            Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            Install: enable "Install from unknown sources" for your file manager / browser, then open the APK below. Signed with the auto-generated debug keystore.
+          files: ${{ steps.stage_release.outputs.dest }}
+          make_latest: true
+          fail_on_unmatched_files: true
+
       - name: Upload Detekt reports
         if: always()
         uses: actions/upload-artifact@v4
