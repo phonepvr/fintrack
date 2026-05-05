@@ -22,3 +22,21 @@ fun LocalDate.formatted(): String {
     val javaDate = java.time.LocalDate.of(year, monthNumber, dayOfMonth)
     return DD_MMM_YYYY.format(javaDate)
 }
+
+/**
+ * Parses a `dd-MMM-yyyy` string back to a [LocalDate]. Use only when reading
+ * CSV exports produced by the v3 export path; ISO-8601 strings (e.g.
+ * `2026-05-05`) are still parsed via [LocalDate.parse].
+ */
+fun parseDateFormatted(value: String): LocalDate {
+    val javaDate = java.time.LocalDate.parse(value, DD_MMM_YYYY)
+    return LocalDate(javaDate.year, javaDate.monthValue, javaDate.dayOfMonth)
+}
+
+/**
+ * Lenient parser used by CSV import: accepts either dd-MMM-yyyy (the v3
+ * export format) or plain ISO-8601 (older exports / hand-edited files).
+ */
+fun parseDateLenient(value: String): LocalDate =
+    runCatching { parseDateFormatted(value) }
+        .getOrElse { LocalDate.parse(value) }

@@ -11,6 +11,8 @@ import com.fintrack.data.db.entities.MilestoneEntity
 import com.fintrack.data.db.entities.SnapshotEntity
 import com.fintrack.domain.model.GoalType
 import com.fintrack.domain.model.MilestoneType
+import com.fintrack.domain.util.formatted
+import com.fintrack.domain.util.parseDateLenient
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -99,7 +101,7 @@ class BackupRepository @Inject constructor(
                 it.userId, it.assetClassId, it.aimPercent.toString(),
             ) })
             writeCsvEntry(zip, "snapshots.csv", SnapshotsCsvHeader, payload.snapshots.map { listOf(
-                it.id, it.userId, it.snapshotDate, it.earningsInCr,
+                it.id, it.userId, csvDate(it.snapshotDate), it.earningsInCr,
                 it.notes.orEmpty(), it.createdAt, it.updatedAt,
             ) })
             writeCsvEntry(zip, "holding_values.csv", HoldingValuesCsvHeader, payload.holdingValues.map { listOf(
@@ -107,13 +109,33 @@ class BackupRepository @Inject constructor(
                 it.invested.orEmpty(), it.current, it.sip.orEmpty(),
             ) })
             writeCsvEntry(zip, "loans.csv", LoansCsvHeader, payload.loans.map { listOf(
-                it.id, it.userId, it.name, it.originalAmount, it.takenDate,
-                it.monthlyEmi, it.isActive.toString(), it.closedDate.orEmpty(),
+                it.id, it.userId, it.name, it.originalAmount, csvDate(it.takenDate),
+                it.monthlyEmi, it.isActive.toString(),
+                it.closedDate?.let(::csvDate).orEmpty(),
                 it.createdAt, it.updatedAt,
             ) })
             writeCsvEntry(zip, "loan_values.csv", LoanValuesCsvHeader, payload.loanValues.map { listOf(
                 it.id, it.snapshotId, it.loanId, it.outstanding,
             ) })
+            writeCsvEntry(zip, "goals.csv", GoalsCsvHeader, payload.goals.map { listOf(
+                it.id, it.userId, it.name, it.goalType,
+                it.targetNetWorth, csvDate(it.targetDate),
+                it.createdAt, it.achievedAt?.let(::csvDate).orEmpty(),
+                it.isArchived.toString(),
+            ) })
+            writeCsvEntry(zip, "milestones.csv", MilestonesCsvHeader, payload.milestones.map { listOf(
+                it.id, it.userId, it.type, it.achievedAtSnapshotId,
+                csvDate(it.achievedAtDate),
+                it.amountAtAchievement.orEmpty(), it.isCelebrated.toString(),
+                it.createdAt,
+            ) })
+            payload.streakState?.let { ss ->
+                writeCsvEntry(zip, "streak_state.csv", StreakStateCsvHeader, listOf(listOf(
+                    ss.userId, ss.currentStreakMonths.toString(),
+                    ss.longestStreakMonths.toString(),
+                    ss.lastSnapshotMonth.orEmpty(),
+                )))
+            }
         }
     }
 
@@ -127,6 +149,9 @@ class BackupRepository @Inject constructor(
         var holdingValues = emptyList<HoldingValueDto>()
         var loans = emptyList<LoanDto>()
         var loanValues = emptyList<LoanValueDto>()
+        var goals = emptyList<GoalDto>()
+        var milestones = emptyList<MilestoneDto>()
+        var streakState: StreakStateDto? = null
 
         ZipInputStream(input).use { zip ->
             var entry: ZipEntry? = zip.nextEntry
@@ -173,7 +198,8 @@ class BackupRepository @Inject constructor(
                     }
                     "snapshots.csv" -> snapshots = parseCsv(text, SnapshotsCsvHeader) { row ->
                         SnapshotDto(
-                            id = row[0], userId = row[1], snapshotDate = row[2],
+                            id = row[0], userId = row[1],
+                            snapshotDate = parseCsvDate(row[2]),
                             earningsInCr = row[3], notes = row[4].ifBlank { null },
                             createdAt = row[5], updatedAt = row[6],
                         )
@@ -188,9 +214,10 @@ class BackupRepository @Inject constructor(
                     "loans.csv" -> loans = parseCsv(text, LoansCsvHeader) { row ->
                         LoanDto(
                             id = row[0], userId = row[1], name = row[2],
-                            originalAmount = row[3], takenDate = row[4],
+                            originalAmount = row[3],
+                            takenDate = parseCsvDate(row[4]),
                             monthlyEmi = row[5], isActive = row[6].toBooleanLenient(),
-                            closedDate = row[7].ifBlank { null },
+                            closedDate = row[7].ifBlank { null }?.let(::parseCsvDate),
                             createdAt = row[8], updatedAt = row[9],
                         )
                     }
@@ -199,6 +226,37 @@ class BackupRepository @Inject constructor(
                             id = row[0], snapshotId = row[1], loanId = row[2],
                             outstanding = row[3],
                         )
+                    }
+                    "goals.csv" -> goals = parseCsv(text, GoalsCsvHeader) { row ->
+                        GoalDto(
+                            id = row[0], userId = row[1], name = row[2],
+                            goalType = row[3], targetNetWorth = row[4],
+                            targetDate = parseCsvDate(row[5]),
+                            createdAt = row[6],
+                            achievedAt = row[7].ifBlank { null }?.let(::parseCsvDate),
+                            isArchived = row[8].toBooleanLenient(),
+                        )
+                    }
+                    "milestones.csv" -> milestones = parseCsv(text, MilestonesCsvHeader) { row ->
+                        MilestoneDto(
+                            id = row[0], userId = row[1], type = row[2],
+                            achievedAtSnapshotId = row[3],
+                            achievedAtDate = parseCsvDate(row[4]),
+                            amountAtAchievement = row[5].ifBlank { null },
+                            isCelebrated = row[6].toBooleanLenient(),
+                            createdAt = row[7],
+                        )
+                    }
+                    "streak_state.csv" -> {
+                        val rows = parseCsv(text, StreakStateCsvHeader) { row ->
+                            StreakStateDto(
+                                userId = row[0],
+                                currentStreakMonths = row[1].toIntOrNull() ?: 0,
+                                longestStreakMonths = row[2].toIntOrNull() ?: 0,
+                                lastSnapshotMonth = row[3].ifBlank { null },
+                            )
+                        }
+                        streakState = rows.firstOrNull()
                     }
                 }
                 zip.closeEntry()
@@ -224,9 +282,9 @@ class BackupRepository @Inject constructor(
             holdingValues = holdingValues,
             loans = loans,
             loanValues = loanValues,
-            goals = emptyList(),
-            milestones = emptyList(),
-            streakState = null,
+            goals = goals,
+            milestones = milestones,
+            streakState = streakState,
         )
         return applyPayload(targetUserId, payload)
     }
@@ -358,6 +416,8 @@ class BackupRepository @Inject constructor(
         val loanDao = database.loanDao()
         val loanValueDao = database.loanValueDao()
         val goalDao = database.goalDao()
+        val milestoneDao = database.milestoneDao()
+        val streakDao = database.streakStateDao()
 
         val targetUser = userDao.getUser(targetUserId)
             ?: error("Target user $targetUserId not found on this device")
@@ -417,6 +477,7 @@ class BackupRepository @Inject constructor(
 
         val now = Clock.System.now()
         var snapshotsAdded = 0
+        val snapshotIdMap = mutableMapOf<String, UUID>()
 
         database.withTransaction {
             if (newHoldings.isNotEmpty()) holdingDao.insertAll(newHoldings)
@@ -425,10 +486,11 @@ class BackupRepository @Inject constructor(
             // Snapshots always land under the target user, regardless of file's userId.
             for (sdto in payload.snapshots) {
                 val newSnapshotId = UUID.randomUUID()
+                snapshotIdMap[sdto.id] = newSnapshotId
                 val snapshot = SnapshotEntity(
                     id = newSnapshotId,
                     userId = targetUser.id,
-                    snapshotDate = LocalDate.parse(sdto.snapshotDate),
+                    snapshotDate = parseDateLenient(sdto.snapshotDate),
                     earningsInCr = BigDecimal(sdto.earningsInCr),
                     notes = sdto.notes,
                     createdAt = parseInstantSafely(sdto.createdAt) ?: now,
@@ -487,22 +549,39 @@ class BackupRepository @Inject constructor(
                     name = gdto.name,
                     goalType = runCatching { GoalType.valueOf(gdto.goalType) }.getOrDefault(GoalType.NET_WORTH),
                     targetNetWorth = BigDecimal(gdto.targetNetWorth),
-                    targetDate = LocalDate.parse(gdto.targetDate),
+                    targetDate = parseDateLenient(gdto.targetDate),
                     createdAt = parseInstantSafely(gdto.createdAt) ?: now,
-                    achievedAt = gdto.achievedAt?.let(LocalDate::parse),
+                    achievedAt = gdto.achievedAt?.let(::parseDateLenient),
                     isArchived = gdto.isArchived,
                 ))
             }
 
-            // Milestones — silently re-key snapshot ids using the import map.
-            // Currently we don't carry the original→new snapshot id map across this loop,
-            // so milestones from another device's snapshot graph aren't applied.
-            // Phase G/J will revisit; for now we drop them gracefully.
-            @Suppress("UNUSED_VARIABLE")
-            val droppedMilestones = payload.milestones.size
-            @Suppress("UNUSED_VARIABLE")
-            val droppedMilestoneTypes = payload.milestones.mapNotNull {
-                runCatching { MilestoneType.valueOf(it.type) }.getOrNull()
+            // Milestones — re-key snapshot ids using the import map. Milestones
+            // whose source snapshot wasn't in the payload are dropped (would
+            // FK-fail otherwise). The detector re-runs on next save anyway.
+            for (mdto in payload.milestones) {
+                val newSnap = snapshotIdMap[mdto.achievedAtSnapshotId] ?: continue
+                val type = runCatching { MilestoneType.valueOf(mdto.type) }.getOrNull() ?: continue
+                milestoneDao.insert(com.fintrack.data.db.entities.MilestoneEntity(
+                    id = UUID.randomUUID(),
+                    userId = targetUser.id,
+                    type = type,
+                    achievedAtSnapshotId = newSnap,
+                    achievedAtDate = parseDateLenient(mdto.achievedAtDate),
+                    amountAtAchievement = mdto.amountAtAchievement?.let(::BigDecimal),
+                    isCelebrated = mdto.isCelebrated,
+                    createdAt = parseInstantSafely(mdto.createdAt) ?: now,
+                ))
+            }
+
+            // Streak state — overwrite under the target user.
+            payload.streakState?.let { ss ->
+                streakDao.upsert(com.fintrack.data.db.entities.StreakStateEntity(
+                    userId = targetUser.id,
+                    currentStreakMonths = ss.currentStreakMonths,
+                    longestStreakMonths = ss.longestStreakMonths,
+                    lastSnapshotMonth = ss.lastSnapshotMonth,
+                ))
             }
         }
 
@@ -572,8 +651,33 @@ class BackupRepository @Inject constructor(
             "is_active", "closed_date", "created_at", "updated_at",
         )
         val LoanValuesCsvHeader = listOf("id", "snapshot_id", "loan_id", "outstanding")
+        val GoalsCsvHeader = listOf(
+            "id", "user_id", "name", "goal_type", "target_net_worth",
+            "target_date", "created_at", "achieved_at", "is_archived",
+        )
+        val MilestonesCsvHeader = listOf(
+            "id", "user_id", "type", "achieved_at_snapshot_id", "achieved_at_date",
+            "amount_at_achievement", "is_celebrated", "created_at",
+        )
+        val StreakStateCsvHeader = listOf(
+            "user_id", "current_streak_months", "longest_streak_months", "last_snapshot_month",
+        )
     }
 }
+
+/**
+ * Snapshots / loans / goals carry LocalDate fields that we render in CSV
+ * with the user-friendly `dd-MMM-yyyy` form per spec §8 — JSON keeps the
+ * canonical `yyyy-MM-dd` form. The DTO already holds a string, so we
+ * only convert at the I/O edges.
+ */
+private fun csvDate(isoOrFormatted: String): String =
+    runCatching { parseDateLenient(isoOrFormatted).formatted() }
+        .getOrDefault(isoOrFormatted)
+
+private fun parseCsvDate(text: String): String =
+    runCatching { parseDateLenient(text).toString() }
+        .getOrDefault(text)
 
 private fun String.toBooleanLenient(): Boolean =
     when (lowercase().trim()) {
