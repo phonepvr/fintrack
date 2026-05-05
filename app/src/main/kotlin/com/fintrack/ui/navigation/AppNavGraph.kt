@@ -19,6 +19,7 @@ import com.fintrack.ui.home.HomeRoute
 import com.fintrack.ui.lock.BiometricUnavailableScreen
 import com.fintrack.ui.lock.LockRoute
 import com.fintrack.ui.onboarding.CreateFirstProfileRoute
+import com.fintrack.ui.onboarding.OnboardingPagerRoute
 import com.fintrack.ui.picker.ProfilePickerRoute
 import com.fintrack.ui.settings.about.AboutRoute
 import com.fintrack.ui.settings.about.ManifestViewerRoute
@@ -57,6 +58,10 @@ fun FintrackApp(
 
         AppState.BiometricUnavailable -> BiometricUnavailableScreen(
             onRetry = appViewModel::onBiometricAvailable,
+        )
+
+        AppState.NeedsOnboarding -> OnboardingPagerRoute(
+            onComplete = appViewModel::completeOnboarding,
         )
 
         AppState.NeedsFirstProfile -> CreateFirstProfileRoute(
@@ -124,13 +129,20 @@ private fun AuthenticatedNavHost(appViewModel: AppViewModel) {
             AboutRoute(
                 onBack = { navController.popBackStack() },
                 onViewManifest = { navController.navigate("settings/about/manifest") },
-                // Phase B wires the replay flow; Phase A leaves the button
-                // as a no-op so the About surface lands first.
-                onReplayOnboarding = {},
+                onReplayOnboarding = { navController.navigate("onboarding/replay") },
             )
         }
         composable("settings/about/manifest") {
             ManifestViewerRoute(onBack = { navController.popBackStack() })
+        }
+        composable("onboarding/replay") {
+            // Replay never touches the onboarding flag — it's a normal nav
+            // round trip back to About per spec §2.2.
+            OnboardingPagerRoute(
+                onComplete = { navController.popBackStack() },
+                isReplay = true,
+                onDismissReplay = { navController.popBackStack() },
+            )
         }
         composable(SNAPSHOT_NEW_ROUTE) {
             SnapshotEntryRoute(onDone = { navController.popBackStack() })

@@ -21,16 +21,24 @@ import javax.inject.Inject
 /**
  * Top-level state machine for the lock + onboarding gate.
  *
- *   Loading → Locked → (no users? NeedsFirstProfile : ShowingPicker | Ready)
+ *   Loading → Locked → NeedsOnboarding → NeedsFirstProfile → ShowingPicker | Ready
  *
  * The combine block is pure — side effects (auto-activating a single user,
- * persisting active user id) live in [onUnlocked] / [onProfileCreated] /
- * [activateUser] / [requestSwitchUser].
+ * persisting active user id, flipping the onboarding flag) live in
+ * [onUnlocked] / [onProfileCreated] / [activateUser] / [requestSwitchUser] /
+ * [completeOnboarding].
+ *
+ * `NeedsOnboarding` fires whenever `hasCompletedOnboarding` is false —
+ * both for first-launch installs (no users yet) and for v3-upgrade
+ * installs (users exist, but the new flag defaults to 0). The four-card
+ * pager is short enough that showing it once on upgrade is intentional;
+ * after `completeOnboarding()` the state recomputes naturally.
  */
 sealed interface AppState {
     data object Loading : AppState
     data object Locked : AppState
     data object BiometricUnavailable : AppState
+    data object NeedsOnboarding : AppState
     data object NeedsFirstProfile : AppState
     data object ShowingPicker : AppState
     data class Ready(val activeUserId: UUID) : AppState
@@ -53,10 +61,12 @@ class AppViewModel @Inject constructor(
         userRepository.observeActiveUsers(),
         userScope.activeUserId,
         biometricAvailable,
-    ) { isUnlocked, users, activeUserId, available ->
+        globalSettingsRepository.observe(),
+    ) { isUnlocked, users, activeUserId, available, settings ->
         when {
             !available -> AppState.BiometricUnavailable
             !isUnlocked -> AppState.Locked
+            !settings.hasCompletedOnboarding -> AppState.NeedsOnboarding
             users.isEmpty() -> AppState.NeedsFirstProfile
             activeUserId != null && users.any { it.id == activeUserId } ->
                 AppState.Ready(activeUserId)
@@ -137,5 +147,17 @@ class AppViewModel @Inject constructor(
     fun onLocked() {
         inactivityTracker.forceLock()
         userScope.clear()
+    }
+
+    /**
+     * Called by the onboarding pager's final-card CTA on first launch.
+     * Flips the persistent flag so the gate doesn't re-fire on subsequent
+     * unlocks. Replays from the About screen do NOT call this — they're a
+     * normal NavController navigation that doesn't touch the flag.
+     */
+    fun completeOnboarding() {
+        viewModelScope.launch {
+            globalSettingsRepository.setHasCompletedOnboarding(true)
+        }
     }
 }
