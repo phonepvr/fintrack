@@ -4,10 +4,18 @@ Android-only, **offline-first**, **privacy-focused** personal **wealth tracker**
 Multiple profiles share one device, each with their own isolated portfolio,
 loans, goals, streaks, and milestones.
 
-> Status: v3 ships through Phases A–K. Net Worth replaces "total portfolio"
-> as the headline number; the four-class enum becomes a three-level taxonomy
-> table; loans/streaks/milestones/goals are first-class; backups round-trip
-> the full v3 schema; XLSX template + import is wired.
+> Status: v3.1 (3.1.0 / build 4) layers a three-phase UX pass on top of v3:
+> a four-card swipeable onboarding pager on first launch (gated by
+> `GlobalSettings.has_completed_onboarding`, schema v4), a rewritten About
+> screen with an expandable glossary (wealth metrics, asset classes,
+> streaks/milestones/goals, loans), and five in-context `?` help sheets that
+> deep-link back to the matching About card. The v3 privacy panels are
+> preserved verbatim; no permissions, dependencies, or data shapes change.
+>
+> v3 base: Net Worth replaces "total portfolio" as the headline number; the
+> four-class enum becomes a three-level taxonomy table; loans / streaks /
+> milestones / goals are first-class; backups round-trip the full schema;
+> XLSX template + import is wired.
 
 ---
 
@@ -207,6 +215,14 @@ app/src/main/kotlin/com/fintrack/
 | I | XLSX template + import | Apache POI 5.2.5 + R8 keep rules; SAF download/import; preview with Skip/Replace radio. |
 | J | CSV/JSON export updates | All v3 entities round-trip; `dd-MMM-yyyy` for CSV; v2 backup rejection. |
 | K | Polish | Empty/error states, README, version bump to 3.0.0, full test pass. |
+
+## v3.1 deliverables
+
+| Phase | Headline |
+|---|---|
+| A | Schema migration v3 → v4 (`has_completed_onboarding`); pure-Kotlin `GlossaryContent` registry keyed off seeded UUIDs (renames preserve canonical copy); About screen rewritten with identity strip, Welcome + Replay button, How-to-use 6 steps, four expandable glossary cards, then the v3 privacy panels verbatim. |
+| B | Onboarding pager: four-card Material 3 `HorizontalPager` with animated dot indicator, Skip + per-card Next, last-card Get-started CTA. New `AppState.NeedsOnboarding` gate fires when the flag is `0` (first-launch and v3-upgrade). About → Replay opens the same pager in `isReplay = true` mode and pops back without touching the flag. |
+| C | Five `?` icon help sheets (Snapshot Entry × 2, Home/Journey, Goals, Aim editor) each rendering a `ModalBottomSheet` with title + body + bullets + "Learn more in About" deep-link. About route widened to `settings/about?scrollTo={anchor}` (optional query); the matching glossary card auto-scrolls into view and auto-expands. |
 
 ## Signed release build
 
