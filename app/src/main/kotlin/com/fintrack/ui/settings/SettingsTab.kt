@@ -41,6 +41,7 @@ fun SettingsTab(
     onAimEditor: () -> Unit,
     onHoldings: () -> Unit,
     onLoans: () -> Unit,
+    onGoals: () -> Unit,
     onManageUsers: () -> Unit,
     onBackup: () -> Unit,
     onAbout: () -> Unit,
@@ -67,6 +68,13 @@ fun SettingsTab(
                 label = "Loans",
                 subtitle = loansSummary(state),
                 onClick = onLoans,
+            )
+        }
+        item("goals") {
+            LinkRow(
+                label = "Goals",
+                subtitle = "Net worth + debt-free targets",
+                onClick = onGoals,
             )
         }
         item("inactivity") {

@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -59,14 +60,17 @@ private enum class JourneySubTab(val label: String) {
 fun OverviewTab(
     onSnapshotDetail: (UUID) -> Unit,
     viewModel: OverviewViewModel = hiltViewModel(),
+    goalsViewModel: com.fintrack.ui.journey.goals.JourneyGoalsViewModel = hiltViewModel(),
 ) {
     val headline by viewModel.headline.collectAsState()
     val analytics by viewModel.filteredAnalytics.collectAsState()
     val history by viewModel.history.collectAsState()
     val period by viewModel.period.collectAsState()
     val chartView by viewModel.chartView.collectAsState()
+    val goals by goalsViewModel.progresses.collectAsState()
 
     var subTab by rememberSaveable { mutableIntStateOf(0) }
+    var selectedGoalId by rememberSaveable { mutableStateOf<String?>(null) }
 
     if (analytics.isEmpty() && headline == null) {
         EmptyOverview()
@@ -90,6 +94,9 @@ fun OverviewTab(
                 history = history,
                 period = period,
                 chartView = chartView,
+                goals = goals,
+                selectedGoalId = selectedGoalId?.let(UUID::fromString),
+                onSelectGoal = { id -> selectedGoalId = id?.toString() },
                 onPeriod = viewModel::setPeriod,
                 onChartView = viewModel::setChartView,
                 onSnapshotDetail = onSnapshotDetail,
@@ -106,16 +113,29 @@ private fun ChartsContent(
     history: List<HistoryRow>,
     period: Period,
     chartView: ChartView,
+    goals: List<com.fintrack.domain.goals.GoalProgress>,
+    selectedGoalId: UUID?,
+    onSelectGoal: (UUID?) -> Unit,
     onPeriod: (Period) -> Unit,
     onChartView: (ChartView) -> Unit,
     onSnapshotDetail: (UUID) -> Unit,
 ) {
+    val selectedGoal = goals.firstOrNull { it.goal.id == selectedGoalId }
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         headline?.let { item("headline") { HeadlineCardsRow(it) } }
+        if (goals.isNotEmpty()) {
+            item("goals") {
+                com.fintrack.ui.journey.goals.JourneyGoalsCard(
+                    progresses = goals,
+                    selectedGoalId = selectedGoalId,
+                    onSelect = onSelectGoal,
+                )
+            }
+        }
 
         item("filters") {
             PeriodChips(selected = period, onSelected = onPeriod)
@@ -124,7 +144,7 @@ private fun ChartsContent(
             ChartViewChips(selected = chartView, onSelected = onChartView)
         }
         item("chart") {
-            ChartCard(view = chartView, analytics = analytics)
+            ChartCard(view = chartView, analytics = analytics, overlay = selectedGoal)
         }
         item("history_header") {
             HistoryTableHeader()
@@ -243,14 +263,25 @@ private fun ChartViewChips(selected: ChartView, onSelected: (ChartView) -> Unit)
 }
 
 @Composable
-private fun ChartCard(view: ChartView, analytics: List<SnapshotAnalytics>) {
+private fun ChartCard(
+    view: ChartView,
+    analytics: List<SnapshotAnalytics>,
+    overlay: com.fintrack.domain.goals.GoalProgress?,
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
-            val series = seriesFor(view, analytics)
+            val baseSeries = seriesFor(view, analytics)
             val isPercent = view == ChartView.PERCENT_OF_EARNINGS
+            val series = if (overlay != null && analytics.isNotEmpty() && !isPercent) {
+                baseSeries + ChartSeries(
+                    name = "${overlay.goal.name} target",
+                    color = Color(0xFFAB47BC),
+                    points = analytics.map { it.date to overlay.targetValue },
+                )
+            } else baseSeries
             LineChart(
                 series = series,
                 valueFormatter = if (isPercent) { v -> formatPercent(v, decimals = 0) }
