@@ -113,8 +113,8 @@ object GoalCalculator {
         val totalDays = goal.targetDate.toEpochDays() - createdAtDate.toEpochDays()
         if (totalDays <= 0) return HUNDRED
         val elapsedDays = today.toEpochDays() - createdAtDate.toEpochDays()
-        val raw = BigDecimal(elapsedDays.coerceAtLeast(0L))
-            .divide(BigDecimal(totalDays.toLong()), 6, RoundingMode.HALF_UP)
+        val raw = BigDecimal(elapsedDays.coerceAtLeast(0))
+            .divide(BigDecimal(totalDays), 6, RoundingMode.HALF_UP)
             .multiply(HUNDRED)
             .setScale(2, RoundingMode.HALF_UP)
         return when {
