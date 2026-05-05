@@ -256,7 +256,12 @@ private fun FooterChips(analytics: SnapshotAnalytics) {
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
     ) {
         Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            FooterRow("Net Worth", formatIndianCurrency(analytics.netWorth), bold = true)
+            FooterRow(
+                label = "Net Worth",
+                value = formatIndianCurrency(analytics.netWorth),
+                info = com.fintrack.ui.metrics.Metrics.NET_WORTH,
+                bold = true,
+            )
             if (analytics.earningsInCr.signum() != 0) {
                 Text(
                     "is ${formatPercent(analytics.percentOfEarnings)} of " +
@@ -268,25 +273,51 @@ private fun FooterChips(analytics: SnapshotAnalytics) {
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
-            FooterRow("Total Assets", formatIndianCurrency(analytics.totalAssets))
+            FooterRow(
+                label = "Total Assets",
+                value = formatIndianCurrency(analytics.totalAssets),
+                info = com.fintrack.ui.metrics.Metrics.TOTAL_ASSETS,
+            )
             if (analytics.totalLiabilities.signum() > 0) {
-                FooterRow("Total Liabilities", formatIndianCurrency(analytics.totalLiabilities), color = DriftOff)
+                FooterRow(
+                    label = "Total Liabilities",
+                    value = formatIndianCurrency(analytics.totalLiabilities),
+                    info = com.fintrack.ui.metrics.Metrics.TOTAL_LIABILITIES,
+                    color = DriftOff,
+                )
             }
-            FooterRow("Total Invested", formatIndianCurrency(analytics.totalInvested))
-            FooterRow("Total SIP", formatIndianCurrency(analytics.totalSip))
+            FooterRow(
+                label = "Total Invested",
+                value = formatIndianCurrency(analytics.totalInvested),
+                info = com.fintrack.ui.metrics.Metrics.TOTAL_INVESTED,
+            )
+            FooterRow(
+                label = "Total SIP",
+                value = formatIndianCurrency(analytics.totalSip),
+                info = com.fintrack.ui.metrics.Metrics.TOTAL_SIP,
+            )
             val fixedReturns = analytics.byAssetClass[com.fintrack.data.db.seed.SeedData.FIXED_RETURN_ID]?.current
                 ?: analytics.byAssetClass.entries.firstOrNull {
                     it.value.assetClassName.startsWith("Fixed", ignoreCase = true)
                 }?.value?.current
                 ?: java.math.BigDecimal.ZERO
-            FooterRow("Fixed Returns", formatIndianCurrency(fixedReturns))
-            FooterRow("Investment value", formatIndianCurrency(analytics.investmentValue))
+            FooterRow(
+                label = "Fixed Returns",
+                value = formatIndianCurrency(fixedReturns),
+                info = com.fintrack.ui.metrics.Metrics.FIXED_RETURNS,
+            )
+            FooterRow(
+                label = "Investment Value",
+                value = formatIndianCurrency(analytics.investmentValue),
+                info = com.fintrack.ui.metrics.Metrics.INVESTMENT_VALUE,
+            )
             val deltaAbs = analytics.deltaAbsolute
             val deltaPct = analytics.deltaPercent
             if (deltaAbs != null && deltaPct != null) {
                 FooterRow(
                     label = "Δ vs previous",
                     value = "${formatSignedCurrency(deltaAbs)}  (${formatSignedPercent(deltaPct)})",
+                    info = com.fintrack.ui.metrics.Metrics.DELTA_VS_PREV,
                     color = if (deltaAbs.signum() >= 0) DriftWithin else DriftOff,
                 )
             }
@@ -298,17 +329,19 @@ private fun FooterChips(analytics: SnapshotAnalytics) {
 private fun FooterRow(
     label: String,
     value: String,
+    info: com.fintrack.ui.metrics.MetricInfo,
     bold: Boolean = false,
     color: Color = MaterialTheme.colorScheme.onSurface,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            label,
+        com.fintrack.ui.metrics.LabelWithHelp(
+            text = label,
+            info = info,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(
             value,

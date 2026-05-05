@@ -47,6 +47,9 @@ data class SnapshotListItem(
     val percentOfEarnings: BigDecimal,
     /** Sum of current values of holdings in the seeded "Fixed Return" asset class. */
     val fixedReturns: BigDecimal,
+    /** Total assets minus the Fixed-Return total — i.e. the equity / risk
+     *  side of the portfolio. Mirrors `SnapshotAnalytics.investmentValue`. */
+    val investmentValue: BigDecimal,
     /** Earnings field captured on this snapshot, in crores. Used by the
      *  inline "is X% of Earnings (₹Y Cr)" subtitle next to Net Worth. */
     val earningsInCr: BigDecimal,
@@ -140,6 +143,7 @@ class SnapshotsListViewModel @Inject constructor(
                             invested = q.invested,
                             percentOfEarnings = percentOfEarnings,
                             fixedReturns = q.fixedReturns,
+                            investmentValue = q.assets.subtract(q.fixedReturns),
                             earningsInCr = snap.earningsInCr,
                             deltaAbsolute = deltaAbs,
                             deltaPercent = deltaPct,

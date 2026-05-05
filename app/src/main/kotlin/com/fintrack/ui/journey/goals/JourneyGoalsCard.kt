@@ -28,7 +28,7 @@ import com.fintrack.domain.util.formatted
 import java.util.UUID
 
 /**
- * Goals card surfaced on the My Journey So Far tab between the headline
+ * Goals card surfaced on the Journey &amp; Goals tab between the headline
  * row and the chart. Tapping a row notifies the parent to overlay the
  * goal's target line on the chart.
  */

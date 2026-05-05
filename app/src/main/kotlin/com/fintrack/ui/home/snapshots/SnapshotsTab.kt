@@ -145,10 +145,9 @@ private fun SnapshotRow(
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.SemiBold,
                     )
-                    Text(
-                        "Net Worth",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    com.fintrack.ui.metrics.LabelWithHelp(
+                        text = "Net Worth",
+                        info = com.fintrack.ui.metrics.Metrics.NET_WORTH,
                     )
                     if (item.earningsInCr.signum() != 0) {
                         Text(
@@ -201,12 +200,18 @@ private fun SnapshotRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                MetricCell("Assets", formatIndianCurrency(item.totalAssets), Modifier.weight(1f))
+                MetricCell(
+                    label = "Assets",
+                    value = formatIndianCurrency(item.totalAssets),
+                    info = com.fintrack.ui.metrics.Metrics.TOTAL_ASSETS,
+                    modifier = Modifier.weight(1f),
+                )
                 if (showLiabilities) {
                     MetricCell(
-                        "Liabilities",
-                        formatIndianCurrency(item.totalLiabilities),
-                        Modifier.weight(1f),
+                        label = "Liabilities",
+                        value = formatIndianCurrency(item.totalLiabilities),
+                        info = com.fintrack.ui.metrics.Metrics.TOTAL_LIABILITIES,
+                        modifier = Modifier.weight(1f),
                     )
                 }
             }
@@ -216,14 +221,16 @@ private fun SnapshotRow(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 MetricCell(
-                    "Invested",
-                    formatIndianCurrency(item.invested),
-                    Modifier.weight(1f),
+                    label = "Investment Value",
+                    value = formatIndianCurrency(item.investmentValue),
+                    info = com.fintrack.ui.metrics.Metrics.INVESTMENT_VALUE,
+                    modifier = Modifier.weight(1f),
                 )
                 MetricCell(
-                    "Fixed Returns",
-                    formatIndianCurrency(item.fixedReturns),
-                    Modifier.weight(1f),
+                    label = "Fixed Returns",
+                    value = formatIndianCurrency(item.fixedReturns),
+                    info = com.fintrack.ui.metrics.Metrics.FIXED_RETURNS,
+                    modifier = Modifier.weight(1f),
                 )
             }
             DropdownMenu(
@@ -270,7 +277,12 @@ private fun SnapshotRow(
 }
 
 @Composable
-private fun MetricCell(label: String, value: String, modifier: Modifier = Modifier) {
+private fun MetricCell(
+    label: String,
+    value: String,
+    info: com.fintrack.ui.metrics.MetricInfo,
+    modifier: Modifier = Modifier,
+) {
     Box(
         modifier = modifier
             .background(
@@ -280,11 +292,7 @@ private fun MetricCell(label: String, value: String, modifier: Modifier = Modifi
             .padding(horizontal = 10.dp, vertical = 8.dp),
     ) {
         Column {
-            Text(
-                label,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            com.fintrack.ui.metrics.LabelWithHelp(text = label, info = info)
             Text(
                 value,
                 style = MaterialTheme.typography.bodyMedium,

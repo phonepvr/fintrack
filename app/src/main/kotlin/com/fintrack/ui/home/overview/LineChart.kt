@@ -1,24 +1,18 @@
 package com.fintrack.ui.home.overview
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -198,8 +192,7 @@ fun LineChart(
                 }
             }
         }
-        Spacer(Modifier.height(6.dp))
-        Legend(series = series.filter { it.points.isNotEmpty() }, onSurface = onSurface)
+        // Legend is rendered by ChartCard after the chart so we don't duplicate it here.
     }
 }
 
@@ -225,30 +218,3 @@ private fun toPx(
     )
 }
 
-@Composable
-private fun Legend(series: List<ChartSeries>, onSurface: Color) {
-    if (series.size <= 1) return
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        series.forEach { s ->
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier
-                        .size(10.dp)
-                        .clip(CircleShape)
-                        .background(s.color),
-                )
-                Spacer(Modifier.size(6.dp))
-                Text(
-                    s.name,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = onSurface,
-                )
-            }
-        }
-    }
-}

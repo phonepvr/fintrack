@@ -98,7 +98,7 @@ private val onboardingCards: List<OnboardingCard> = listOf(
         headline = "See your money grow",
         body = "Every entry builds your timeline. Track net worth across months, " +
             "watch your investments versus your debts, hit milestones, and stay " +
-            "on streak. Your \"My Journey So Far\" tab tells the story.",
+            "on streak. Your \"Journey & Goals\" tab tells the story.",
         icon = Icons.Filled.TrendingUp,
     ),
     OnboardingCard(

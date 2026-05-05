@@ -89,7 +89,6 @@ fun OverviewTab(
         }
         when (JourneySubTab.entries[subTab]) {
             JourneySubTab.Charts -> ChartsContent(
-                headline = headline,
                 analytics = analytics,
                 history = history,
                 period = period,
@@ -108,7 +107,6 @@ fun OverviewTab(
 
 @Composable
 private fun ChartsContent(
-    headline: HeadlineCard?,
     analytics: List<SnapshotAnalytics>,
     history: List<HistoryRow>,
     period: Period,
@@ -126,7 +124,9 @@ private fun ChartsContent(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        headline?.let { item("headline") { HeadlineCardsRow(it) } }
+        // Headline metric cards (Net Worth / Total Invested / % of Earnings) were
+        // removed in v3.3 — those numbers already live on each Snapshot row, and
+        // the Journey & Goals tab focuses on the chart + history table.
         if (goals.isNotEmpty()) {
             item("goals") {
                 com.fintrack.ui.journey.goals.JourneyGoalsCard(
@@ -167,67 +167,6 @@ private fun EmptyOverview() {
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-    }
-}
-
-@Composable
-private fun HeadlineCardsRow(card: HeadlineCard) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-        HeadlineCardBox(
-            modifier = Modifier.weight(1f),
-            label = "Net Worth",
-            value = formatIndianCurrency(card.netWorth),
-            sub = card.deltaAbsolute?.let { abs ->
-                val pct = card.deltaPercent
-                if (pct == null) formatSignedCurrency(abs)
-                else "${formatSignedCurrency(abs)} (${formatSignedPercent(pct)})"
-            } ?: "First snapshot",
-            subColor = card.deltaAbsolute?.let {
-                if (it.signum() >= 0) DriftWithin else DriftOff
-            } ?: MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        HeadlineCardBox(
-            modifier = Modifier.weight(1f),
-            label = "Total Invested",
-            value = formatIndianCurrency(card.totalInvested),
-            sub = card.gainPercent?.let { "Gain ${formatSignedPercent(it)}" },
-            subColor = card.gainPercent?.let {
-                if (it.signum() >= 0) DriftWithin else DriftOff
-            } ?: MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        HeadlineCardBox(
-            modifier = Modifier.weight(1f),
-            label = "% of Earnings",
-            value = formatPercent(card.percentOfEarnings),
-        )
-    }
-}
-
-@Composable
-private fun HeadlineCardBox(
-    modifier: Modifier = Modifier,
-    label: String,
-    value: String,
-    sub: String? = null,
-    subColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
-) {
-    Card(
-        modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-    ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            Text(
-                label,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Spacer(Modifier.height(2.dp))
-            Text(value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-            if (sub != null) {
-                Spacer(Modifier.height(2.dp))
-                Text(sub, style = MaterialTheme.typography.labelSmall, color = subColor)
-            }
-        }
     }
 }
 
@@ -326,17 +265,17 @@ private fun seriesFor(view: ChartView, analytics: List<SnapshotAnalytics>): List
     return when (view) {
         ChartView.WEALTH_EARNING_INVESTMENT -> listOf(
             ChartSeries(
-                name = "Wealth",
+                name = "Net Worth",
                 color = WealthColor,
                 points = analytics.map { it.date to it.netWorth },
             ),
             ChartSeries(
-                name = "Earning",
+                name = "Earnings",
                 color = EarningColor,
                 points = analytics.map { it.date to it.earningsInCr.multiply(BigDecimal("10000000")) },
             ),
             ChartSeries(
-                name = "Investment",
+                name = "Total Invested",
                 color = InvestmentColor,
                 points = analytics.map { it.date to it.totalInvested },
             ),
@@ -356,14 +295,14 @@ private fun seriesFor(view: ChartView, analytics: List<SnapshotAnalytics>): List
 
         ChartView.FIXED_VS_INVESTMENT -> listOf(
             ChartSeries(
-                name = "Fixed Return",
+                name = "Fixed Returns",
                 color = AssetClassColor(2),
                 points = analytics.map { a ->
                     a.date to (a.byAssetClass[SeedData.FIXED_RETURN_ID]?.current ?: BigDecimal.ZERO)
                 },
             ),
             ChartSeries(
-                name = "Investment",
+                name = "Investment Value",
                 color = InvestmentColor,
                 points = analytics.map { it.date to it.investmentValue },
             ),
@@ -371,7 +310,7 @@ private fun seriesFor(view: ChartView, analytics: List<SnapshotAnalytics>): List
 
         ChartView.PERCENT_OF_EARNINGS -> listOf(
             ChartSeries(
-                name = "% of earnings",
+                name = "Net Worth as % of Earnings",
                 color = WealthColor,
                 points = analytics.map { it.date to it.percentOfEarnings },
             ),
