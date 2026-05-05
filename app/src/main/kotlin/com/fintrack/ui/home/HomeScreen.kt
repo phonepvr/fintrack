@@ -84,6 +84,7 @@ fun HomeRoute(
     onEditSnapshot: (UUID) -> Unit,
     onAimEditor: () -> Unit,
     onHoldings: () -> Unit,
+    onLoans: () -> Unit,
     onManageUsers: () -> Unit,
     onBackup: () -> Unit,
     onAbout: () -> Unit,
@@ -148,6 +149,7 @@ fun HomeRoute(
                 HomeTab.Settings -> SettingsTab(
                     onAimEditor = onAimEditor,
                     onHoldings = onHoldings,
+                    onLoans = onLoans,
                     onManageUsers = onManageUsers,
                     onBackup = onBackup,
                     onAbout = onAbout,

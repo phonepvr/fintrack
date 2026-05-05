@@ -40,6 +40,7 @@ import com.fintrack.ui.onboarding.parseHex
 fun SettingsTab(
     onAimEditor: () -> Unit,
     onHoldings: () -> Unit,
+    onLoans: () -> Unit,
     onManageUsers: () -> Unit,
     onBackup: () -> Unit,
     onAbout: () -> Unit,
@@ -59,6 +60,13 @@ fun SettingsTab(
                 label = "Holdings",
                 subtitle = "${state.activeHoldingCount} active · ${state.totalHoldingCount} total · shared across users",
                 onClick = onHoldings,
+            )
+        }
+        item("loans") {
+            LinkRow(
+                label = "Loans",
+                subtitle = loansSummary(state),
+                onClick = onLoans,
             )
         }
         item("inactivity") {
@@ -181,6 +189,13 @@ private fun InactivityCard(
         }
     }
 }
+
+private fun loansSummary(state: SettingsTabUiState): String =
+    when {
+        state.activeLoanCount == 0 && state.totalLoanCount == 0 -> "No loans yet"
+        state.activeLoanCount == state.totalLoanCount -> "${state.activeLoanCount} active"
+        else -> "${state.activeLoanCount} active · ${state.totalLoanCount} total"
+    }
 
 private fun aimSummary(state: SettingsTabUiState): String {
     val rows = state.activeUserAim

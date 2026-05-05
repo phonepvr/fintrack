@@ -3,6 +3,7 @@ package com.fintrack.data.repo
 import androidx.room.withTransaction
 import com.fintrack.data.db.FintrackDatabase
 import com.fintrack.data.db.entities.HoldingValueEntity
+import com.fintrack.data.db.entities.LoanValueEntity
 import com.fintrack.data.db.entities.SnapshotEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Clock
@@ -20,12 +21,19 @@ data class HoldingValueDraft(
     val sip: BigDecimal?,
 )
 
+/** Outstanding amount per active loan, captured at snapshot time. */
+data class LoanValueDraft(
+    val loanId: UUID,
+    val outstanding: BigDecimal,
+)
+
 @Singleton
 class SnapshotRepository @Inject constructor(
     private val database: FintrackDatabase,
 ) {
     private val snapshots get() = database.snapshotDao()
     private val values get() = database.holdingValueDao()
+    private val loanValues get() = database.loanValueDao()
 
     fun observeForUser(userId: UUID): Flow<List<SnapshotEntity>> =
         snapshots.observeForUser(userId)
@@ -58,6 +66,7 @@ class SnapshotRepository @Inject constructor(
         earningsInCr: BigDecimal,
         notes: String?,
         holdingValues: List<HoldingValueDraft>,
+        loanValues: List<LoanValueDraft> = emptyList(),
     ): UUID {
         val now = Clock.System.now()
         val snapshot = SnapshotEntity(
@@ -69,9 +78,15 @@ class SnapshotRepository @Inject constructor(
             createdAt = now,
             updatedAt = now,
         )
+        val loanValueDrafts = loanValues
         database.withTransaction {
             snapshots.insert(snapshot)
             values.insertAll(holdingValues.map { it.toEntity(snapshot.id) })
+            if (loanValueDrafts.isNotEmpty()) {
+                this@SnapshotRepository.loanValues.insertAll(
+                    loanValueDrafts.map { it.toEntity(snapshot.id) },
+                )
+            }
         }
         return snapshot.id
     }
@@ -88,6 +103,7 @@ class SnapshotRepository @Inject constructor(
         earningsInCr: BigDecimal,
         notes: String?,
         holdingValues: List<HoldingValueDraft>,
+        loanValues: List<LoanValueDraft> = emptyList(),
     ) {
         val existing = snapshots.getForUser(userId, snapshotId)
             ?: error("Snapshot $snapshotId not found for user $userId")
@@ -97,10 +113,17 @@ class SnapshotRepository @Inject constructor(
             notes = notes,
             updatedAt = Clock.System.now(),
         )
+        val loanValueDrafts = loanValues
         database.withTransaction {
             snapshots.update(updated)
             values.deleteAllForSnapshot(snapshotId)
             values.insertAll(holdingValues.map { it.toEntity(snapshotId) })
+            this@SnapshotRepository.loanValues.deleteAllForSnapshot(snapshotId)
+            if (loanValueDrafts.isNotEmpty()) {
+                this@SnapshotRepository.loanValues.insertAll(
+                    loanValueDrafts.map { it.toEntity(snapshotId) },
+                )
+            }
         }
     }
 
@@ -113,6 +136,7 @@ class SnapshotRepository @Inject constructor(
         val original = snapshots.getForUser(userId, snapshotId)
             ?: error("Snapshot $snapshotId not found for user $userId")
         val originalValues = values.getForSnapshot(userId, snapshotId)
+        val originalLoanValues = loanValues.getForSnapshot(userId, snapshotId)
         return createSnapshot(
             userId = userId,
             date = newDate,
@@ -125,6 +149,9 @@ class SnapshotRepository @Inject constructor(
                     current = it.current,
                     sip = it.sip,
                 )
+            },
+            loanValues = originalLoanValues.map {
+                LoanValueDraft(loanId = it.loanId, outstanding = it.outstanding)
             },
         )
     }
@@ -141,5 +168,13 @@ class SnapshotRepository @Inject constructor(
             invested = invested,
             current = current,
             sip = sip,
+        )
+
+    private fun LoanValueDraft.toEntity(snapshotId: UUID): LoanValueEntity =
+        LoanValueEntity(
+            id = UUID.randomUUID(),
+            snapshotId = snapshotId,
+            loanId = loanId,
+            outstanding = outstanding,
         )
 }

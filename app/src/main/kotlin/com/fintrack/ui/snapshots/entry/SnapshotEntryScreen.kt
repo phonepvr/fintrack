@@ -17,9 +17,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,7 +31,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -49,11 +47,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.fintrack.domain.util.formatIndianCurrency
 import com.fintrack.domain.util.formatted
 import com.fintrack.security.MoneyTextField
-import kotlinx.datetime.Instant
+import com.fintrack.ui.common.CommonDatePickerSheet
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.atStartOfDayIn
-import kotlinx.datetime.toLocalDateTime
 import java.math.BigDecimal
 import java.util.UUID
 
@@ -76,10 +71,9 @@ fun SnapshotEntryRoute(
         }
     }
 
-    val runningTotals = remember(state.rows) {
+    val runningTotals = remember(state.rows, state.loanRows) {
         val assets = state.rows.fold(BigDecimal.ZERO) { acc, r -> acc + r.current.parseAmountOrZero() }
-        // Phase C wires the loans section; for now liabilities are always 0 here.
-        val liabilities = BigDecimal.ZERO
+        val liabilities = state.loanRows.fold(BigDecimal.ZERO) { acc, r -> acc + r.outstanding.parseAmountOrZero() }
         RunningTotals(assets, liabilities, assets - liabilities)
     }
 
@@ -120,6 +114,8 @@ fun SnapshotEntryRoute(
             onSetCurrent = viewModel::setRowCurrent,
             onSetSip = viewModel::setRowSip,
             onSetNotes = viewModel::setNotes,
+            onSetLoanOutstanding = viewModel::setLoanOutstanding,
+            onAddLoan = viewModel::createAndAttachLoan,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
@@ -136,6 +132,8 @@ private fun SnapshotEntryForm(
     onSetCurrent: (UUID, String) -> Unit,
     onSetSip: (UUID, String) -> Unit,
     onSetNotes: (String) -> Unit,
+    onSetLoanOutstanding: (UUID, String) -> Unit,
+    onAddLoan: (String, BigDecimal, LocalDate, BigDecimal) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val orderedAssetClassNames: List<String> = remember(state.rows) {
@@ -145,6 +143,7 @@ private fun SnapshotEntryForm(
         state.rows.groupBy { it.assetClassName }
     }
     var showDatePicker by remember { mutableStateOf(false) }
+    var showAddLoan by remember { mutableStateOf(false) }
 
     LazyColumn(
         modifier = modifier,
@@ -187,6 +186,31 @@ private fun SnapshotEntryForm(
             }
         }
 
+        item(key = "section_loans") { SectionHeader("Loans") }
+        if (state.loanRows.isEmpty()) {
+            item(key = "loans_empty") {
+                Text(
+                    text = "No active loans. Use the button below to add one.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(vertical = 4.dp),
+                )
+            }
+        } else {
+            items(state.loanRows, key = { "loan_${it.loanId}" }) { row ->
+                LoanRow(
+                    row = row,
+                    onOutstanding = { onSetLoanOutstanding(row.loanId, it) },
+                )
+            }
+        }
+        item(key = "loans_add") {
+            Spacer(Modifier.height(8.dp))
+            TextButton(onClick = { showAddLoan = true }) {
+                Text("+ Add new loan")
+            }
+        }
+
         item {
             Spacer(Modifier.height(16.dp))
             OutlinedTextField(
@@ -197,18 +221,29 @@ private fun SnapshotEntryForm(
                 maxLines = 6,
                 modifier = Modifier.fillMaxWidth(),
             )
-            Spacer(Modifier.height(96.dp)) // breathing room above the running-total bar
+            Spacer(Modifier.height(120.dp)) // breathing room above the running-total bar
         }
     }
 
     if (showDatePicker) {
-        DatePickerSheet(
+        CommonDatePickerSheet(
             initial = state.date,
             onPicked = {
                 onSetDate(it)
                 showDatePicker = false
             },
             onDismiss = { showDatePicker = false },
+        )
+    }
+
+    if (showAddLoan) {
+        AddLoanDialog(
+            today = state.date,
+            onSubmit = { name, original, taken, emi ->
+                onAddLoan(name, original, taken, emi)
+                showAddLoan = false
+            },
+            onDismiss = { showAddLoan = false },
         )
     }
 }
@@ -227,34 +262,6 @@ private fun DateField(date: LocalDate, onClick: () -> Unit) {
             TextButton(onClick = onClick) { Text("Change") }
         },
     )
-}
-
-@Composable
-private fun DatePickerSheet(
-    initial: LocalDate,
-    onPicked: (LocalDate) -> Unit,
-    onDismiss: () -> Unit,
-) {
-    val initialMillis = initial.atStartOfDayIn(TimeZone.UTC).toEpochMilliseconds()
-    val state = rememberDatePickerState(initialSelectedDateMillis = initialMillis)
-    DatePickerDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(onClick = {
-                val millis = state.selectedDateMillis
-                if (millis != null) {
-                    val date = Instant.fromEpochMilliseconds(millis)
-                        .toLocalDateTime(TimeZone.UTC).date
-                    onPicked(date)
-                } else {
-                    onDismiss()
-                }
-            }) { Text("OK") }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
-    ) {
-        DatePicker(state = state)
-    }
 }
 
 @Composable
@@ -281,6 +288,109 @@ private fun SubSectionHeader(name: String) {
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
     Spacer(Modifier.height(4.dp))
+}
+
+@Composable
+private fun LoanRow(
+    row: LoanFieldsState,
+    onOutstanding: (String) -> Unit,
+) {
+    Column(modifier = Modifier.padding(vertical = 6.dp)) {
+        Text(row.name, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+        Text(
+            "Original: ${formatIndianCurrency(row.originalAmount)}",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(4.dp))
+        MoneyTextField(
+            label = "Outstanding",
+            value = row.outstanding,
+            onValueChange = onOutstanding,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}
+
+@Composable
+private fun AddLoanDialog(
+    today: LocalDate,
+    onSubmit: (name: String, originalAmount: BigDecimal, takenDate: LocalDate, monthlyEmi: BigDecimal) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var name by remember { mutableStateOf("") }
+    var original by remember { mutableStateOf("") }
+    var emi by remember { mutableStateOf("") }
+    var takenDate by remember { mutableStateOf(today) }
+    var showTakenPicker by remember { mutableStateOf(false) }
+
+    val canSubmit = name.isNotBlank() && original.parseAmountOrNull()?.signum() == 1
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Add new loan") },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Name (e.g. Home Loan)") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(Modifier.height(8.dp))
+                MoneyTextField(
+                    label = "Original amount",
+                    value = original,
+                    onValueChange = { original = it },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(Modifier.height(8.dp))
+                MoneyTextField(
+                    label = "Monthly EMI (optional)",
+                    value = emi,
+                    onValueChange = { emi = it },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = takenDate.formatted(),
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Taken on") },
+                    trailingIcon = {
+                        TextButton(onClick = { showTakenPicker = true }) { Text("Change") }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                enabled = canSubmit,
+                onClick = {
+                    onSubmit(
+                        name.trim(),
+                        original.parseAmountOrNull() ?: BigDecimal.ZERO,
+                        takenDate,
+                        emi.parseAmountOrNull() ?: BigDecimal.ZERO,
+                    )
+                },
+            ) { Text("Add") }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
+    )
+
+    if (showTakenPicker) {
+        CommonDatePickerSheet(
+            initial = takenDate,
+            onPicked = {
+                takenDate = it
+                showTakenPicker = false
+            },
+            onDismiss = { showTakenPicker = false },
+        )
+    }
 }
 
 @Composable

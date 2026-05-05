@@ -8,6 +8,7 @@ import com.fintrack.data.db.entities.UserEntity
 import com.fintrack.data.repo.AimAllocationRepository
 import com.fintrack.data.repo.GlobalSettingsRepository
 import com.fintrack.data.repo.HoldingRepository
+import com.fintrack.data.repo.LoanRepository
 import com.fintrack.data.repo.UserRepository
 import com.fintrack.domain.UserScope
 import com.fintrack.security.InactivityTracker
@@ -29,6 +30,8 @@ data class SettingsTabUiState(
     val activeHoldingCount: Int = 0,
     val totalHoldingCount: Int = 0,
     val userCount: Int = 0,
+    val activeLoanCount: Int = 0,
+    val totalLoanCount: Int = 0,
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -38,6 +41,7 @@ class SettingsTabViewModel @Inject constructor(
     private val aimAllocationRepository: AimAllocationRepository,
     private val globalSettingsRepository: GlobalSettingsRepository,
     private val holdingRepository: HoldingRepository,
+    private val loanRepository: LoanRepository,
     private val userScope: UserScope,
     private val inactivityTracker: InactivityTracker,
 ) : ViewModel() {
@@ -53,7 +57,22 @@ class SettingsTabViewModel @Inject constructor(
         globalSettingsRepository.observe(),
         holdingRepository.observeAll(),
         userRepository.observeActiveUsers(),
-    ) { user, aim, global, allHoldings, users ->
+        userScope.activeUserId.flatMapLatest { id ->
+            if (id == null) flowOf(emptyList())
+            else loanRepository.observeLoansForUser(id)
+        },
+    ) { values: Array<Any?> ->
+        @Suppress("UNCHECKED_CAST")
+        val user = values[0] as UserEntity?
+        @Suppress("UNCHECKED_CAST")
+        val aim = values[1] as List<AimAllocationEntity>
+        val global = values[2] as GlobalSettingsEntity?
+        @Suppress("UNCHECKED_CAST")
+        val allHoldings = values[3] as List<com.fintrack.data.db.entities.HoldingEntity>
+        @Suppress("UNCHECKED_CAST")
+        val users = values[4] as List<UserEntity>
+        @Suppress("UNCHECKED_CAST")
+        val loans = values[5] as List<com.fintrack.data.db.entities.LoanEntity>
         SettingsTabUiState(
             activeUser = user,
             activeUserAim = aim,
@@ -61,6 +80,8 @@ class SettingsTabViewModel @Inject constructor(
             activeHoldingCount = allHoldings.count { it.isActive },
             totalHoldingCount = allHoldings.size,
             userCount = users.size,
+            activeLoanCount = loans.count { it.isActive },
+            totalLoanCount = loans.size,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SettingsTabUiState())
 
