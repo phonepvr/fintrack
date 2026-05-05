@@ -38,3 +38,49 @@
     *** Companion;
     kotlinx.serialization.KSerializer serializer(...);
 }
+
+# -----------------------------------------------------------------------------
+# Apache POI (XLSX template + import).
+#
+# POI is reflection-heavy via XmlBeans; without these rules R8 strips the
+# schema classes / service-loader registrations and the workbook factory
+# fails at runtime. Keep the schema-bearing packages and silence the warns
+# on host-only classes (java.awt, javax.swing, etc.) that POI references
+# but never invokes on Android.
+# -----------------------------------------------------------------------------
+-keep class org.apache.poi.** { *; }
+-keep class org.apache.xmlbeans.** { *; }
+-keep class org.openxmlformats.** { *; }
+-keep class schemaorg_apache_xmlbeans.** { *; }
+-keep class com.microsoft.schemas.** { *; }
+-keep class org.etsi.uri.** { *; }
+-keep class org.w3.x2000.** { *; }
+-keep class javax.xml.** { *; }
+
+-keepattributes Signature, InnerClasses, EnclosingMethod
+-keepclassmembers class * implements java.io.Serializable {
+    static final long serialVersionUID;
+    private static final java.io.ObjectStreamField[] serialPersistentFields;
+    private void writeObject(java.io.ObjectOutputStream);
+    private void readObject(java.io.ObjectInputStream);
+    java.lang.Object writeReplace();
+    java.lang.Object readResolve();
+}
+
+-dontwarn org.apache.poi.**
+-dontwarn org.apache.xmlbeans.**
+-dontwarn org.openxmlformats.**
+-dontwarn schemaorg_apache_xmlbeans.**
+-dontwarn com.microsoft.schemas.**
+-dontwarn org.etsi.uri.**
+-dontwarn org.w3.x2000.**
+-dontwarn java.awt.**
+-dontwarn javax.swing.**
+-dontwarn javax.xml.stream.**
+-dontwarn org.apache.commons.compress.**
+-dontwarn org.apache.commons.collections4.**
+-dontwarn org.apache.logging.log4j.**
+
+# POI ships ServiceLoader resources; keep them.
+-keep class org.apache.poi.ooxml.POIXMLDocumentPart { *; }
+-keep class org.apache.poi.openxml4j.opc.PackageRelationship { *; }

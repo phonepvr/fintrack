@@ -32,6 +32,9 @@ vico                      = "2.0.2"
 kotlinxDatetime           = "0.6.1"
 kotlinxSerializationJson  = "1.7.3"
 
+# XLSX (Apache POI 5.2.x — last line that supports Java 17; 5.3+ needs Java 21).
+poi                       = "5.2.5"
+
 # Test
 junitJupiter              = "5.11.4"
 turbine                   = "1.2.0"
@@ -83,6 +86,10 @@ vico-compose                       = { module = "com.patrykandpatrick.vico:compo
 vico-core                          = { module = "com.patrykandpatrick.vico:core", version.ref = "vico" }
 kotlinx-datetime                   = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-serialization-json         = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+
+# XLSX
+poi-ooxml-lite                     = { module = "org.apache.poi:poi-ooxml-lite", version.ref = "poi" }
+poi-ooxml                          = { module = "org.apache.poi:poi-ooxml", version.ref = "poi" }
 
 # Test
 junit-jupiter                      = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junitJupiter" }

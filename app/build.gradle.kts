@@ -105,6 +105,18 @@ android {
                 "/META-INF/LICENSE-notice.md",
                 "/META-INF/INDEX.LIST",
                 "/META-INF/io.netty.versions.properties",
+                // Apache POI / XmlBeans bring license + notice files that
+                // collide across artifacts; drop everything but the actual
+                // schema metadata.
+                "/META-INF/DEPENDENCIES",
+                "/META-INF/LICENSE",
+                "/META-INF/LICENSE.txt",
+                "/META-INF/NOTICE",
+                "/META-INF/NOTICE.txt",
+                "/META-INF/versions/9/OSGI-INF/MANIFEST.MF",
+            )
+            pickFirsts += setOf(
+                "META-INF/services/org.apache.xmlbeans.impl.regex.FactoryProvider",
             )
         }
         // SQLCipher native libs are required at runtime; don't strip them.
@@ -175,6 +187,11 @@ dependencies {
     // Dates / serialization
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.serialization.json)
+
+    // XLSX (Apache POI). poi-ooxml-lite carries the smaller schema set;
+    // we don't use charts / streaming, so the lite jar is enough.
+    implementation(libs.poi.ooxml)
+    implementation(libs.poi.ooxml.lite)
 
     // Unit test
     testImplementation(libs.junit.jupiter)
