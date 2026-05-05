@@ -58,4 +58,58 @@ class AimEditorStateTest {
         val empty = AimEditorUiState(loading = false, rows = emptyList())
         assertThat(empty.canSave).isFalse()
     }
+
+    @Test
+    @DisplayName("distributeRemainder fills a positive gap into 0% rows")
+    fun distributeRemainderFillsZeros() {
+        val rows = listOf(
+            row(ml, "Market Linked", 70),
+            row(fr, "Fixed Return", 25),
+            row(cr, "Crypto", 0),
+        )
+        val out = distributeRemainderTo(rows)
+        assertThat(out.sumOf { it.percent }).isEqualTo(100)
+        assertThat(out.first { it.assetClassId == ml }.percent).isEqualTo(70)
+        assertThat(out.first { it.assetClassId == fr }.percent).isEqualTo(25)
+        assertThat(out.first { it.assetClassId == cr }.percent).isEqualTo(5)
+    }
+
+    @Test
+    @DisplayName("distributeRemainder splits the gap evenly across multiple zero rows")
+    fun distributeRemainderSplitsAcrossZeros() {
+        val a = UUID.randomUUID(); val b = UUID.randomUUID(); val c = UUID.randomUUID()
+        val rows = listOf(
+            row(ml, "ML", 70),
+            row(a, "Z1", 0),
+            row(b, "Z2", 0),
+            row(c, "Z3", 0),
+        )
+        val out = distributeRemainderTo(rows)
+        assertThat(out.sumOf { it.percent }).isEqualTo(100)
+        // 30 split across 3 rows → 10 each.
+        assertThat(out.filter { it.percent == 10 }).hasSize(3)
+    }
+
+    @Test
+    @DisplayName("distributeRemainder is a no-op when sum is already 100")
+    fun distributeRemainderNoop() {
+        val rows = listOf(
+            row(ml, "ML", 70),
+            row(fr, "FR", 25),
+            row(cr, "CR", 5),
+        )
+        assertThat(distributeRemainderTo(rows)).isEqualTo(rows)
+    }
+
+    @Test
+    @DisplayName("distributeRemainder handles overshoot by spreading the negative gap")
+    fun distributeRemainderHandlesOvershoot() {
+        val rows = listOf(
+            row(ml, "ML", 70),
+            row(fr, "FR", 30),
+            row(cr, "CR", 5),
+        )
+        val out = distributeRemainderTo(rows)
+        assertThat(out.sumOf { it.percent }).isEqualTo(100)
+    }
 }

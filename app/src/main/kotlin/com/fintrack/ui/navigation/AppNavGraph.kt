@@ -91,7 +91,10 @@ private fun AuthenticatedNavHost(appViewModel: AppViewModel) {
             AimEditorRoute(onDone = { navController.popBackStack() })
         }
         composable("settings/holdings") {
-            HoldingsManagementRoute(onBack = { navController.popBackStack() })
+            HoldingsManagementRoute(
+                onBack = { navController.popBackStack() },
+                onAimEditor = { navController.navigate("settings/aim") },
+            )
         }
         composable("settings/loans") {
             LoansManagementRoute(onBack = { navController.popBackStack() })

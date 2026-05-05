@@ -73,6 +73,39 @@ data class AimEditorUiState(
     val canSave: Boolean get() = sum == 100 && !saving && rows.isNotEmpty()
 }
 
+/**
+ * Pure helper for the "distribute remainder" affordance (spec §5.8).
+ * Keeps the user's current non-zero percentages and splits the gap
+ * (100 − sum) across rows currently at 0%. Falls back to spreading the
+ * gap across all rows when no zero rows exist (or when sum already
+ * exceeds 100, since a negative gap can't be 'filled' by zero rows).
+ */
+internal fun distributeRemainderTo(rows: List<AimRowState>): List<AimRowState> {
+    if (rows.isEmpty()) return rows
+    val gap = 100 - rows.sumOf { it.percent }
+    if (gap == 0) return rows
+    val zeroRows = rows.filter { it.percent == 0 }
+    return if (gap > 0 && zeroRows.isNotEmpty()) {
+        val per = gap / zeroRows.size
+        val rem = gap - per * zeroRows.size
+        var assigned = 0
+        rows.map { r ->
+            if (r.percent != 0) r else {
+                val extra = if (assigned < rem) 1 else 0
+                assigned++
+                r.copy(percent = per + extra)
+            }
+        }
+    } else {
+        val per = gap / rows.size
+        val rem = gap - per * rows.size
+        rows.mapIndexed { idx, r ->
+            val extra = if (idx == 0) rem else 0
+            r.copy(percent = (r.percent + per + extra).coerceIn(0, 100))
+        }
+    }
+}
+
 @HiltViewModel
 class AimEditorViewModel @Inject constructor(
     private val aimRepository: AimAllocationRepository,
@@ -122,6 +155,10 @@ class AimEditorViewModel @Inject constructor(
                 ui.copy(rows = rows)
             }
         }
+    }
+
+    fun distributeRemainder() {
+        _state.update { ui -> ui.copy(rows = distributeRemainderTo(ui.rows)) }
     }
 
     fun save() {
@@ -176,7 +213,8 @@ fun AimEditorRoute(
                     }
                 },
                 actions = {
-                    TextButton(onClick = viewModel::distributeEvenly) { Text("Distribute") }
+                    TextButton(onClick = viewModel::distributeRemainder) { Text("Fill gap") }
+                    TextButton(onClick = viewModel::distributeEvenly) { Text("Even") }
                     TextButton(onClick = viewModel::save, enabled = state.canSave) {
                         Text(if (state.saving) "Saving…" else "Save")
                     }
