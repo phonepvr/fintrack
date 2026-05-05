@@ -72,7 +72,7 @@ class HomeViewModel @Inject constructor(
 
 private enum class HomeTab(val labelRes: Int) {
     Snapshots(R.string.home_tab_snapshots),
-    Overview(R.string.home_tab_overview),
+    Journey(R.string.home_tab_journey),
     Settings(R.string.home_tab_settings),
 }
 
@@ -145,7 +145,7 @@ fun HomeRoute(
                     onSnapshotDetail = onSnapshotDetail,
                     onEditSnapshot = onEditSnapshot,
                 )
-                HomeTab.Overview -> OverviewTab(onSnapshotDetail = onSnapshotDetail)
+                HomeTab.Journey -> OverviewTab(onSnapshotDetail = onSnapshotDetail)
                 HomeTab.Settings -> SettingsTab(
                     onAimEditor = onAimEditor,
                     onHoldings = onHoldings,

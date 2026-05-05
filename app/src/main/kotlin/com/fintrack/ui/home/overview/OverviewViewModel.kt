@@ -7,9 +7,7 @@ import com.fintrack.data.repo.HoldingRepository
 import com.fintrack.data.repo.LoanRepository
 import com.fintrack.data.repo.SnapshotRepository
 import com.fintrack.data.repo.TaxonomyRepository
-import com.fintrack.data.db.seed.SeedData
 import com.fintrack.domain.UserScope
-import com.fintrack.domain.analytics.DriftBand
 import com.fintrack.domain.analytics.SnapshotAnalytics
 import com.fintrack.domain.analytics.SnapshotAnalyticsCalculator
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,7 +38,7 @@ enum class Period(val label: String) {
 }
 
 enum class ChartView(val label: String) {
-    TOTAL("Total"),
+    WEALTH_EARNING_INVESTMENT("Wealth/Earn/Inv"),
     BY_ASSET_CLASS("By class"),
     FIXED_VS_INVESTMENT("Fixed vs Inv"),
     PERCENT_OF_EARNINGS("% of earnings"),
@@ -48,19 +46,22 @@ enum class ChartView(val label: String) {
 
 data class HistoryRow(
     val analytics: SnapshotAnalytics,
-    val fixedReturn: BigDecimal,
-    val investmentValue: BigDecimal,
+    val totalAssets: BigDecimal,
+    val totalLiabilities: BigDecimal,
+    val totalInvested: BigDecimal,
     val netWorth: BigDecimal,
-    val deltaTotal: BigDecimal?,
+    val earningsRupees: BigDecimal,
+    val gainPercent: BigDecimal?,                // (assets − invested) / invested × 100
+    val deltaNetWorth: BigDecimal?,
 )
 
 data class HeadlineCard(
     val netWorth: BigDecimal,
     val deltaAbsolute: BigDecimal?,
     val deltaPercent: BigDecimal?,
+    val totalInvested: BigDecimal,
+    val gainPercent: BigDecimal?,
     val percentOfEarnings: BigDecimal,
-    val classesWithinTarget: Int,
-    val totalClasses: Int,
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -77,7 +78,7 @@ class OverviewViewModel @Inject constructor(
     private val _period = MutableStateFlow(Period.ALL)
     val period: StateFlow<Period> = _period.asStateFlow()
 
-    private val _chartView = MutableStateFlow(ChartView.TOTAL)
+    private val _chartView = MutableStateFlow(ChartView.WEALTH_EARNING_INVESTMENT)
     val chartView: StateFlow<ChartView> = _chartView.asStateFlow()
 
     fun setPeriod(p: Period) { _period.value = p }
@@ -162,10 +163,13 @@ class OverviewViewModel @Inject constructor(
             list.map { a ->
                 HistoryRow(
                     analytics = a,
-                    fixedReturn = a.byAssetClass[SeedData.FIXED_RETURN_ID]?.current ?: BigDecimal.ZERO,
-                    investmentValue = a.investmentValue,
+                    totalAssets = a.totalAssets,
+                    totalLiabilities = a.totalLiabilities,
+                    totalInvested = a.totalInvested,
                     netWorth = a.netWorth,
-                    deltaTotal = a.deltaAbsolute,
+                    earningsRupees = a.earningsInCr.multiply(BigDecimal("10000000")),
+                    gainPercent = gainPercent(a.totalAssets, a.totalInvested),
+                    deltaNetWorth = a.deltaAbsolute,
                 )
             }.reversed()
         }
@@ -175,10 +179,18 @@ class OverviewViewModel @Inject constructor(
         netWorth = latest.netWorth,
         deltaAbsolute = latest.deltaAbsolute,
         deltaPercent = latest.deltaPercent,
+        totalInvested = latest.totalInvested,
+        gainPercent = gainPercent(latest.totalAssets, latest.totalInvested),
         percentOfEarnings = latest.percentOfEarnings,
-        classesWithinTarget = latest.byAssetClass.values.count { it.driftBand == DriftBand.WITHIN },
-        totalClasses = latest.byAssetClass.size,
     )
+
+    private fun gainPercent(totalAssets: BigDecimal, totalInvested: BigDecimal): BigDecimal? {
+        if (totalInvested.signum() == 0) return null
+        return totalAssets.subtract(totalInvested)
+            .divide(totalInvested, 6, java.math.RoundingMode.HALF_UP)
+            .multiply(BigDecimal("100"))
+            .setScale(2, java.math.RoundingMode.HALF_UP)
+    }
 
     private fun today(): LocalDate =
         Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
