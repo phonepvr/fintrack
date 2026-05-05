@@ -104,6 +104,15 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+      - name: Read versionName from build.gradle.kts
+        # Single source of truth so version bumps don't require touching CI.
+        id: read_version
+        run: |
+          VERSION=$(grep -E '^\s*versionName\s*=' app/build.gradle.kts | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
+          if [ -z "$VERSION" ]; then echo "Could not parse versionName"; exit 1; fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Resolved versionName=$VERSION"
+
       - name: Stage APK for release
         if: |
           steps.locate.outcome == 'success' &&
@@ -125,10 +134,10 @@ jobs:
           steps.tests.outcome == 'success'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v3.0.0-build${{ github.run_number }}
-          name: v3.0.0 (build ${{ github.run_number }})
+          tag_name: v${{ steps.read_version.outputs.version }}-build${{ github.run_number }}
+          name: v${{ steps.read_version.outputs.version }} (build ${{ github.run_number }})
           body: |
-            FinTrack v3.0.0 debug build.
+            FinTrack v${{ steps.read_version.outputs.version }} debug build.
 
             Commit: ${{ github.sha }}
             Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
