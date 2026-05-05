@@ -1,5 +1,6 @@
 package com.fintrack.ui.snapshots.entry
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,8 +17,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -48,6 +47,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.fintrack.domain.util.formatIndianCurrency
+import com.fintrack.domain.util.formatted
+import com.fintrack.security.MoneyTextField
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -75,8 +76,11 @@ fun SnapshotEntryRoute(
         }
     }
 
-    val runningTotal = remember(state.rows) {
-        state.rows.fold(BigDecimal.ZERO) { acc, r -> acc + r.current.parseAmountOrZero() }
+    val runningTotals = remember(state.rows) {
+        val assets = state.rows.fold(BigDecimal.ZERO) { acc, r -> acc + r.current.parseAmountOrZero() }
+        // Phase C wires the loans section; for now liabilities are always 0 here.
+        val liabilities = BigDecimal.ZERO
+        RunningTotals(assets, liabilities, assets - liabilities)
     }
 
     Scaffold(
@@ -98,7 +102,7 @@ fun SnapshotEntryRoute(
         },
         snackbarHost = { SnackbarHost(snackbarState) },
         bottomBar = {
-            RunningTotalBar(value = runningTotal)
+            RunningTotalBar(totals = runningTotals)
         },
     ) { padding ->
         if (state.loading) {
@@ -134,9 +138,6 @@ private fun SnapshotEntryForm(
     onSetNotes: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    // Phase A: order rows by assetClass display order (the asset-class id is
-    // already on each row from the VM hydrator). Phase B introduces the new
-    // three-level grouping. For now we render assetClass → sub-bucket sub-headers.
     val orderedAssetClassNames: List<String> = remember(state.rows) {
         state.rows.map { it.assetClassName }.distinct()
     }
@@ -172,9 +173,12 @@ private fun SnapshotEntryForm(
                 val sbRows = rowsBySubBucket[sbName].orEmpty()
                 if (sbRows.isEmpty()) continue
                 item(key = "subhead_${acName}_$sbName") { SubSectionHeader(sbName) }
+                val suppressRowName = sbRows.size == 1 &&
+                    sbRows.single().name.equals(sbName, ignoreCase = true)
                 items(sbRows, key = { "row_${it.holdingId}" }) { row ->
                     HoldingRow(
                         row = row,
+                        suppressName = suppressRowName,
                         onInvested = { onSetInvested(row.holdingId, it) },
                         onCurrent = { onSetCurrent(row.holdingId, it) },
                         onSip = { onSetSip(row.holdingId, it) },
@@ -212,7 +216,7 @@ private fun SnapshotEntryForm(
 @Composable
 private fun DateField(date: LocalDate, onClick: () -> Unit) {
     OutlinedTextField(
-        value = date.toString(),
+        value = date.formatted(),
         onValueChange = {},
         readOnly = true,
         label = { Text("Date") },
@@ -282,33 +286,36 @@ private fun SubSectionHeader(name: String) {
 @Composable
 private fun HoldingRow(
     row: HoldingFieldsState,
+    suppressName: Boolean,
     onInvested: (String) -> Unit,
     onCurrent: (String) -> Unit,
     onSip: (String) -> Unit,
 ) {
     Column(modifier = Modifier.padding(vertical = 6.dp)) {
-        Text(row.name, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
-        Spacer(Modifier.height(4.dp))
+        if (!suppressName) {
+            Text(row.name, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+            Spacer(Modifier.height(4.dp))
+        }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             if (row.trackInvested) {
-                MoneyField(
+                MoneyTextField(
                     label = "Invested",
                     value = row.invested,
-                    onChange = onInvested,
+                    onValueChange = onInvested,
                     modifier = Modifier.weight(1f),
                 )
             }
-            MoneyField(
+            MoneyTextField(
                 label = "Current",
                 value = row.current,
-                onChange = onCurrent,
+                onValueChange = onCurrent,
                 modifier = Modifier.weight(1f),
             )
             if (row.trackSip) {
-                MoneyField(
+                MoneyTextField(
                     label = "SIP",
                     value = row.sip,
-                    onChange = onSip,
+                    onValueChange = onSip,
                     modifier = Modifier.weight(1f),
                 )
             }
@@ -316,25 +323,14 @@ private fun HoldingRow(
     }
 }
 
-@Composable
-private fun MoneyField(
-    label: String,
-    value: String,
-    onChange: (String) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onChange,
-        label = { Text(label) },
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-        modifier = modifier,
-    )
-}
+internal data class RunningTotals(
+    val assets: BigDecimal,
+    val liabilities: BigDecimal,
+    val netWorth: BigDecimal,
+)
 
 @Composable
-private fun RunningTotalBar(value: BigDecimal) {
+private fun RunningTotalBar(totals: RunningTotals) {
     Surface(
         tonalElevation = 4.dp,
         modifier = Modifier.fillMaxWidth(),
@@ -342,27 +338,51 @@ private fun RunningTotalBar(value: BigDecimal) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+                .padding(horizontal = 16.dp, vertical = 10.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                text = "Running total",
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            TotalChip("Assets", totals.assets, Modifier.weight(1f))
+            TotalChip("Liabilities", totals.liabilities, Modifier.weight(1f))
+            TotalChip(
+                "Net Worth",
+                totals.netWorth,
+                Modifier.weight(1f),
+                emphasised = true,
             )
-            AssistChip(
-                onClick = {},
-                label = {
-                    Text(
-                        text = formatIndianCurrency(value),
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                },
-                colors = AssistChipDefaults.assistChipColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    labelColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                ),
+        }
+    }
+}
+
+@Composable
+private fun TotalChip(
+    label: String,
+    value: BigDecimal,
+    modifier: Modifier = Modifier,
+    emphasised: Boolean = false,
+) {
+    val containerColor = if (emphasised) {
+        MaterialTheme.colorScheme.primaryContainer
+    } else {
+        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+    }
+    val labelColor = if (emphasised) {
+        MaterialTheme.colorScheme.onPrimaryContainer
+    } else {
+        MaterialTheme.colorScheme.onSurfaceVariant
+    }
+    Box(
+        modifier = modifier
+            .background(containerColor, shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
+            .padding(horizontal = 10.dp, vertical = 8.dp),
+    ) {
+        Column {
+            Text(label, style = MaterialTheme.typography.labelSmall, color = labelColor)
+            Text(
+                formatIndianCurrency(value),
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = labelColor,
             )
         }
     }

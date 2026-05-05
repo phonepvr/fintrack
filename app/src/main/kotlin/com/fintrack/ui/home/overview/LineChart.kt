@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.fintrack.domain.util.formatIndianCurrency
+import com.fintrack.domain.util.formatted
 import kotlinx.datetime.LocalDate
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -152,13 +153,13 @@ fun LineChart(
             }
 
             drawContext.canvas.nativeCanvas.drawText(
-                LocalDate.fromEpochDays(minX.toInt()).toString(),
+                LocalDate.fromEpochDays(minX.toInt()).formatted(),
                 plotLeft,
                 plotBottom + bottomPad * 0.7f,
                 xLabelLeftPaint,
             )
             drawContext.canvas.nativeCanvas.drawText(
-                LocalDate.fromEpochDays(maxX.toInt()).toString(),
+                LocalDate.fromEpochDays(maxX.toInt()).formatted(),
                 plotRight,
                 plotBottom + bottomPad * 0.7f,
                 xLabelRightPaint,

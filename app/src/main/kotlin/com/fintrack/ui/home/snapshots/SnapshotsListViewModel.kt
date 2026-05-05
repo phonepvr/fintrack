@@ -2,6 +2,7 @@ package com.fintrack.ui.home.snapshots
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.fintrack.data.repo.LoanRepository
 import com.fintrack.data.repo.SnapshotRepository
 import com.fintrack.domain.UserScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,19 +20,34 @@ import java.math.RoundingMode
 import java.util.UUID
 import javax.inject.Inject
 
+/**
+ * Per spec §5.4: every snapshot card now shows
+ *  - Net Worth (assets - liabilities), the headline number
+ *  - Δ vs previous snapshot (absolute + percent), based on Net Worth
+ *  - Assets / Liabilities / Invested / % of Earnings in a 2×2 grid
+ *
+ * `liabilities` is 0 in Phase B (Loan UI lands in Phase C); the row
+ * already reads the data from `LoanRepository` so when seed loans
+ * exist the math is right end-to-end.
+ */
 data class SnapshotListItem(
     val id: UUID,
     val date: LocalDate,
-    val totalPortfolio: BigDecimal,
+    val totalAssets: BigDecimal,
+    val totalLiabilities: BigDecimal,
+    val netWorth: BigDecimal,
+    val invested: BigDecimal,
     val percentOfEarnings: BigDecimal,
     val deltaAbsolute: BigDecimal?,
     val deltaPercent: BigDecimal?,
+    val isLatest: Boolean,
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class SnapshotsListViewModel @Inject constructor(
     private val snapshotRepository: SnapshotRepository,
+    private val loanRepository: LoanRepository,
     private val userScope: UserScope,
 ) : ViewModel() {
 
@@ -46,40 +62,46 @@ class SnapshotsListViewModel @Inject constructor(
                 combine(
                     snapshotRepository.observeForUser(userId),
                     snapshotRepository.observeAllValuesForUser(userId),
-                ) { snapshots, allValues ->
-                    val valuesBySnapshot = allValues.groupBy { it.snapshotId }
-                    // Process chronologically (ascending) so we can compute deltas,
-                    // then reverse to newest-first for display.
+                    loanRepository.observeAllValuesForUser(userId),
+                ) { snapshots, holdingValues, loanValues ->
+                    val holdingsBySnapshot = holdingValues.groupBy { it.snapshotId }
+                    val loansBySnapshot = loanValues.groupBy { it.snapshotId }
                     val chrono = snapshots.sortedBy { it.snapshotDate }
-                    val totals = chrono.associate { snap ->
-                        snap.id to (
-                            valuesBySnapshot[snap.id].orEmpty()
-                                .fold(BigDecimal.ZERO) { acc, v -> acc + v.current }
-                        )
+                    val perSnapshot = chrono.map { snap ->
+                        val hvs = holdingsBySnapshot[snap.id].orEmpty()
+                        val lvs = loansBySnapshot[snap.id].orEmpty()
+                        val assets = hvs.fold(BigDecimal.ZERO) { acc, v -> acc + v.current }
+                        val liabilities = lvs.fold(BigDecimal.ZERO) { acc, v -> acc + v.outstanding }
+                        val invested = hvs.fold(BigDecimal.ZERO) { acc, v ->
+                            acc + (v.invested ?: BigDecimal.ZERO)
+                        }
+                        Triple(snap, assets - liabilities, Quad(assets, liabilities, invested, snap))
                     }
-                    chrono.mapIndexed { index, snapshot ->
-                        val total = totals.getValue(snapshot.id)
-                        val previous = if (index > 0) totals.getValue(chrono[index - 1].id) else null
-                        val percentOfEarnings = if (snapshot.earningsInCr.signum() == 0) {
+                    perSnapshot.mapIndexed { index, (snap, netWorth, q) ->
+                        val previousNet = if (index > 0) perSnapshot[index - 1].second else null
+                        val percentOfEarnings = if (snap.earningsInCr.signum() == 0) {
                             BigDecimal.ZERO
                         } else {
-                            // total is in rupees; earnings is in crore. Convert and ratio.
-                            total.divide(snapshot.earningsInCr.multiply(crore), 4, RoundingMode.HALF_UP)
+                            netWorth.divide(snap.earningsInCr.multiply(crore), 4, RoundingMode.HALF_UP)
                                 .multiply(hundred)
                         }
-                        val deltaAbs = previous?.let { total.subtract(it) }
-                        val deltaPct = previous?.takeIf { it.signum() != 0 }?.let { prev ->
-                            total.subtract(prev)
+                        val deltaAbs = previousNet?.let { netWorth.subtract(it) }
+                        val deltaPct = previousNet?.takeIf { it.signum() != 0 }?.let { prev ->
+                            netWorth.subtract(prev)
                                 .divide(prev, 4, RoundingMode.HALF_UP)
                                 .multiply(hundred)
                         }
                         SnapshotListItem(
-                            id = snapshot.id,
-                            date = snapshot.snapshotDate,
-                            totalPortfolio = total,
+                            id = snap.id,
+                            date = snap.snapshotDate,
+                            totalAssets = q.assets,
+                            totalLiabilities = q.liabilities,
+                            netWorth = netWorth,
+                            invested = q.invested,
                             percentOfEarnings = percentOfEarnings,
                             deltaAbsolute = deltaAbs,
                             deltaPercent = deltaPct,
+                            isLatest = index == perSnapshot.lastIndex,
                         )
                     }.reversed()
                 }
@@ -101,4 +123,11 @@ class SnapshotsListViewModel @Inject constructor(
             onCreated(newId)
         }
     }
+
+    private data class Quad(
+        val assets: BigDecimal,
+        val liabilities: BigDecimal,
+        val invested: BigDecimal,
+        val snap: com.fintrack.data.db.entities.SnapshotEntity,
+    )
 }

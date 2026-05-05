@@ -35,6 +35,7 @@ import com.fintrack.domain.util.formatIndianCurrency
 import com.fintrack.domain.util.formatPercent
 import com.fintrack.domain.util.formatSignedCurrency
 import com.fintrack.domain.util.formatSignedPercent
+import com.fintrack.domain.util.formatted
 import com.fintrack.ui.theme.DriftOff
 import com.fintrack.ui.theme.DriftWithin
 import java.math.BigDecimal
@@ -281,7 +282,7 @@ private fun HistoryTableRow(row: HistoryRow, onTap: () -> Unit) {
             .clickable(onClick = onTap)
             .padding(vertical = 8.dp),
     ) {
-        TableCell(row.analytics.date.toString(), weight = 1.2f)
+        TableCell(row.analytics.date.formatted(), weight = 1.2f)
         TableCell(formatIndianCurrency(row.fixedReturn), weight = 1f)
         TableCell(formatIndianCurrency(row.investmentValue), weight = 1f)
         TableCell(formatIndianCurrency(row.netWorth), weight = 1.1f, bold = true)

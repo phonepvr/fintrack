@@ -50,6 +50,7 @@ import com.fintrack.domain.util.formatIndianCurrency
 import com.fintrack.domain.util.formatPercent
 import com.fintrack.domain.util.formatSignedCurrency
 import com.fintrack.domain.util.formatSignedPercent
+import com.fintrack.domain.util.formatted
 import com.fintrack.ui.theme.DriftOff
 import com.fintrack.ui.theme.DriftWarn
 import com.fintrack.ui.theme.DriftWithin
@@ -66,7 +67,7 @@ fun SnapshotDetailRoute(
         topBar = {
             TopAppBar(
                 modifier = Modifier.statusBarsPadding(),
-                title = { Text(state.analytics?.date?.toString() ?: "Snapshot") },
+                title = { Text(state.analytics?.date?.formatted() ?: "Snapshot") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -330,7 +331,7 @@ private fun LoansCard(rows: List<LoanDetailRow>, totalLiabilities: java.math.Big
                     ) {
                         MetaChip("Original", formatIndianCurrency(row.originalAmount))
                         MetaChip("EMI", formatIndianCurrency(row.monthlyEmi))
-                        MetaChip("Taken", row.takenDate.toString())
+                        MetaChip("Taken", row.takenDate.formatted())
                     }
                 }
             }

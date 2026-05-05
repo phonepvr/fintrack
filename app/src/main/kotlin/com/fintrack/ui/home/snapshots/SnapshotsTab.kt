@@ -45,6 +45,7 @@ import com.fintrack.domain.util.formatIndianCurrency
 import com.fintrack.domain.util.formatPercent
 import com.fintrack.domain.util.formatSignedCurrency
 import com.fintrack.domain.util.formatSignedPercent
+import com.fintrack.domain.util.formatted
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -106,6 +107,7 @@ private fun SnapshotRow(
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
     var deletePromptOpen by remember { mutableStateOf(false) }
+    val showLiabilities = item.totalLiabilities.signum() != 0
 
     Box(
         modifier = Modifier
@@ -122,30 +124,81 @@ private fun SnapshotRow(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text(item.date.toString(), style = MaterialTheme.typography.titleMedium)
-                Text(
-                    formatIndianCurrency(item.totalPortfolio),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
-            }
-            Spacer(Modifier.size(4.dp))
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(
-                    "${formatPercent(item.percentOfEarnings)} of earnings",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                if (item.deltaAbsolute != null && item.deltaPercent != null) {
+                Column {
                     Text(
-                        "${formatSignedCurrency(item.deltaAbsolute)} (${formatSignedPercent(item.deltaPercent)})",
-                        style = MaterialTheme.typography.bodySmall,
+                        item.date.formatted(),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        formatIndianCurrency(item.netWorth),
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    Text(
+                        "Net Worth",
+                        style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
+                Column(horizontalAlignment = Alignment.End) {
+                    if (item.isLatest) {
+                        Text(
+                            "Latest",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                        Spacer(Modifier.size(2.dp))
+                    }
+                    if (item.deltaAbsolute != null && item.deltaPercent != null) {
+                        Text(
+                            formatSignedCurrency(item.deltaAbsolute),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                        Text(
+                            formatSignedPercent(item.deltaPercent),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    } else {
+                        Text(
+                            "First snapshot",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+            }
+            Spacer(Modifier.size(10.dp))
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                MetricCell("Assets", formatIndianCurrency(item.totalAssets), Modifier.weight(1f))
+                if (showLiabilities) {
+                    MetricCell(
+                        "Liabilities",
+                        formatIndianCurrency(item.totalLiabilities),
+                        Modifier.weight(1f),
+                    )
+                }
+            }
+            Spacer(Modifier.size(6.dp))
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                MetricCell(
+                    "Invested",
+                    formatIndianCurrency(item.invested),
+                    Modifier.weight(1f),
+                )
+                MetricCell(
+                    "% of earnings",
+                    formatPercent(item.percentOfEarnings),
+                    Modifier.weight(1f),
+                )
             }
             DropdownMenu(
                 expanded = menuExpanded,
@@ -182,7 +235,7 @@ private fun SnapshotRow(
             title = { Text("Delete snapshot?") },
             text = {
                 Text(
-                    "Snapshot from ${item.date} will be permanently removed " +
+                    "Snapshot from ${item.date.formatted()} will be permanently removed " +
                         "from this profile.",
                 )
             },
@@ -200,6 +253,31 @@ private fun SnapshotRow(
                 }
             },
         )
+    }
+}
+
+@Composable
+private fun MetricCell(label: String, value: String, modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .background(
+                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
+            )
+            .padding(horizontal = 10.dp, vertical = 8.dp),
+    ) {
+        Column {
+            Text(
+                label,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(
+                value,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+        }
     }
 }
 
