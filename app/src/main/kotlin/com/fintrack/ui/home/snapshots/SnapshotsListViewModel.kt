@@ -2,11 +2,14 @@ package com.fintrack.ui.home.snapshots
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.fintrack.data.db.entities.SnapshotEntity
 import com.fintrack.data.repo.LoanRepository
 import com.fintrack.data.repo.MilestoneRepository
 import com.fintrack.data.repo.SnapshotRepository
 import com.fintrack.data.repo.StreakRepository
 import com.fintrack.domain.UserScope
+import com.fintrack.domain.snapshots.SnapshotDeleteImpact
+import com.fintrack.domain.snapshots.SnapshotDeleteImpactAnalyzer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
@@ -134,6 +137,19 @@ class SnapshotsListViewModel @Inject constructor(
             )
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), StreakMeta())
+
+    private val snapshotEntities: StateFlow<List<SnapshotEntity>> = userScope.activeUserId
+        .flatMapLatest { uid ->
+            if (uid == null) flowOf(emptyList()) else snapshotRepository.observeForUser(uid)
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    fun impactFor(snapshotId: UUID): SnapshotDeleteImpact =
+        SnapshotDeleteImpactAnalyzer.analyze(
+            targetSnapshotId = snapshotId,
+            allSnapshots = snapshotEntities.value,
+            currentStreakMonths = streakMeta.value.currentStreakMonths,
+        )
 
     fun deleteSnapshot(snapshotId: UUID) {
         val userId = userScope.activeUserId.value ?: return

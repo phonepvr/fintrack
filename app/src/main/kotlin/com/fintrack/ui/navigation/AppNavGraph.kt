@@ -189,6 +189,7 @@ private fun AuthenticatedNavHost(appViewModel: AppViewModel) {
                         }
                     }
                 },
+                onDeleted = { navController.popBackStack() },
             )
         }
     }

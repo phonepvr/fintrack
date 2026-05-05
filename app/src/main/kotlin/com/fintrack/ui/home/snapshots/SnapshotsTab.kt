@@ -17,7 +17,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -41,11 +40,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.fintrack.R
+import com.fintrack.domain.snapshots.SnapshotDeleteImpact
 import com.fintrack.domain.util.formatIndianCurrency
 import com.fintrack.domain.util.formatPercent
 import com.fintrack.domain.util.formatSignedCurrency
 import com.fintrack.domain.util.formatSignedPercent
 import com.fintrack.domain.util.formatted
+import com.fintrack.ui.snapshots.common.SnapshotDeleteDialog
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -93,6 +94,7 @@ fun SnapshotsTab(
                             viewModel.duplicateSnapshot(item.id, todayLocal())
                         },
                         onDelete = { viewModel.deleteSnapshot(item.id) },
+                        impactProvider = { viewModel.impactFor(item.id) },
                     )
                     HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
                 }
@@ -110,9 +112,11 @@ private fun SnapshotRow(
     onEdit: () -> Unit,
     onDuplicate: () -> Unit,
     onDelete: () -> Unit,
+    impactProvider: () -> SnapshotDeleteImpact,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
     var deletePromptOpen by remember { mutableStateOf(false) }
+    var deleteImpact by remember { mutableStateOf(SnapshotDeleteImpact()) }
     val showLiabilities = item.totalLiabilities.signum() != 0
 
     Box(
@@ -234,6 +238,7 @@ private fun SnapshotRow(
                     text = { Text("Delete") },
                     onClick = {
                         menuExpanded = false
+                        deleteImpact = impactProvider()
                         deletePromptOpen = true
                     },
                 )
@@ -242,28 +247,14 @@ private fun SnapshotRow(
     }
 
     if (deletePromptOpen) {
-        AlertDialog(
-            onDismissRequest = { deletePromptOpen = false },
-            title = { Text("Delete snapshot?") },
-            text = {
-                Text(
-                    "Snapshot from ${item.date.formatted()} will be permanently removed " +
-                        "from this profile.",
-                )
+        SnapshotDeleteDialog(
+            date = item.date,
+            impact = deleteImpact,
+            onConfirm = {
+                deletePromptOpen = false
+                onDelete()
             },
-            confirmButton = {
-                TextButton(onClick = {
-                    deletePromptOpen = false
-                    onDelete()
-                }) {
-                    Text("Delete")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { deletePromptOpen = false }) {
-                    Text("Cancel")
-                }
-            },
+            onDismiss = { deletePromptOpen = false },
         )
     }
 }

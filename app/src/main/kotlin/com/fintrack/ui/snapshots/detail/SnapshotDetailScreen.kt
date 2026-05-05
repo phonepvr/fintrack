@@ -19,11 +19,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,6 +37,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,6 +57,7 @@ import com.fintrack.domain.util.formatPercent
 import com.fintrack.domain.util.formatSignedCurrency
 import com.fintrack.domain.util.formatSignedPercent
 import com.fintrack.domain.util.formatted
+import com.fintrack.ui.snapshots.common.SnapshotDeleteDialog
 import com.fintrack.ui.theme.DriftOff
 import com.fintrack.ui.theme.DriftWarn
 import com.fintrack.ui.theme.DriftWithin
@@ -60,9 +67,12 @@ import java.util.UUID
 fun SnapshotDetailRoute(
     onBack: () -> Unit,
     onEdit: () -> Unit,
+    onDeleted: () -> Unit,
     viewModel: SnapshotDetailViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsState()
+    var menuExpanded by remember { mutableStateOf(false) }
+    var deletePromptOpen by remember { mutableStateOf(false) }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -76,6 +86,21 @@ fun SnapshotDetailRoute(
                 actions = {
                     IconButton(onClick = onEdit) {
                         Icon(Icons.Filled.Edit, contentDescription = "Edit")
+                    }
+                    IconButton(onClick = { menuExpanded = true }) {
+                        Icon(Icons.Filled.MoreVert, contentDescription = "More actions")
+                    }
+                    DropdownMenu(
+                        expanded = menuExpanded,
+                        onDismissRequest = { menuExpanded = false },
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Delete") },
+                            onClick = {
+                                menuExpanded = false
+                                deletePromptOpen = true
+                            },
+                        )
                     }
                 },
             )
@@ -100,6 +125,18 @@ fun SnapshotDetailRoute(
                     .padding(padding),
             )
         }
+    }
+    val analytics = state.analytics
+    if (deletePromptOpen && analytics != null) {
+        SnapshotDeleteDialog(
+            date = analytics.date,
+            impact = state.deleteImpact,
+            onConfirm = {
+                deletePromptOpen = false
+                viewModel.delete(onDeleted)
+            },
+            onDismiss = { deletePromptOpen = false },
+        )
     }
 }
 

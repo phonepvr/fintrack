@@ -6,11 +6,15 @@ import androidx.lifecycle.viewModelScope
 import com.fintrack.data.repo.AimAllocationRepository
 import com.fintrack.data.repo.HoldingRepository
 import com.fintrack.data.repo.LoanRepository
+import com.fintrack.data.repo.MilestoneRepository
 import com.fintrack.data.repo.SnapshotRepository
+import com.fintrack.data.repo.StreakRepository
 import com.fintrack.data.repo.TaxonomyRepository
 import com.fintrack.domain.UserScope
 import com.fintrack.domain.analytics.SnapshotAnalytics
 import com.fintrack.domain.analytics.SnapshotAnalyticsCalculator
+import com.fintrack.domain.snapshots.SnapshotDeleteImpact
+import com.fintrack.domain.snapshots.SnapshotDeleteImpactAnalyzer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,6 +30,7 @@ data class SnapshotDetailUiState(
     val loading: Boolean = true,
     val analytics: SnapshotAnalytics? = null,
     val error: String? = null,
+    val deleteImpact: SnapshotDeleteImpact = SnapshotDeleteImpact(),
 )
 
 @HiltViewModel
@@ -35,6 +40,8 @@ class SnapshotDetailViewModel @Inject constructor(
     private val taxonomyRepository: TaxonomyRepository,
     private val aimRepository: AimAllocationRepository,
     private val loanRepository: LoanRepository,
+    private val streakRepository: StreakRepository,
+    private val milestoneRepository: MilestoneRepository,
     private val userScope: UserScope,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -89,7 +96,33 @@ class SnapshotDetailViewModel @Inject constructor(
             loanValues = loanValues,
             previousNetWorth = previousNetWorth,
         )
-        _state.update { it.copy(loading = false, analytics = analytics, error = null) }
+
+        val allSnapshots = snapshotRepository.observeForUser(activeUser).first()
+        val streakState = streakRepository.getForUser(activeUser)
+        val deleteImpact = SnapshotDeleteImpactAnalyzer.analyze(
+            targetSnapshotId = snapshotId,
+            allSnapshots = allSnapshots,
+            currentStreakMonths = streakState?.currentStreakMonths ?: 0,
+        )
+
+        _state.update {
+            it.copy(
+                loading = false,
+                analytics = analytics,
+                error = null,
+                deleteImpact = deleteImpact,
+            )
+        }
+    }
+
+    fun delete(onDone: () -> Unit) {
+        val userId = userScope.activeUserId.value ?: return
+        viewModelScope.launch {
+            snapshotRepository.deleteSnapshot(userId, snapshotId)
+            streakRepository.recompute(userId)
+            milestoneRepository.detectAndPersist(userId)
+            onDone()
+        }
     }
 
     companion object {
