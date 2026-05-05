@@ -8,6 +8,7 @@ import com.fintrack.data.db.entities.LoanEntity
 import com.fintrack.data.db.entities.LoanValueEntity
 import com.fintrack.data.db.entities.SnapshotEntity
 import com.fintrack.domain.model.GoalType
+import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Clock
 import java.math.BigDecimal
 import java.util.UUID
@@ -68,20 +69,17 @@ class XlsxImportApplier @Inject constructor(
         var goalsCreated = 0
 
         users.getUser(userId) ?: error("Unknown user $userId")
-        val holdingsByName = holdings.observeAll().let { flow ->
-            kotlinx.coroutines.flow.first(flow)
-        }.associateBy { it.name.lowercase() }
+        val holdingsByName = holdings.observeAll().first()
+            .associateBy { it.name.lowercase() }
 
         val now = Clock.System.now()
         database.withTransaction {
-            val existingByDate = snapshots.observeForUser(userId).let { flow ->
-                kotlinx.coroutines.flow.first(flow)
-            }.associateBy { it.snapshotDate }
+            val existingByDate = snapshots.observeForUser(userId).first()
+                .associateBy { it.snapshotDate }
 
             // Resolve loans first (they're referenced by name from LoanValues).
-            val existingLoans = loans.observeForUser(userId).let { flow ->
-                kotlinx.coroutines.flow.first(flow)
-            }.associateBy { it.name.lowercase() }
+            val existingLoans = loans.observeForUser(userId).first()
+                .associateBy { it.name.lowercase() }
             val loansByName = mutableMapOf<String, UUID>()
             existingLoans.forEach { (k, v) -> loansByName[k] = v.id }
             for (l in data.loans) {
@@ -188,9 +186,8 @@ class XlsxImportApplier @Inject constructor(
             }
 
             // Goals — dedup by name within user.
-            val existingGoals = goals.observeAllForUser(userId).let { flow ->
-                kotlinx.coroutines.flow.first(flow)
-            }.map { it.name.lowercase() }.toSet()
+            val existingGoals = goals.observeAllForUser(userId).first()
+                .map { it.name.lowercase() }.toSet()
             for (g in data.goals) {
                 if (g.name.lowercase() in existingGoals) continue
                 val type = runCatching { GoalType.valueOf(g.goalType.uppercase()) }.getOrNull()
