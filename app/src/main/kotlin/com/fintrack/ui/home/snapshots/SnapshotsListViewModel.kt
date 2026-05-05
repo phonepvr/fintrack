@@ -24,14 +24,11 @@ import java.util.UUID
 import javax.inject.Inject
 
 /**
- * Per spec §5.4: every snapshot card now shows
+ * Per spec §5.4: every snapshot card shows
  *  - Net Worth (assets - liabilities), the headline number
  *  - Δ vs previous snapshot (absolute + percent), based on Net Worth
  *  - Assets / Liabilities / Invested / % of Earnings in a 2×2 grid
- *
- * `liabilities` is 0 in Phase B (Loan UI lands in Phase C); the row
- * already reads the data from `LoanRepository` so when seed loans
- * exist the math is right end-to-end.
+ *  - 🔥 streak chip on the latest card (when streak > 0)
  */
 data class SnapshotListItem(
     val id: UUID,

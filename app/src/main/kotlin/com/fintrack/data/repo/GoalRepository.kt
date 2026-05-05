@@ -11,10 +11,6 @@ import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
-/**
- * Phase A: CRUD skeleton. Pace / progress / projection compute lands in
- * Phase H (GoalCalculator) once Wins / Goals UIs are in.
- */
 @Singleton
 class GoalRepository @Inject constructor(
     private val database: FintrackDatabase,
