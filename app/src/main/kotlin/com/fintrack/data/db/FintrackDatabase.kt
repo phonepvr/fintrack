@@ -31,9 +31,12 @@ import com.fintrack.data.db.entities.SubBucketEntity
 import com.fintrack.data.db.entities.UserEntity
 
 /**
- * v3 schema (version 3 — skipping 2 to keep the file/backup format unambiguous).
- * The schema is rebuilt on first launch via fallbackToDestructiveMigration in
- * DatabaseModule because v2 only ever held dummy data on test devices.
+ * v3 schema rebuilt on first launch via fallbackToDestructiveMigration; from
+ * v3 onward, real user data exists, so column changes ride explicit migrations
+ * registered in DatabaseModule (the destructive fallback stays as a last
+ * resort for users coming from older builds without a registered path).
+ *
+ * v4 (v3.1 release) — adds GlobalSettings.has_completed_onboarding.
  */
 @Database(
     entities = [
@@ -51,7 +54,7 @@ import com.fintrack.data.db.entities.UserEntity
         MilestoneEntity::class,
         GoalEntity::class,
     ],
-    version = 3,
+    version = 4,
     exportSchema = true,
 )
 @TypeConverters(Converters::class)

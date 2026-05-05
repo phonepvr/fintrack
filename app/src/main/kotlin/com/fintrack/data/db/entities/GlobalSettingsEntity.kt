@@ -23,6 +23,9 @@ data class GlobalSettingsEntity(
 
     @ColumnInfo(name = "always_show_profile_picker", defaultValue = "0")
     val alwaysShowProfilePicker: Boolean = false,
+
+    @ColumnInfo(name = "has_completed_onboarding", defaultValue = "0")
+    val hasCompletedOnboarding: Boolean = false,
 ) {
     companion object {
         const val SINGLETON_ID = 1

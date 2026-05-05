@@ -27,4 +27,5 @@ class GlobalSettingsRepository @Inject constructor(
     suspend fun setActiveUserId(userId: UUID?) = dao.setActiveUserId(userId)
     suspend fun setInactivityLockSeconds(seconds: Int) = dao.setInactivityLockSeconds(seconds)
     suspend fun setAlwaysShowProfilePicker(value: Boolean) = dao.setAlwaysShowProfilePicker(value)
+    suspend fun setHasCompletedOnboarding(value: Boolean) = dao.setHasCompletedOnboarding(value)
 }

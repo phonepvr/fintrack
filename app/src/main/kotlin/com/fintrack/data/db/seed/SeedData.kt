@@ -122,5 +122,6 @@ object SeedData {
         defaultCurrencySymbol = "₹",
         activeUserId = null,
         alwaysShowProfilePicker = false,
+        hasCompletedOnboarding = false,
     )
 }

@@ -5,6 +5,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.fintrack.data.db.FintrackDatabase
+import com.fintrack.data.db.migrations.MIGRATION_3_4
 import com.fintrack.data.db.dao.AimAllocationDao
 import com.fintrack.data.db.dao.AssetClassDao
 import com.fintrack.data.db.dao.GlobalSettingsDao
@@ -48,10 +49,10 @@ object DatabaseModule {
             FintrackDatabase.DATABASE_NAME,
         )
             .openHelperFactory(factory)
-            // v3 is a clean rebuild from v2 — v2 only ever held dummy data.
-            // No migration files; if Room sees a schema mismatch, drop and rebuild.
-            // Room 2.6.1's fallbackToDestructiveMigration takes no arguments;
-            // the boolean overload landed in 2.7.
+            // v3 → v4 ALTER TABLE runs first; the destructive fallback stays
+            // as a last resort for users coming from v1/v2 (or any future
+            // version without a registered path). v3 onward holds real data.
+            .addMigrations(MIGRATION_3_4)
             .fallbackToDestructiveMigration()
             .addCallback(object : RoomDatabase.Callback() {
                 override fun onCreate(db: SupportSQLiteDatabase) {
@@ -63,8 +64,8 @@ object DatabaseModule {
                     super.onOpen(db)
                     db.execSQL(
                         "INSERT OR IGNORE INTO global_settings " +
-                            "(id, inactivity_lock_seconds, default_currency_symbol, active_user_id, always_show_profile_picker) " +
-                            "VALUES (1, 60, '₹', NULL, 0)",
+                            "(id, inactivity_lock_seconds, default_currency_symbol, active_user_id, always_show_profile_picker, has_completed_onboarding) " +
+                            "VALUES (1, 60, '₹', NULL, 0, 0)",
                     )
                 }
             })
@@ -74,8 +75,8 @@ object DatabaseModule {
     private fun seedOnCreate(db: SupportSQLiteDatabase) {
         db.execSQL(
             "INSERT OR IGNORE INTO global_settings " +
-                "(id, inactivity_lock_seconds, default_currency_symbol, active_user_id, always_show_profile_picker) " +
-                "VALUES (?, ?, ?, NULL, 0)",
+                "(id, inactivity_lock_seconds, default_currency_symbol, active_user_id, always_show_profile_picker, has_completed_onboarding) " +
+                "VALUES (?, ?, ?, NULL, 0, 0)",
             arrayOf<Any>(1, 60, "₹"),
         )
 

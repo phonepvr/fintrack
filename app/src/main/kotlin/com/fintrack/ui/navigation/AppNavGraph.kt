@@ -124,6 +124,9 @@ private fun AuthenticatedNavHost(appViewModel: AppViewModel) {
             AboutRoute(
                 onBack = { navController.popBackStack() },
                 onViewManifest = { navController.navigate("settings/about/manifest") },
+                // Phase B wires the replay flow; Phase A leaves the button
+                // as a no-op so the About surface lands first.
+                onReplayOnboarding = {},
             )
         }
         composable("settings/about/manifest") {

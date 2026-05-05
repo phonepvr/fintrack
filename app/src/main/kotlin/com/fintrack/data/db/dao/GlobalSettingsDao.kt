@@ -28,4 +28,7 @@ interface GlobalSettingsDao {
 
     @Query("UPDATE global_settings SET always_show_profile_picker = :value WHERE id = ${GlobalSettingsEntity.SINGLETON_ID}")
     suspend fun setAlwaysShowProfilePicker(value: Boolean)
+
+    @Query("UPDATE global_settings SET has_completed_onboarding = :value WHERE id = ${GlobalSettingsEntity.SINGLETON_ID}")
+    suspend fun setHasCompletedOnboarding(value: Boolean)
 }
