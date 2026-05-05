@@ -64,14 +64,13 @@ android {
     // generates a fresh key per run and Android refuses to upgrade across
     // builds ("package conflicts with an existing package"). The key inside
     // app/keystore/debug.keystore is the standard Android debug identity —
-    // public by design, not a release/Play Store signing key.
-    signingConfigs {
-        create("debug") {
-            storeFile = rootProject.file("app/keystore/debug.keystore")
-            storePassword = "android"
-            keyAlias = "androiddebugkey"
-            keyPassword = "android"
-        }
+    // public by design, not a release/Play Store signing key. AGP creates
+    // a default "debug" signing config; we mutate it rather than re-create.
+    signingConfigs.getByName("debug") {
+        storeFile = rootProject.file("app/keystore/debug.keystore")
+        storePassword = "android"
+        keyAlias = "androiddebugkey"
+        keyPassword = "android"
     }
 
     buildTypes {
@@ -79,7 +78,7 @@ android {
             isMinifyEnabled = false
             applicationIdSuffix = ".debug"
             isDebuggable = true
-            signingConfig = signingConfigs.getByName("debug")
+            // signingConfig defaults to the "debug" config above — no override needed.
         }
         release {
             isMinifyEnabled = true
