@@ -26,6 +26,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -41,6 +43,9 @@ import androidx.lifecycle.viewModelScope
 import com.fintrack.R
 import com.fintrack.data.repo.UserRepository
 import com.fintrack.domain.UserScope
+import com.fintrack.ui.help.HelpIconButton
+import com.fintrack.ui.help.HelpSheet
+import com.fintrack.ui.help.HelpSheetContent
 import com.fintrack.ui.home.overview.OverviewTab
 import com.fintrack.ui.home.snapshots.SnapshotsTab
 import com.fintrack.ui.settings.SettingsTab
@@ -90,10 +95,12 @@ fun HomeRoute(
     onBackup: () -> Unit,
     onExcel: () -> Unit,
     onAbout: () -> Unit,
+    onNavigateToAbout: (anchor: String) -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val activeUser by viewModel.activeUser.collectAsState()
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
+    var showJourneyHelp by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -117,6 +124,9 @@ fun HomeRoute(
                     }
                 },
                 actions = {
+                    if (HomeTab.entries[selectedTab] == HomeTab.Journey) {
+                        HelpIconButton(onClick = { showJourneyHelp = true })
+                    }
                     IconButton(onClick = onSwitchUser) {
                         Icon(
                             imageVector = Icons.Filled.SwitchAccount,
@@ -160,6 +170,14 @@ fun HomeRoute(
                 )
             }
         }
+    }
+
+    if (showJourneyHelp) {
+        HelpSheet(
+            sheet = HelpSheetContent.JOURNEY_STREAKS,
+            onDismiss = { showJourneyHelp = false },
+            onLearnMore = onNavigateToAbout,
+        )
     }
 }
 

@@ -48,6 +48,9 @@ import com.fintrack.domain.util.formatIndianCurrency
 import com.fintrack.domain.util.formatted
 import com.fintrack.security.MoneyTextField
 import com.fintrack.ui.common.CommonDatePickerSheet
+import com.fintrack.ui.help.HelpIconButton
+import com.fintrack.ui.help.HelpSheet
+import com.fintrack.ui.help.HelpSheetContent
 import kotlinx.datetime.LocalDate
 import java.math.BigDecimal
 import java.util.UUID
@@ -55,11 +58,13 @@ import java.util.UUID
 @Composable
 fun SnapshotEntryRoute(
     onDone: () -> Unit,
+    onNavigateToAbout: (anchor: String) -> Unit = {},
     viewModel: SnapshotEntryViewModel = hiltViewModel(),
 ) {
     // [snapshotId] (null for new) is read from SavedStateHandle by [SnapshotEntryViewModel].
     val state by viewModel.state.collectAsState()
     val snackbarState = remember { SnackbarHostState() }
+    var helpSheetKey by remember { mutableStateOf<HelpSheetContent.Sheet?>(null) }
 
     LaunchedEffect(state.savedSnapshotId) {
         if (state.savedSnapshotId != null) onDone()
@@ -88,6 +93,7 @@ fun SnapshotEntryRoute(
                     }
                 },
                 actions = {
+                    HelpIconButton(onClick = { helpSheetKey = HelpSheetContent.SNAPSHOT_WHAT_IS })
                     TextButton(onClick = viewModel::save, enabled = !state.saving) {
                         Text(if (state.saving) "Saving…" else "Save")
                     }
@@ -116,9 +122,18 @@ fun SnapshotEntryRoute(
             onSetNotes = viewModel::setNotes,
             onSetLoanOutstanding = viewModel::setLoanOutstanding,
             onAddLoan = viewModel::createAndAttachLoan,
+            onShowEarningsHelp = { helpSheetKey = HelpSheetContent.SNAPSHOT_EARNINGS },
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
+        )
+    }
+
+    helpSheetKey?.let { sheet ->
+        HelpSheet(
+            sheet = sheet,
+            onDismiss = { helpSheetKey = null },
+            onLearnMore = onNavigateToAbout,
         )
     }
 }
@@ -134,6 +149,7 @@ private fun SnapshotEntryForm(
     onSetNotes: (String) -> Unit,
     onSetLoanOutstanding: (UUID, String) -> Unit,
     onAddLoan: (String, BigDecimal, LocalDate, BigDecimal) -> Unit,
+    onShowEarningsHelp: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val orderedAssetClassNames: List<String> = remember(state.rows) {
@@ -152,14 +168,17 @@ private fun SnapshotEntryForm(
         item {
             DateField(state.date, onClick = { showDatePicker = true })
             Spacer(Modifier.height(12.dp))
-            OutlinedTextField(
-                value = state.earnings,
-                onValueChange = onSetEarnings,
-                label = { Text("Earnings (₹ in cr)") },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                modifier = Modifier.fillMaxWidth(),
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                OutlinedTextField(
+                    value = state.earnings,
+                    onValueChange = onSetEarnings,
+                    label = { Text("Earnings (₹ in cr)") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    modifier = Modifier.weight(1f),
+                )
+                HelpIconButton(onClick = onShowEarningsHelp)
+            }
             Spacer(Modifier.height(8.dp))
         }
 

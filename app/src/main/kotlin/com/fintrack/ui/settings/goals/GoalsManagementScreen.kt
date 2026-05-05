@@ -47,6 +47,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.fintrack.data.db.entities.GoalEntity
+import com.fintrack.ui.help.HelpIconButton
+import com.fintrack.ui.help.HelpSheet
+import com.fintrack.ui.help.HelpSheetContent
 import com.fintrack.domain.model.GoalType
 import com.fintrack.domain.util.formatIndianCurrency
 import com.fintrack.domain.util.formatted
@@ -62,6 +65,7 @@ import java.math.BigDecimal
 @Composable
 fun GoalsManagementRoute(
     onBack: () -> Unit,
+    onNavigateToAbout: (anchor: String) -> Unit = {},
     viewModel: GoalsManagementViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsState()
@@ -69,6 +73,7 @@ fun GoalsManagementRoute(
     var showAdd by remember { mutableStateOf(false) }
     var editTarget by remember { mutableStateOf<GoalEntity?>(null) }
     var deleteTarget by remember { mutableStateOf<GoalEntity?>(null) }
+    var showHelp by remember { mutableStateOf(false) }
 
     LaunchedEffect(state.error) {
         state.error?.let {
@@ -87,6 +92,7 @@ fun GoalsManagementRoute(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
+                actions = { HelpIconButton(onClick = { showHelp = true }) },
             )
         },
         snackbarHost = { SnackbarHost(snackbarState) },
@@ -172,6 +178,14 @@ fun GoalsManagementRoute(
                 }) { Text("Delete") }
             },
             dismissButton = { TextButton(onClick = { deleteTarget = null }) { Text("Cancel") } },
+        )
+    }
+
+    if (showHelp) {
+        HelpSheet(
+            sheet = HelpSheetContent.GOALS_HOW_THEY_WORK,
+            onDismiss = { showHelp = false },
+            onLearnMore = onNavigateToAbout,
         )
     }
 }

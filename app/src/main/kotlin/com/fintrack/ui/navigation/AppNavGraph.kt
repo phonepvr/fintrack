@@ -9,9 +9,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.fintrack.security.BiometricAuthenticator
 import com.fintrack.ui.AppState
 import com.fintrack.ui.AppViewModel
@@ -84,6 +86,9 @@ fun FintrackApp(
 @Composable
 private fun AuthenticatedNavHost(appViewModel: AppViewModel) {
     val navController = rememberNavController()
+    val navToAbout: (String) -> Unit = { anchor ->
+        navController.navigate("settings/about?scrollTo=$anchor")
+    }
     NavHost(navController = navController, startDestination = HOME_ROUTE) {
         composable(HOME_ROUTE) {
             HomeRoute(
@@ -99,10 +104,14 @@ private fun AuthenticatedNavHost(appViewModel: AppViewModel) {
                 onBackup = { navController.navigate("settings/backup") },
                 onExcel = { navController.navigate("settings/excel") },
                 onAbout = { navController.navigate("settings/about") },
+                onNavigateToAbout = navToAbout,
             )
         }
         composable("settings/aim") {
-            AimEditorRoute(onDone = { navController.popBackStack() })
+            AimEditorRoute(
+                onDone = { navController.popBackStack() },
+                onNavigateToAbout = navToAbout,
+            )
         }
         composable("settings/holdings") {
             HoldingsManagementRoute(
@@ -114,7 +123,10 @@ private fun AuthenticatedNavHost(appViewModel: AppViewModel) {
             LoansManagementRoute(onBack = { navController.popBackStack() })
         }
         composable("settings/goals") {
-            GoalsManagementRoute(onBack = { navController.popBackStack() })
+            GoalsManagementRoute(
+                onBack = { navController.popBackStack() },
+                onNavigateToAbout = navToAbout,
+            )
         }
         composable("settings/users") {
             ManageUsersRoute(onBack = { navController.popBackStack() })
@@ -125,11 +137,21 @@ private fun AuthenticatedNavHost(appViewModel: AppViewModel) {
         composable("settings/excel") {
             ExcelRoute(onBack = { navController.popBackStack() })
         }
-        composable("settings/about") {
+        composable(
+            route = "settings/about?scrollTo={scrollTo}",
+            arguments = listOf(
+                navArgument("scrollTo") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                },
+            ),
+        ) { backStack ->
             AboutRoute(
                 onBack = { navController.popBackStack() },
                 onViewManifest = { navController.navigate("settings/about/manifest") },
                 onReplayOnboarding = { navController.navigate("onboarding/replay") },
+                scrollToSection = backStack.arguments?.getString("scrollTo"),
             )
         }
         composable("settings/about/manifest") {
@@ -145,10 +167,16 @@ private fun AuthenticatedNavHost(appViewModel: AppViewModel) {
             )
         }
         composable(SNAPSHOT_NEW_ROUTE) {
-            SnapshotEntryRoute(onDone = { navController.popBackStack() })
+            SnapshotEntryRoute(
+                onDone = { navController.popBackStack() },
+                onNavigateToAbout = navToAbout,
+            )
         }
         composable("snapshot/edit/{${SnapshotEntryViewModel.ARG_SNAPSHOT_ID}}") {
-            SnapshotEntryRoute(onDone = { navController.popBackStack() })
+            SnapshotEntryRoute(
+                onDone = { navController.popBackStack() },
+                onNavigateToAbout = navToAbout,
+            )
         }
         composable("snapshot/detail/{${SnapshotDetailViewModel.ARG_SNAPSHOT_ID}}") { backStack ->
             val id = backStack.arguments?.getString(SnapshotDetailViewModel.ARG_SNAPSHOT_ID)

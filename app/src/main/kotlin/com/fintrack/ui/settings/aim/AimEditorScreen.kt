@@ -33,8 +33,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import com.fintrack.ui.help.HelpIconButton
+import com.fintrack.ui.help.HelpSheet
+import com.fintrack.ui.help.HelpSheetContent
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -188,11 +193,13 @@ class AimEditorViewModel @Inject constructor(
 @Composable
 fun AimEditorRoute(
     onDone: () -> Unit,
+    onNavigateToAbout: (anchor: String) -> Unit = {},
     viewModel: AimEditorViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    var showHelp by remember { mutableStateOf(false) }
 
     LaunchedEffect(state.saved) { if (state.saved) onDone() }
     LaunchedEffect(state.error) {
@@ -213,6 +220,7 @@ fun AimEditorRoute(
                     }
                 },
                 actions = {
+                    HelpIconButton(onClick = { showHelp = true })
                     TextButton(onClick = viewModel::distributeRemainder) { Text("Fill gap") }
                     TextButton(onClick = viewModel::distributeEvenly) { Text("Even") }
                     TextButton(onClick = viewModel::save, enabled = state.canSave) {
@@ -250,6 +258,14 @@ fun AimEditorRoute(
                 )
             }
         }
+    }
+
+    if (showHelp) {
+        HelpSheet(
+            sheet = HelpSheetContent.AIM_WHAT_IS,
+            onDismiss = { showHelp = false },
+            onLearnMore = onNavigateToAbout,
+        )
     }
 }
 
