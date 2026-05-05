@@ -1,4 +1,4 @@
-# Build summary (run 25360751520, sha aa529ad305e9efea43f0e4e6d93c2c96ffc7438a)
+# Build summary (run 25360852761, sha 1f3c55fcda2cc6f034b2d57c9ea98d339a4589c4)
 
 | Step | Outcome |
 |---|---|
@@ -11,15 +11,13 @@
 ## compile.log — error/warning lines
 
 ```
-2431:e: file:///home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/domain/goals/GoalCalculator.kt:111:14 Unresolved reference 'toLocalDateTime'.
-2432:e: file:///home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/domain/goals/GoalCalculator.kt:112:23 'operator' modifier is required on 'FirNamedFunctionSymbol kotlin/compareTo' in 'compareTo'.
-2433:e: file:///home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/domain/goals/GoalCalculator.kt:114:14 Unresolved reference 'toLocalDateTime'.
-2440:FAILURE: Build failed with an exception.
-2514:Caused by: org.gradle.workers.internal.DefaultWorkerExecutor$WorkExecutionException: A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
-2672:Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilation error. See log for more details
+2429:e: file:///home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/domain/goals/GoalCalculator.kt:116:56 Argument type mismatch: actual type is 'Long', but 'Int' was expected.
+2436:FAILURE: Build failed with an exception.
+2481:Caused by: org.gradle.workers.internal.DefaultWorkerExecutor$WorkExecutionException: A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+2610:Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilation error. See log for more details
 ```
 
-## compile.log — full log (2706 lines)
+## compile.log — full log (2644 lines)
 
 ```
 [truncated to first 200 + last 400 lines]
@@ -28,8 +26,8 @@ Initialized jansi services in: /home/runner/.gradle/native
 To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.11.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
 Starting process 'Gradle build daemon'. Working directory: /home/runner/.gradle/daemon/8.11.1 Command: /usr/lib/jvm/temurin-17-jdk-amd64/bin/java --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED --add-opens=java.base/java.nio.charset=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED --add-opens=java.xml/javax.xml.namespace=ALL-UNNAMED -XX:+UseParallelGC -Xmx4g -Dfile.encoding=UTF-8 -Duser.country -Duser.language=en -Duser.variant -cp /home/runner/.gradle/wrapper/dists/gradle-8.11.1-bin/bpt9gzteqjrbo1mjrsomdt32c/gradle-8.11.1/lib/gradle-daemon-main-8.11.1.jar -javaagent:/home/runner/.gradle/wrapper/dists/gradle-8.11.1-bin/bpt9gzteqjrbo1mjrsomdt32c/gradle-8.11.1/lib/agents/gradle-instrumentation-agent-8.11.1.jar org.gradle.launcher.daemon.bootstrap.GradleDaemon 8.11.1
 Successfully started process 'Gradle build daemon'
-An attempt to start the daemon took 1.057 secs.
-The client will now receive all logging from the daemon (pid: 2490). The daemon log file: /home/runner/.gradle/daemon/8.11.1/daemon-2490.out.log
+An attempt to start the daemon took 1.167 secs.
+The client will now receive all logging from the daemon (pid: 2489). The daemon log file: /home/runner/.gradle/daemon/8.11.1/daemon-2489.out.log
 Daemon will be stopped at the end of the build 
 Using 4 worker leases.
 Received JVM installation metadata from '/usr/lib/jvm/temurin-17-jdk-amd64': {JAVA_HOME=/usr/lib/jvm/temurin-17-jdk-amd64, JAVA_VERSION=17.0.18, JAVA_VENDOR=Eclipse Adoptium, RUNTIME_NAME=OpenJDK Runtime Environment, RUNTIME_VERSION=17.0.18+8, VM_NAME=OpenJDK 64-Bit Server VM, VM_VERSION=17.0.18+8, VM_VENDOR=Eclipse Adoptium, OS_ARCH=amd64}
@@ -211,7 +209,6 @@ Transforming sdk-common-31.7.3.jar (com.android.tools:sdk-common:31.7.3) with Me
 Transforming sdklib-31.7.3.jar (com.android.tools:sdklib:31.7.3) with InstrumentationAnalysisTransform
 Transforming sdklib-31.7.3.jar (com.android.tools:sdklib:31.7.3) with MergeInstrumentationAnalysisTransform
 Transforming repository-31.7.3.jar (com.android.tools:repository:31.7.3) with InstrumentationAnalysisTransform
-Transforming hilt-android-gradle-plugin-2.54.jar (com.google.dagger:hilt-android-gradle-plugin:2.54) with ExternalDependencyInstrumentingArtifactTransform
 Transforming repository-31.7.3.jar (com.android.tools:repository:31.7.3) with MergeInstrumentationAnalysisTransform
 Transforming aaptcompiler-8.7.3.jar (com.android.tools.build:aaptcompiler:8.7.3) with InstrumentationAnalysisTransform
 Transforming aaptcompiler-8.7.3.jar (com.android.tools.build:aaptcompiler:8.7.3) with MergeInstrumentationAnalysisTransform
@@ -223,9 +220,70 @@ Transforming databinding-compiler-common-8.7.3.jar (androidx.databinding:databin
 Transforming databinding-compiler-common-8.7.3.jar (androidx.databinding:databinding-compiler-common:8.7.3) with MergeInstrumentationAnalysisTransform
 Transforming android-test-plugin-host-emulator-control-proto-31.7.3.jar (com.android.tools.utp:android-test-plugin-host-emulator-control-proto:31.7.3) with InstrumentationAnalysisTransform
 Transforming android-test-plugin-host-emulator-control-proto-31.7.3.jar (com.android.tools.utp:android-test-plugin-host-emulator-control-proto:31.7.3) with MergeInstrumentationAnalysisTransform
+Transforming android-test-plugin-host-retention-proto-31.7.3.jar (com.android.tools.utp:android-test-plugin-host-retention-proto:31.7.3) with InstrumentationAnalysisTransform
 
-... (2106 lines elided) ...
+... (2044 lines elided) ...
 
+Transforming runtime-saveable-release-api.jar with StructureTransformAction
+Transforming runtime-release-api.jar with StructureTransformAction
+Transforming annotation-experimental-1.4.1-api.jar with StructureTransformAction
+Transforming savedstate-ktx-1.2.1-api.jar with StructureTransformAction
+Transforming savedstate-1.2.1-api.jar with StructureTransformAction
+Transforming kotlinx-coroutines-core-jvm-1.10.1.jar with StructureTransformAction
+Transforming kotlinx-coroutines-android-1.10.1.jar with StructureTransformAction
+Transforming kotlinx-datetime-jvm-0.6.1.jar with StructureTransformAction
+Transforming kotlinx-serialization-core-jvm-1.7.3.jar with StructureTransformAction
+Transforming kotlinx-serialization-json-jvm-1.7.3.jar with StructureTransformAction
+Transforming security-crypto-1.1.0-alpha06-api.jar with StructureTransformAction
+Transforming versionedparcelable-1.1.1-api.jar with StructureTransformAction
+Transforming core-runtime-2.2.0-api.jar with StructureTransformAction
+Transforming core-common-2.2.0.jar with StructureTransformAction
+Transforming collection-jvm-1.4.4.jar with StructureTransformAction
+Transforming annotation-jvm-1.9.1.jar with StructureTransformAction
+Transforming kotlin-stdlib-jdk8-1.8.22.jar with StructureTransformAction
+Transforming kotlin-stdlib-jdk7-1.8.22.jar with StructureTransformAction
+Transforming kotlin-stdlib-2.1.20.jar with StructureTransformAction
+Transforming sqlcipher-android-4.6.1-api.jar with StructureTransformAction
+Transforming compose-2.0.2-api.jar with StructureTransformAction
+Transforming core-2.0.2-api.jar with StructureTransformAction
+Transforming annotations-23.0.0.jar with StructureTransformAction
+Transforming startup-runtime-1.1.1-api.jar with StructureTransformAction
+Transforming hilt-core-2.54.jar with StructureTransformAction
+Transforming dagger-2.54.jar with StructureTransformAction
+Transforming jakarta.inject-api-2.0.1.jar with StructureTransformAction
+Transforming javax.inject-1.jar with StructureTransformAction
+Transforming jspecify-1.0.0.jar with StructureTransformAction
+Transforming dagger-lint-aar-2.54-api.jar with StructureTransformAction
+Transforming jsr305-3.0.2.jar with StructureTransformAction
+[KOTLIN] Kotlin compilation 'jdkHome' argument: null
+i: starting the daemon as: /usr/lib/jvm/temurin-17-jdk-amd64/bin/java -cp /home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-compiler-embeddable/2.1.20/4ef56b3316798316bfac7a0ae443391c9e900ea1/kotlin-compiler-embeddable-2.1.20.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/2.1.20/aa8ca79cd50578314f6d1180c47cbe14c0fee567/kotlin-stdlib-2.1.20.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-script-runtime/2.1.20/f7c623d7f7bdb01f5ccd6b437bc0a937fcd7c57e/kotlin-script-runtime-2.1.20.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-reflect/1.6.10/1cbe9c92c12a94eea200d23c2bbaedaf3daf5132/kotlin-reflect-1.6.10.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-daemon-embeddable/2.1.20/95670fce77befd02a70a0bc3abe8ee4533521334/kotlin-daemon-embeddable-2.1.20.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.intellij.deps/trove4j/1.0.20200330/3afb14d5f9ceb459d724e907a21145e8ff394f02/trove4j-1.0.20200330.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-coroutines-core-jvm/1.8.0/ac1dc37a30a93150b704022f8d895ee1bd3a36b3/kotlinx-coroutines-core-jvm-1.8.0.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar -Djava.awt.headless=true -Djava.rmi.server.hostname=127.0.0.1 -Xmx4g -XX:ReservedCodeCacheSize=320m -Dkotlin.environment.keepalive -ea -XX:+UseCodeCacheFlushing -XX:+UseParallelGC -Dkotlin.daemon.initiator.marker.file=/tmp/kotlin-compiler-in-fintrack-7340352410631969105.alive --add-exports java.base/sun.nio.ch=ALL-UNNAMED org.jetbrains.kotlin.daemon.KotlinCompileDaemon --daemon-runFilesPath /home/runner/.kotlin/daemon --daemon-autoshutdownIdleSeconds=7200 --daemon-compilerClasspath /home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-compiler-embeddable/2.1.20/4ef56b3316798316bfac7a0ae443391c9e900ea1/kotlin-compiler-embeddable-2.1.20.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/2.1.20/aa8ca79cd50578314f6d1180c47cbe14c0fee567/kotlin-stdlib-2.1.20.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-script-runtime/2.1.20/f7c623d7f7bdb01f5ccd6b437bc0a937fcd7c57e/kotlin-script-runtime-2.1.20.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-reflect/1.6.10/1cbe9c92c12a94eea200d23c2bbaedaf3daf5132/kotlin-reflect-1.6.10.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-daemon-embeddable/2.1.20/95670fce77befd02a70a0bc3abe8ee4533521334/kotlin-daemon-embeddable-2.1.20.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.intellij.deps/trove4j/1.0.20200330/3afb14d5f9ceb459d724e907a21145e8ff394f02/trove4j-1.0.20200330.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-coroutines-core-jvm/1.8.0/ac1dc37a30a93150b704022f8d895ee1bd3a36b3/kotlinx-coroutines-core-jvm-1.8.0.jar:/home/runner/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar
+i: #1 retrying connecting to the daemon 
+i: [ksp] loaded provider(s): [dagger.hilt.processor.internal.uninstallmodules.KspUninstallModulesProcessor$Provider, dagger.hilt.processor.internal.definecomponent.KspDefineComponentProcessor$Provider, dagger.hilt.android.processor.internal.androidentrypoint.KspAndroidEntryPointProcessor$Provider, dagger.hilt.processor.internal.root.KspRootProcessor$Provider, dagger.hilt.android.processor.internal.viewmodel.KspViewModelProcessor$Provider, dagger.hilt.android.processor.internal.bindvalue.KspBindValueProcessor$Provider, dagger.hilt.processor.internal.root.KspComponentTreeDepsProcessor$Provider, dagger.hilt.processor.internal.aliasof.KspAliasOfProcessor$Provider, dagger.hilt.processor.internal.generatesrootinput.KspGeneratesRootInputProcessor$Provider, dagger.hilt.processor.internal.originatingelement.KspOriginatingElementProcessor$Provider, dagger.hilt.processor.internal.earlyentrypoint.KspEarlyEntryPointProcessor$Provider, dagger.hilt.android.processor.internal.customtestapplication.KspCustomTestApplicationProcessor$Provider, dagger.hilt.processor.internal.aggregateddeps.KspAggregatedDepsProcessor$Provider, androidx.room.RoomKspProcessor$Provider, dagger.internal.codegen.KspComponentProcessor$Provider]
+Finished executing kotlin compiler using DAEMON strategy
+Stored cache entry for task ':app:kspDebugKotlin' with cache key c3cbae58a0e471dc8d5fb4e4e4b93de8
+Resolve mutations for :app:compileDebugKotlin (Thread[Execution worker Thread 2,5,main]) started.
+:app:compileDebugKotlin (Thread[Execution worker Thread 2,5,main]) started.
+
+> Task :app:compileDebugKotlin
+Transforming android.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming core-lambda-stubs.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming R.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming hilt-navigation-compose-1.2.0-api.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming hilt-navigation-1.2.0-api.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming navigation-common-2.8.5-api.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming navigation-runtime-2.8.5-api.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming navigation-common-ktx-2.8.5-api.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming navigation-runtime-ktx-2.8.5-api.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming navigation-compose-2.8.5-api.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming hilt-android-2.54-api.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming biometric-ktx-1.2.0-alpha05-api.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming biometric-1.2.0-alpha05-api.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming fragment-1.5.4-api.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming loader-1.0.0-api.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming viewpager-1.0.0-api.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming customview-1.0.0-api.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming core-1.15.0-api.jar with BuildToolsApiClasspathEntrySnapshotTransform
+Transforming lifecycle-livedata-core-ktx-2.8.7-api.jar with BuildToolsApiClasspathEntrySnapshotTransform
 Transforming lifecycle-livedata-2.8.7-api.jar with BuildToolsApiClasspathEntrySnapshotTransform
 Transforming lifecycle-runtime-ktx-release-api.jar with BuildToolsApiClasspathEntrySnapshotTransform
 Transforming lifecycle-livedata-core-2.8.7-api.jar with BuildToolsApiClasspathEntrySnapshotTransform
@@ -298,7 +356,7 @@ Transforming javax.inject-1.jar with BuildToolsApiClasspathEntrySnapshotTransfor
 Transforming jspecify-1.0.0.jar with BuildToolsApiClasspathEntrySnapshotTransform
 Transforming dagger-lint-aar-2.54-api.jar with BuildToolsApiClasspathEntrySnapshotTransform
 Transforming jsr305-3.0.2.jar with BuildToolsApiClasspathEntrySnapshotTransform
-Build cache key for task ':app:compileDebugKotlin' is cdf1291e284e083b4957c861009ac7c2
+Build cache key for task ':app:compileDebugKotlin' is 7a58c1bdd7077ff3856b5a1acc29e222
 Task ':app:compileDebugKotlin' is not up-to-date because:
   No history is available.
 The input changes require a full rebuild for incremental task ':app:compileDebugKotlin'.
@@ -349,15 +407,13 @@ Script source files:
 Script file extensions: 
 Using Kotlin/JVM incremental compilation
 [KOTLIN] Kotlin compilation 'jdkHome' argument: null
-Options for KOTLIN DAEMON: IncrementalCompilationOptions(super=CompilationOptions(compilerMode=INCREMENTAL_COMPILER, targetPlatform=JVM, reportCategories=[0, 3], reportSeverity=2, requestedCompilationResults=[0], kotlinScriptExtensions=[]), sourceChanges=org.jetbrains.kotlin.buildtools.api.SourcesChanges$Unknown@49343faa, classpathChanges=NotAvailableForNonIncrementalRun, workingDir=/home/runner/work/fintrack/fintrack/app/build/kotlin/compileDebugKotlin/cacheable, multiModuleICSettings=MultiModuleICSettings(buildHistoryFile=/home/runner/work/fintrack/fintrack/app/build/kotlin/compileDebugKotlin/local-state/build-history.bin, useModuleDetection=true), usePreciseJavaTracking=true, icFeatures=IncrementalCompilationFeatures(withAbiSnapshot=false, preciseCompilationResultsBackup=true, keepIncrementalCompilationCachesInMemory=true, enableUnsafeIncrementalCompilationForMultiplatform=false, enableMonotonousIncrementalCompileSetExpansion=true), outputFiles=[/home/runner/work/fintrack/fintrack/app/build/tmp/kotlin-classes/debug, /home/runner/work/fintrack/fintrack/app/build/kotlin/compileDebugKotlin/cacheable, /home/runner/work/fintrack/fintrack/app/build/kotlin/compileDebugKotlin/local-state])
-e: file:///home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/domain/goals/GoalCalculator.kt:111:14 Unresolved reference 'toLocalDateTime'.
-e: file:///home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/domain/goals/GoalCalculator.kt:112:23 'operator' modifier is required on 'FirNamedFunctionSymbol kotlin/compareTo' in 'compareTo'.
-e: file:///home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/domain/goals/GoalCalculator.kt:114:14 Unresolved reference 'toLocalDateTime'.
+Options for KOTLIN DAEMON: IncrementalCompilationOptions(super=CompilationOptions(compilerMode=INCREMENTAL_COMPILER, targetPlatform=JVM, reportCategories=[0, 3], reportSeverity=2, requestedCompilationResults=[0], kotlinScriptExtensions=[]), sourceChanges=org.jetbrains.kotlin.buildtools.api.SourcesChanges$Unknown@3704294b, classpathChanges=NotAvailableForNonIncrementalRun, workingDir=/home/runner/work/fintrack/fintrack/app/build/kotlin/compileDebugKotlin/cacheable, multiModuleICSettings=MultiModuleICSettings(buildHistoryFile=/home/runner/work/fintrack/fintrack/app/build/kotlin/compileDebugKotlin/local-state/build-history.bin, useModuleDetection=true), usePreciseJavaTracking=true, icFeatures=IncrementalCompilationFeatures(withAbiSnapshot=false, preciseCompilationResultsBackup=true, keepIncrementalCompilationCachesInMemory=true, enableUnsafeIncrementalCompilationForMultiplatform=false, enableMonotonousIncrementalCompileSetExpansion=true), outputFiles=[/home/runner/work/fintrack/fintrack/app/build/tmp/kotlin-classes/debug, /home/runner/work/fintrack/fintrack/app/build/kotlin/compileDebugKotlin/cacheable, /home/runner/work/fintrack/fintrack/app/build/kotlin/compileDebugKotlin/local-state])
+e: file:///home/runner/work/fintrack/fintrack/app/src/main/kotlin/com/fintrack/domain/goals/GoalCalculator.kt:116:56 Argument type mismatch: actual type is 'Long', but 'Int' was expected.
 Finished executing kotlin compiler using DAEMON strategy
 
 > Task :app:compileDebugKotlin FAILED
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/compile-1777961418117.json
-Build 3fa8a3b6-a9cb-4587-b601-11f86e79a41a is closed
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/compile-1777961608748.json
+Build 7a1cdb43-4cad-4de3-9b4a-24d5bd91956b is closed
 
 FAILURE: Build failed with an exception.
 
@@ -402,35 +458,6 @@ org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':app:com
 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:459)
 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
-	at org.gradle.execution.plan.DefaultPlanExecutor.process(DefaultPlanExecutor.java:111)
-	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.executeWithServices(DefaultTaskExecutionGraph.java:138)
-	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.execute(DefaultTaskExecutionGraph.java:123)
-	at org.gradle.execution.SelectedTaskExecutionAction.execute(SelectedTaskExecutionAction.java:35)
-	at org.gradle.execution.DryRunBuildExecutionAction.execute(DryRunBuildExecutionAction.java:51)
-	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:54)
-	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:43)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
-	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor.execute(BuildOperationFiringBuildWorkerExecutor.java:40)
-	at org.gradle.internal.build.DefaultBuildLifecycleController.lambda$executeTasks$10(DefaultBuildLifecycleController.java:313)
-	at org.gradle.internal.model.StateTransitionController.doTransition(StateTransitionController.java:266)
-	at org.gradle.internal.model.StateTransitionController.lambda$tryTransition$8(StateTransitionController.java:177)
-	at org.gradle.internal.work.DefaultSynchronizer.withLock(DefaultSynchronizer.java:46)
-	at org.gradle.internal.model.StateTransitionController.tryTransition(StateTransitionController.java:177)
-	at org.gradle.internal.build.DefaultBuildLifecycleController.executeTasks(DefaultBuildLifecycleController.java:304)
-	at org.gradle.internal.build.DefaultBuildWorkGraphController$DefaultBuildWorkGraph.runWork(DefaultBuildWorkGraphController.java:220)
-	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:263)
-	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:127)
-	at org.gradle.composite.internal.DefaultBuildController.doRun(DefaultBuildController.java:181)
-	at org.gradle.composite.internal.DefaultBuildController.access$000(DefaultBuildController.java:50)
-	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.lambda$run$0(DefaultBuildController.java:198)
-	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:85)
-	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.run(DefaultBuildController.java:198)
 	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
 	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
 Caused by: org.gradle.workers.internal.DefaultWorkerExecutor$WorkExecutionException: A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
@@ -560,35 +587,6 @@ Caused by: org.gradle.workers.internal.DefaultWorkerExecutor$WorkExecutionExcept
 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:459)
 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
-	at org.gradle.execution.plan.DefaultPlanExecutor.process(DefaultPlanExecutor.java:111)
-	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.executeWithServices(DefaultTaskExecutionGraph.java:138)
-	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.execute(DefaultTaskExecutionGraph.java:123)
-	at org.gradle.execution.SelectedTaskExecutionAction.execute(SelectedTaskExecutionAction.java:35)
-	at org.gradle.execution.DryRunBuildExecutionAction.execute(DryRunBuildExecutionAction.java:51)
-	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:54)
-	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:43)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
-	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor.execute(BuildOperationFiringBuildWorkerExecutor.java:40)
-	at org.gradle.internal.build.DefaultBuildLifecycleController.lambda$executeTasks$10(DefaultBuildLifecycleController.java:313)
-	at org.gradle.internal.model.StateTransitionController.doTransition(StateTransitionController.java:266)
-	at org.gradle.internal.model.StateTransitionController.lambda$tryTransition$8(StateTransitionController.java:177)
-	at org.gradle.internal.work.DefaultSynchronizer.withLock(DefaultSynchronizer.java:46)
-	at org.gradle.internal.model.StateTransitionController.tryTransition(StateTransitionController.java:177)
-	at org.gradle.internal.build.DefaultBuildLifecycleController.executeTasks(DefaultBuildLifecycleController.java:304)
-	at org.gradle.internal.build.DefaultBuildWorkGraphController$DefaultBuildWorkGraph.runWork(DefaultBuildWorkGraphController.java:220)
-	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:263)
-	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:127)
-	at org.gradle.composite.internal.DefaultBuildController.doRun(DefaultBuildController.java:181)
-	at org.gradle.composite.internal.DefaultBuildController.access$000(DefaultBuildController.java:50)
-	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.lambda$run$0(DefaultBuildController.java:198)
-	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:85)
-	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.run(DefaultBuildController.java:198)
 	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
 	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
 Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilation error. See log for more details
