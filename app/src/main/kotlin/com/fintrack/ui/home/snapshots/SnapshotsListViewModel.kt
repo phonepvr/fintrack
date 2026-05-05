@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fintrack.data.repo.LoanRepository
 import com.fintrack.data.repo.SnapshotRepository
+import com.fintrack.data.repo.StreakRepository
 import com.fintrack.domain.UserScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
@@ -48,6 +50,7 @@ data class SnapshotListItem(
 class SnapshotsListViewModel @Inject constructor(
     private val snapshotRepository: SnapshotRepository,
     private val loanRepository: LoanRepository,
+    private val streakRepository: StreakRepository,
     private val userScope: UserScope,
 ) : ViewModel() {
 
@@ -109,10 +112,35 @@ class SnapshotsListViewModel @Inject constructor(
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    /**
+     * Streak meta surfaced on the latest snapshot card and as a top-of-list
+     * nudge banner per spec §6.2. Banner shows past the 15th of the current
+     * month if the user has not stamped a snapshot in the current month yet.
+     */
+    val streakMeta: StateFlow<StreakMeta> = userScope.activeUserId
+        .flatMapLatest { uid ->
+            if (uid == null) flowOf(null)
+            else streakRepository.observeForUser(uid)
+        }
+        .map { state ->
+            val today = todayLocal()
+            val currentTag = "%04d-%02d".format(today.year, today.monthNumber)
+            val showNudge = state != null &&
+                today.dayOfMonth >= 15 &&
+                state.lastSnapshotMonth != currentTag
+            StreakMeta(
+                currentStreakMonths = state?.currentStreakMonths ?: 0,
+                longestStreakMonths = state?.longestStreakMonths ?: 0,
+                showNudge = showNudge,
+            )
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), StreakMeta())
+
     fun deleteSnapshot(snapshotId: UUID) {
         val userId = userScope.activeUserId.value ?: return
         viewModelScope.launch {
             snapshotRepository.deleteSnapshot(userId, snapshotId)
+            streakRepository.recompute(userId)
         }
     }
 
@@ -120,6 +148,7 @@ class SnapshotsListViewModel @Inject constructor(
         val userId = userScope.activeUserId.value ?: return
         viewModelScope.launch {
             val newId = snapshotRepository.duplicateSnapshot(userId, snapshotId, newDate)
+            streakRepository.recompute(userId)
             onCreated(newId)
         }
     }
@@ -131,3 +160,9 @@ class SnapshotsListViewModel @Inject constructor(
         val snap: com.fintrack.data.db.entities.SnapshotEntity,
     )
 }
+
+data class StreakMeta(
+    val currentStreakMonths: Int = 0,
+    val longestStreakMonths: Int = 0,
+    val showNudge: Boolean = false,
+)

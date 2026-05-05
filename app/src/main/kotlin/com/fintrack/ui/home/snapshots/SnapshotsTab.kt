@@ -60,6 +60,7 @@ fun SnapshotsTab(
     viewModel: SnapshotsListViewModel = hiltViewModel(),
 ) {
     val items by viewModel.items.collectAsState()
+    val streak by viewModel.streakMeta.collectAsState()
 
     Scaffold(
         floatingActionButton = {
@@ -79,9 +80,13 @@ fun SnapshotsTab(
                     .padding(padding),
                 contentPadding = PaddingValues(top = 8.dp, bottom = 96.dp),
             ) {
+                if (streak.showNudge) {
+                    item("nudge") { StreakNudgeBanner(onNewSnapshot = onNewSnapshot) }
+                }
                 items(items, key = { it.id }) { item ->
                     SnapshotRow(
                         item = item,
+                        streakMonths = if (item.isLatest) streak.currentStreakMonths else 0,
                         onTap = { onSnapshotDetail(item.id) },
                         onEdit = { onEditSnapshot(item.id) },
                         onDuplicate = {
@@ -100,6 +105,7 @@ fun SnapshotsTab(
 @Composable
 private fun SnapshotRow(
     item: SnapshotListItem,
+    streakMonths: Int,
     onTap: () -> Unit,
     onEdit: () -> Unit,
     onDuplicate: () -> Unit,
@@ -143,11 +149,17 @@ private fun SnapshotRow(
                 }
                 Column(horizontalAlignment = Alignment.End) {
                     if (item.isLatest) {
-                        Text(
-                            "Latest",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.primary,
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            if (streakMonths > 0) {
+                                StreakChip(months = streakMonths)
+                                Spacer(Modifier.size(6.dp))
+                            }
+                            Text(
+                                "Latest",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.primary,
+                            )
+                        }
                         Spacer(Modifier.size(2.dp))
                     }
                     if (item.deltaAbsolute != null && item.deltaPercent != null) {
@@ -277,6 +289,56 @@ private fun MetricCell(label: String, value: String, modifier: Modifier = Modifi
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold,
             )
+        }
+    }
+}
+
+@Composable
+private fun StreakChip(months: Int) {
+    Box(
+        modifier = Modifier
+            .background(
+                MaterialTheme.colorScheme.tertiaryContainer,
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(50),
+            )
+            .padding(horizontal = 8.dp, vertical = 2.dp),
+    ) {
+        Text(
+            text = if (months == 1) "🔥 1 mo" else "🔥 $months mos",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onTertiaryContainer,
+            fontWeight = FontWeight.SemiBold,
+        )
+    }
+}
+
+@Composable
+private fun StreakNudgeBanner(onNewSnapshot: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.tertiaryContainer)
+            .padding(horizontal = 16.dp, vertical = 10.dp),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Column(modifier = Modifier.padding(end = 8.dp)) {
+                Text(
+                    "Don't break the streak",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer,
+                )
+                Text(
+                    "Take a snapshot before the month ends to keep your streak alive.",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer,
+                )
+            }
+            TextButton(onClick = onNewSnapshot) { Text("Add now") }
         }
     }
 }

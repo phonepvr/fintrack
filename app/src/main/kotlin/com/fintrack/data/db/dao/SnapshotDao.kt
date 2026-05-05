@@ -50,6 +50,9 @@ interface SnapshotDao {
     @Query("SELECT COUNT(*) FROM snapshots WHERE user_id = :userId")
     suspend fun countForUser(userId: UUID): Int
 
+    @Query("SELECT snapshot_date FROM snapshots WHERE user_id = :userId")
+    suspend fun getDatesForUser(userId: UUID): List<LocalDate>
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(snapshot: SnapshotEntity)
 

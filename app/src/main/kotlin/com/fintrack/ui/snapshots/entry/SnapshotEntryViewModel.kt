@@ -8,6 +8,7 @@ import com.fintrack.data.repo.HoldingValueDraft
 import com.fintrack.data.repo.LoanRepository
 import com.fintrack.data.repo.LoanValueDraft
 import com.fintrack.data.repo.SnapshotRepository
+import com.fintrack.data.repo.StreakRepository
 import com.fintrack.data.repo.TaxonomyRepository
 import com.fintrack.domain.UserScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -65,6 +66,7 @@ class SnapshotEntryViewModel @Inject constructor(
     private val holdingRepository: HoldingRepository,
     private val taxonomyRepository: TaxonomyRepository,
     private val loanRepository: LoanRepository,
+    private val streakRepository: StreakRepository,
     private val userScope: UserScope,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -251,6 +253,7 @@ class SnapshotEntryViewModel @Inject constructor(
                     )
                     snapshotId
                 }
+                streakRepository.recompute(activeUser)
                 _state.update { it.copy(saving = false, savedSnapshotId = resultId) }
             } catch (t: Throwable) {
                 _state.update { it.copy(saving = false, error = t.message ?: "Save failed") }
