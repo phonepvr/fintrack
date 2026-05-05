@@ -37,6 +37,9 @@ interface SnapshotDao {
     @Query("SELECT * FROM snapshots WHERE user_id = :userId AND id = :snapshotId LIMIT 1")
     suspend fun getForUser(userId: UUID, snapshotId: UUID): SnapshotEntity?
 
+    @Query("SELECT * FROM snapshots WHERE user_id = :userId ORDER BY snapshot_date ASC, created_at ASC")
+    suspend fun getAllForUser(userId: UUID): List<SnapshotEntity>
+
     @Query(
         """
         SELECT * FROM snapshots

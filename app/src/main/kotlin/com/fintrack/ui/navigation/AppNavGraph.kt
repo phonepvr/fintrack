@@ -65,7 +65,12 @@ fun FintrackApp(
             onUserPicked = appViewModel::activateUser,
         )
 
-        is AppState.Ready -> AuthenticatedNavHost(appViewModel = appViewModel)
+        is AppState.Ready -> {
+            AuthenticatedNavHost(appViewModel = appViewModel)
+            // Pop the celebration sheet over the nav host whenever an
+            // un-celebrated milestone exists for the active user.
+            com.fintrack.ui.celebration.CelebrationSheetHost()
+        }
     }
 }
 

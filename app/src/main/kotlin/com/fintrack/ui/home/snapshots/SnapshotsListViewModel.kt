@@ -3,6 +3,7 @@ package com.fintrack.ui.home.snapshots
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fintrack.data.repo.LoanRepository
+import com.fintrack.data.repo.MilestoneRepository
 import com.fintrack.data.repo.SnapshotRepository
 import com.fintrack.data.repo.StreakRepository
 import com.fintrack.domain.UserScope
@@ -51,6 +52,7 @@ class SnapshotsListViewModel @Inject constructor(
     private val snapshotRepository: SnapshotRepository,
     private val loanRepository: LoanRepository,
     private val streakRepository: StreakRepository,
+    private val milestoneRepository: MilestoneRepository,
     private val userScope: UserScope,
 ) : ViewModel() {
 
@@ -141,6 +143,7 @@ class SnapshotsListViewModel @Inject constructor(
         viewModelScope.launch {
             snapshotRepository.deleteSnapshot(userId, snapshotId)
             streakRepository.recompute(userId)
+            milestoneRepository.detectAndPersist(userId)
         }
     }
 
@@ -149,6 +152,7 @@ class SnapshotsListViewModel @Inject constructor(
         viewModelScope.launch {
             val newId = snapshotRepository.duplicateSnapshot(userId, snapshotId, newDate)
             streakRepository.recompute(userId)
+            milestoneRepository.detectAndPersist(userId)
             onCreated(newId)
         }
     }

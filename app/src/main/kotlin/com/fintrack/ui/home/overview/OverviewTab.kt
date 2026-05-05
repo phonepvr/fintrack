@@ -44,6 +44,7 @@ import com.fintrack.domain.util.formatPercent
 import com.fintrack.domain.util.formatSignedCurrency
 import com.fintrack.domain.util.formatSignedPercent
 import com.fintrack.domain.util.formatted
+import com.fintrack.ui.journey.wins.WinsTimeline
 import com.fintrack.ui.theme.DriftOff
 import com.fintrack.ui.theme.DriftWithin
 import java.math.BigDecimal
@@ -93,7 +94,7 @@ fun OverviewTab(
                 onChartView = viewModel::setChartView,
                 onSnapshotDetail = onSnapshotDetail,
             )
-            JourneySubTab.Wins -> WinsPlaceholder()
+            JourneySubTab.Wins -> WinsTimeline()
         }
     }
 }
@@ -134,28 +135,6 @@ private fun ChartsContent(
     }
 }
 
-@Composable
-private fun WinsPlaceholder() {
-    Box(
-        modifier = Modifier.fillMaxSize().padding(32.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                "Wins timeline",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-            )
-            Spacer(Modifier.height(6.dp))
-            Text(
-                "Milestones land in Phase G — first crore, debt-free, " +
-                    "year-on-year growth, etc.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
-}
 
 @Composable
 private fun EmptyOverview() {

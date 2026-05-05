@@ -3,6 +3,8 @@ package com.fintrack.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fintrack.data.repo.GlobalSettingsRepository
+import com.fintrack.data.repo.MilestoneRepository
+import com.fintrack.data.repo.StreakRepository
 import com.fintrack.data.repo.UserRepository
 import com.fintrack.domain.UserScope
 import com.fintrack.security.InactivityTracker
@@ -38,6 +40,8 @@ sealed interface AppState {
 class AppViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val globalSettingsRepository: GlobalSettingsRepository,
+    private val milestoneRepository: MilestoneRepository,
+    private val streakRepository: StreakRepository,
     private val userScope: UserScope,
     private val inactivityTracker: InactivityTracker,
 ) : ViewModel() {
@@ -89,6 +93,7 @@ class AppViewModel @Inject constructor(
                 userRepository.firstActiveUser()?.let { user ->
                     userScope.setActiveUser(user.id)
                     globalSettingsRepository.setActiveUserId(user.id)
+                    backfillEngagement(user.id)
                 }
             }
         }
@@ -98,6 +103,7 @@ class AppViewModel @Inject constructor(
         viewModelScope.launch {
             userScope.setActiveUser(userId)
             globalSettingsRepository.setActiveUserId(userId)
+            backfillEngagement(userId)
         }
     }
 
@@ -105,7 +111,19 @@ class AppViewModel @Inject constructor(
         viewModelScope.launch {
             userScope.setActiveUser(userId)
             globalSettingsRepository.setActiveUserId(userId)
+            backfillEngagement(userId)
         }
+    }
+
+    /**
+     * Silent backfill on user activation: re-runs streak + milestone
+     * detection so any history that pre-dates the engagement layer (or
+     * was added on another device via backup restore) shows the right
+     * chip and timeline. Idempotent.
+     */
+    private suspend fun backfillEngagement(userId: UUID) {
+        streakRepository.recompute(userId)
+        milestoneRepository.detectAndPersist(userId)
     }
 
     /** "Switch user" affordance: clear active user without re-locking biometric. */
