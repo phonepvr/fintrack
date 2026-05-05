@@ -3,6 +3,8 @@ package com.fintrack.domain.goals
 import com.fintrack.data.db.entities.GoalEntity
 import com.fintrack.domain.model.GoalType
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import java.math.BigDecimal
 import java.math.RoundingMode
 
@@ -107,18 +109,18 @@ object GoalCalculator {
     }
 
     private fun computeStraightLinePct(goal: GoalEntity, today: LocalDate): BigDecimal {
-        val totalDays = goal.targetDate.toEpochDays() - goal.createdAt
-            .toLocalDateTime(kotlinx.datetime.TimeZone.UTC).date.toEpochDays()
+        val createdAtDate = goal.createdAt.toLocalDateTime(TimeZone.UTC).date
+        val totalDays = goal.targetDate.toEpochDays() - createdAtDate.toEpochDays()
         if (totalDays <= 0) return HUNDRED
-        val elapsedDays = today.toEpochDays() - goal.createdAt
-            .toLocalDateTime(kotlinx.datetime.TimeZone.UTC).date.toEpochDays()
-        return BigDecimal(elapsedDays.coerceAtLeast(0L))
-            .divide(BigDecimal(totalDays), 6, RoundingMode.HALF_UP)
+        val elapsedDays = today.toEpochDays() - createdAtDate.toEpochDays()
+        val raw = BigDecimal(elapsedDays.coerceAtLeast(0L))
+            .divide(BigDecimal(totalDays.toLong()), 6, RoundingMode.HALF_UP)
             .multiply(HUNDRED)
             .setScale(2, RoundingMode.HALF_UP)
-            .coerceIn(BigDecimal.ZERO, HUNDRED)
+        return when {
+            raw.compareTo(BigDecimal.ZERO) < 0 -> BigDecimal.ZERO.setScale(2)
+            raw.compareTo(HUNDRED) > 0 -> HUNDRED
+            else -> raw
+        }
     }
-
-    private fun BigDecimal.coerceIn(min: BigDecimal, max: BigDecimal): BigDecimal =
-        if (this < min) min else if (this > max) max else this
 }
