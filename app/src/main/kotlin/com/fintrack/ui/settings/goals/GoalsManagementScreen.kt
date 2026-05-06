@@ -153,14 +153,7 @@ fun GoalsManagementRoute(
             initial = goal,
             today = todayLocal(),
             onSubmit = { name, type, target, targetDate ->
-                viewModel.update(
-                    goal.copy(
-                        name = name,
-                        goalType = type,
-                        targetNetWorth = target,
-                        targetDate = targetDate,
-                    ),
-                )
+                viewModel.applyEdit(goal, name, type, target, targetDate)
                 editTarget = null
             },
             onDismiss = { editTarget = null },
@@ -256,7 +249,11 @@ private fun GoalFormDialog(
     var targetDate by remember { mutableStateOf(initial?.targetDate ?: today) }
     var showDatePicker by remember { mutableStateOf(false) }
 
-    val canSubmit = name.isNotBlank() && (
+    // Past target dates are only allowed when editing an existing goal —
+    // back-dating supports tracking historical pace. New goals must aim at
+    // today or later, otherwise pace = MISSED on creation.
+    val isDateValid = initial != null || targetDate >= today
+    val canSubmit = name.isNotBlank() && isDateValid && (
         type == GoalType.DEBT_FREE || target.parseAmountOrNull()?.signum() == 1
     )
 
@@ -299,7 +296,13 @@ private fun GoalFormDialog(
                     value = targetDate.formatted(),
                     onValueChange = {},
                     readOnly = true,
+                    isError = !isDateValid,
                     label = { Text("Target date") },
+                    supportingText = {
+                        if (!isDateValid) {
+                            Text("Target date must be today or later.")
+                        }
+                    },
                     trailingIcon = {
                         TextButton(onClick = { showDatePicker = true }) { Text("Change") }
                     },

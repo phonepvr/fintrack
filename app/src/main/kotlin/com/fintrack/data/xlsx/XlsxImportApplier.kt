@@ -185,9 +185,21 @@ class XlsxImportApplier @Inject constructor(
                 loanValuesCreated++
             }
 
-            // Goals — dedup by name within user.
+            // Goals — dedup by name within user. DEBT_FREE goals get
+            // their `startingLiabilities` anchor captured from the user's
+            // most recent snapshot (post-import), matching the in-app
+            // create flow at GoalsManagementViewModel.kt:59-71. This
+            // avoids the binary 0/100% fallback for goals brought in via
+            // XLSX. If no snapshots exist, defaults to 0 (binary fallback).
             val existingGoals = goals.observeAllForUser(userId).first()
                 .map { it.name.lowercase() }.toSet()
+            val latestImportLiabilities: BigDecimal = run {
+                val latestSnapId = snapshots.observeForUser(userId).first()
+                    .maxByOrNull { it.snapshotDate }?.id
+                    ?: return@run BigDecimal.ZERO
+                loanValues.getForSnapshot(userId, latestSnapId)
+                    .fold(BigDecimal.ZERO) { acc, v -> acc + v.outstanding }
+            }
             for (g in data.goals) {
                 if (g.name.lowercase() in existingGoals) continue
                 val type = runCatching { GoalType.valueOf(g.goalType.uppercase()) }.getOrNull()
@@ -204,6 +216,7 @@ class XlsxImportApplier @Inject constructor(
                         targetNetWorth = if (type == GoalType.NET_WORTH) g.targetNetWorth else BigDecimal.ZERO,
                         targetDate = g.targetDate,
                         createdAt = now,
+                        startingLiabilities = if (type == GoalType.DEBT_FREE) latestImportLiabilities else BigDecimal.ZERO,
                     ),
                 )
                 goalsCreated++

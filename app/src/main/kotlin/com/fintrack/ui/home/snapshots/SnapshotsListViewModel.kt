@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fintrack.data.db.entities.SnapshotEntity
 import com.fintrack.data.db.seed.SeedData
+import com.fintrack.data.repo.GoalRepository
 import com.fintrack.data.repo.HoldingRepository
 import com.fintrack.data.repo.LoanRepository
 import com.fintrack.data.repo.MilestoneRepository
@@ -65,6 +66,7 @@ class SnapshotsListViewModel @Inject constructor(
     private val loanRepository: LoanRepository,
     private val streakRepository: StreakRepository,
     private val milestoneRepository: MilestoneRepository,
+    private val goalRepository: GoalRepository,
     private val taxonomyRepository: TaxonomyRepository,
     private val holdingRepository: HoldingRepository,
     private val userScope: UserScope,
@@ -72,6 +74,13 @@ class SnapshotsListViewModel @Inject constructor(
 
     private val crore = BigDecimal("10000000")
     private val hundred = BigDecimal("100")
+
+    private companion object {
+        // Mirror SnapshotAnalyticsCalculator so list and detail report
+        // percentages with the same precision.
+        const val INTERNAL_SCALE = 6
+        const val PERCENT_SCALE = 2
+    }
 
     /**
      * Set of holding ids that belong to the seeded "Fixed Return" asset
@@ -123,16 +132,18 @@ class SnapshotsListViewModel @Inject constructor(
                     perSnapshot.mapIndexed { index, (snap, netWorth, q) ->
                         val previousNet = if (index > 0) perSnapshot[index - 1].second else null
                         val percentOfEarnings = if (snap.earningsInCr.signum() == 0) {
-                            BigDecimal.ZERO
+                            BigDecimal.ZERO.setScale(PERCENT_SCALE)
                         } else {
-                            netWorth.divide(snap.earningsInCr.multiply(crore), 4, RoundingMode.HALF_UP)
+                            netWorth.divide(snap.earningsInCr.multiply(crore), INTERNAL_SCALE, RoundingMode.HALF_UP)
                                 .multiply(hundred)
+                                .setScale(PERCENT_SCALE, RoundingMode.HALF_UP)
                         }
                         val deltaAbs = previousNet?.let { netWorth.subtract(it) }
                         val deltaPct = previousNet?.takeIf { it.signum() != 0 }?.let { prev ->
                             netWorth.subtract(prev)
-                                .divide(prev, 4, RoundingMode.HALF_UP)
+                                .divide(prev, INTERNAL_SCALE, RoundingMode.HALF_UP)
                                 .multiply(hundred)
+                                .setScale(PERCENT_SCALE, RoundingMode.HALF_UP)
                         }
                         SnapshotListItem(
                             id = snap.id,
@@ -198,6 +209,7 @@ class SnapshotsListViewModel @Inject constructor(
             snapshotRepository.deleteSnapshot(userId, snapshotId)
             streakRepository.recompute(userId)
             milestoneRepository.detectAndPersist(userId)
+            goalRepository.detectAndPersistAchievements(userId)
         }
     }
 
@@ -207,6 +219,7 @@ class SnapshotsListViewModel @Inject constructor(
             val newId = snapshotRepository.duplicateSnapshot(userId, snapshotId, newDate)
             streakRepository.recompute(userId)
             milestoneRepository.detectAndPersist(userId)
+            goalRepository.detectAndPersistAchievements(userId)
             onCreated(newId)
         }
     }

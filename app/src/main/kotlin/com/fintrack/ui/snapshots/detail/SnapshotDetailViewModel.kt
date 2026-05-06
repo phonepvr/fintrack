@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fintrack.data.repo.AimAllocationRepository
+import com.fintrack.data.repo.GoalRepository
 import com.fintrack.data.repo.HoldingRepository
 import com.fintrack.data.repo.LoanRepository
 import com.fintrack.data.repo.MilestoneRepository
@@ -42,6 +43,7 @@ class SnapshotDetailViewModel @Inject constructor(
     private val loanRepository: LoanRepository,
     private val streakRepository: StreakRepository,
     private val milestoneRepository: MilestoneRepository,
+    private val goalRepository: GoalRepository,
     private val userScope: UserScope,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -121,6 +123,7 @@ class SnapshotDetailViewModel @Inject constructor(
             snapshotRepository.deleteSnapshot(userId, snapshotId)
             streakRepository.recompute(userId)
             milestoneRepository.detectAndPersist(userId)
+            goalRepository.detectAndPersistAchievements(userId)
             onDone()
         }
     }

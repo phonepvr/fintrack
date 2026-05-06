@@ -98,6 +98,46 @@ class GoalsManagementViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Edit-flow update that takes the user-edited fields and the original
+     * goal. If the type changed, re-captures `startingLiabilities` from
+     * the latest snapshot (when switching to DEBT_FREE) and clears any
+     * existing `achievedAt` since the achievement criterion is no longer
+     * the same. When the type is unchanged, the rest of the entity (incl.
+     * `startingLiabilities` and `achievedAt`) is preserved.
+     */
+    fun applyEdit(
+        original: GoalEntity,
+        name: String,
+        type: GoalType,
+        target: BigDecimal,
+        targetDate: LocalDate,
+    ) {
+        viewModelScope.launch {
+            try {
+                val typeChanged = original.goalType != type
+                val nextStartingLiabilities = when {
+                    !typeChanged -> original.startingLiabilities
+                    type == GoalType.DEBT_FREE -> latestLiabilities.value
+                    else -> BigDecimal.ZERO
+                }
+                val nextAchievedAt = if (typeChanged) null else original.achievedAt
+                goalRepository.update(
+                    original.copy(
+                        name = name,
+                        goalType = type,
+                        targetNetWorth = target,
+                        targetDate = targetDate,
+                        startingLiabilities = nextStartingLiabilities,
+                        achievedAt = nextAchievedAt,
+                    ),
+                )
+            } catch (t: Throwable) {
+                errorState.value = t.message ?: "Could not update goal"
+            }
+        }
+    }
+
     fun archive(id: UUID) {
         val uid = userScope.activeUserId.value ?: return
         viewModelScope.launch { goalRepository.archive(uid, id) }

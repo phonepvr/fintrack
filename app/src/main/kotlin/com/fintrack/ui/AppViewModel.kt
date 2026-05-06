@@ -3,6 +3,7 @@ package com.fintrack.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fintrack.data.repo.GlobalSettingsRepository
+import com.fintrack.data.repo.GoalRepository
 import com.fintrack.data.repo.MilestoneRepository
 import com.fintrack.data.repo.StreakRepository
 import com.fintrack.data.repo.UserRepository
@@ -50,6 +51,7 @@ class AppViewModel @Inject constructor(
     private val globalSettingsRepository: GlobalSettingsRepository,
     private val milestoneRepository: MilestoneRepository,
     private val streakRepository: StreakRepository,
+    private val goalRepository: GoalRepository,
     private val userScope: UserScope,
     private val inactivityTracker: InactivityTracker,
 ) : ViewModel() {
@@ -134,6 +136,7 @@ class AppViewModel @Inject constructor(
     private suspend fun backfillEngagement(userId: UUID) {
         streakRepository.recompute(userId)
         milestoneRepository.detectAndPersist(userId)
+        goalRepository.detectAndPersistAchievements(userId)
     }
 
     /** "Switch user" affordance: clear active user without re-locking biometric. */

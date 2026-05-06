@@ -182,6 +182,18 @@ private fun SnapshotEntryForm(
             Spacer(Modifier.height(8.dp))
         }
 
+        if (orderedAssetClassNames.isNotEmpty()) {
+            item(key = "holdings_helper") {
+                Text(
+                    text = "Leave a holding's current value blank to skip it for this " +
+                        "month, or enter 0 to record an explicit zero.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(vertical = 4.dp),
+                )
+            }
+        }
+
         for (acName in orderedAssetClassNames) {
             val rows = rowsByClass[acName].orEmpty()
             if (rows.isEmpty()) continue

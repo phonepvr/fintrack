@@ -3,6 +3,7 @@ package com.fintrack.ui.snapshots.entry
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.fintrack.data.repo.GoalRepository
 import com.fintrack.data.repo.HoldingRepository
 import com.fintrack.data.repo.HoldingValueDraft
 import com.fintrack.data.repo.LoanRepository
@@ -69,6 +70,7 @@ class SnapshotEntryViewModel @Inject constructor(
     private val loanRepository: LoanRepository,
     private val streakRepository: StreakRepository,
     private val milestoneRepository: MilestoneRepository,
+    private val goalRepository: GoalRepository,
     private val userScope: UserScope,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -257,6 +259,7 @@ class SnapshotEntryViewModel @Inject constructor(
                 }
                 streakRepository.recompute(activeUser)
                 milestoneRepository.detectAndPersist(activeUser)
+                goalRepository.detectAndPersistAchievements(activeUser)
                 _state.update { it.copy(saving = false, savedSnapshotId = resultId) }
             } catch (t: Throwable) {
                 _state.update { it.copy(saving = false, error = t.message ?: "Save failed") }

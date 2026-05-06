@@ -60,6 +60,7 @@ import com.fintrack.data.db.entities.AssetClassEntity
 import com.fintrack.data.db.entities.HoldingEntity
 import com.fintrack.data.db.entities.SubBucketEntity
 import com.fintrack.data.repo.HoldingRepository
+import com.fintrack.data.repo.GoalRepository
 import com.fintrack.data.repo.MilestoneRepository
 import com.fintrack.data.repo.StreakRepository
 import com.fintrack.data.repo.TaxonomyRepository
@@ -123,6 +124,7 @@ class HoldingsManagementViewModel @Inject constructor(
     private val holdingRepository: HoldingRepository,
     private val streakRepository: StreakRepository,
     private val milestoneRepository: MilestoneRepository,
+    private val goalRepository: GoalRepository,
     private val userScope: UserScope,
 ) : ViewModel() {
 
@@ -259,6 +261,7 @@ class HoldingsManagementViewModel @Inject constructor(
             userScope.activeUserId.value?.let { uid ->
                 streakRepository.recompute(uid)
                 milestoneRepository.detectAndPersist(uid)
+                goalRepository.detectAndPersistAchievements(uid)
             }
             message.tryEmit(ManagementMessage.Plain("Deleted \"${target.name}\"."))
         }
