@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - claude/android-portfolio-tracker-ciOgJ
+      - claude/audit-friction-reduction-ZtsQR
   workflow_dispatch:
 
 concurrency:
