@@ -3,6 +3,9 @@ package com.fintrack.ui.snapshots.detail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.fintrack.data.db.entities.HoldingValueEntity
+import com.fintrack.data.db.entities.LoanValueEntity
+import com.fintrack.data.db.entities.SnapshotEntity
 import com.fintrack.data.repo.AimAllocationRepository
 import com.fintrack.data.repo.GoalRepository
 import com.fintrack.data.repo.HoldingRepository
@@ -20,7 +23,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
@@ -56,27 +63,61 @@ class SnapshotDetailViewModel @Inject constructor(
     val state: StateFlow<SnapshotDetailUiState> = _state.asStateFlow()
 
     init {
-        viewModelScope.launch { hydrate() }
+        viewModelScope.launch { observeAndHydrate() }
     }
 
-    private suspend fun hydrate() {
+    /**
+     * Re-emit a fresh [SnapshotAnalytics] whenever the underlying snapshot,
+     * its holding values, or its loan values change. Fixes the stale-cache
+     * bug where Detail → Edit → save → back-pop returned to a UiState that
+     * pre-dated the edit (notes typed during edit didn't appear). The Detail
+     * VM is retained on the back stack, so a one-shot `init` hydrate would
+     * never re-run; the Flow-based observer below does.
+     */
+    private suspend fun observeAndHydrate() {
         val activeUser = userScope.activeUserId.value
         if (activeUser == null) {
             _state.update { it.copy(loading = false, error = "No active profile") }
             return
         }
-        val snapshot = snapshotRepository.getForUser(activeUser, snapshotId)
-        if (snapshot == null) {
-            _state.update { it.copy(loading = false, error = "Snapshot not found") }
-            return
+        combine(
+            snapshotRepository.observeForUser(activeUser)
+                .map { snaps -> snaps.firstOrNull { it.id == snapshotId } },
+            snapshotRepository.observeAllValuesForUser(activeUser)
+                .map { all -> all.filter { it.snapshotId == snapshotId } },
+            loanRepository.observeAllValuesForUser(activeUser)
+                .map { all -> all.filter { it.snapshotId == snapshotId } },
+        ) { snapshot, values, loanValues ->
+            Triple(snapshot, values, loanValues)
+        }.distinctUntilChanged().collectLatest { (snapshot, values, loanValues) ->
+            if (snapshot == null) {
+                _state.update { it.copy(loading = false, error = "Snapshot not found") }
+                return@collectLatest
+            }
+            val analytics = computeAnalytics(activeUser, snapshot, values, loanValues)
+            val deleteImpact = computeDeleteImpact(activeUser)
+            _state.update {
+                it.copy(
+                    loading = false,
+                    analytics = analytics,
+                    error = null,
+                    deleteImpact = deleteImpact,
+                )
+            }
         }
-        val values = snapshotRepository.getValuesForSnapshot(activeUser, snapshotId)
+    }
+
+    private suspend fun computeAnalytics(
+        activeUser: UUID,
+        snapshot: SnapshotEntity,
+        values: List<HoldingValueEntity>,
+        loanValues: List<LoanValueEntity>,
+    ): SnapshotAnalytics {
         val catalog = holdingRepository.observeAll().first()
         val subBuckets = taxonomyRepository.observeSubBuckets().first()
         val assetClasses = taxonomyRepository.observeAssetClasses().first()
         val aim = aimRepository.getOrDefault(activeUser)
         val loans = loanRepository.observeLoansForUser(activeUser).first()
-        val loanValues = loanRepository.getValuesForSnapshot(activeUser, snapshotId)
 
         val previousSnapshot = snapshotRepository.previousForUser(activeUser, snapshot.snapshotDate)
         val previousNetWorth: BigDecimal? = previousSnapshot?.let { prev ->
@@ -87,7 +128,7 @@ class SnapshotDetailViewModel @Inject constructor(
             prevAssets.subtract(prevLiabilities)
         }
 
-        val analytics = SnapshotAnalyticsCalculator.compute(
+        return SnapshotAnalyticsCalculator.compute(
             snapshot = snapshot,
             values = values,
             catalog = catalog,
@@ -98,23 +139,16 @@ class SnapshotDetailViewModel @Inject constructor(
             loanValues = loanValues,
             previousNetWorth = previousNetWorth,
         )
+    }
 
+    private suspend fun computeDeleteImpact(activeUser: UUID): SnapshotDeleteImpact {
         val allSnapshots = snapshotRepository.observeForUser(activeUser).first()
         val streakState = streakRepository.getForUser(activeUser)
-        val deleteImpact = SnapshotDeleteImpactAnalyzer.analyze(
+        return SnapshotDeleteImpactAnalyzer.analyze(
             targetSnapshotId = snapshotId,
             allSnapshots = allSnapshots,
             currentStreakMonths = streakState?.currentStreakMonths ?: 0,
         )
-
-        _state.update {
-            it.copy(
-                loading = false,
-                analytics = analytics,
-                error = null,
-                deleteImpact = deleteImpact,
-            )
-        }
     }
 
     fun delete(onDone: () -> Unit) {

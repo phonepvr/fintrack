@@ -25,6 +25,7 @@ import com.fintrack.domain.model.GoalType
 import com.fintrack.domain.util.formatIndianCurrency
 import com.fintrack.domain.util.formatPercent
 import com.fintrack.domain.util.formatted
+import java.math.BigDecimal
 import java.util.UUID
 
 /**
@@ -65,6 +66,30 @@ fun JourneyGoalsCard(
     }
 }
 
+/**
+ * Subtitle shown under a goal's name on the Journey card. NET_WORTH formats
+ * "current of target". DEBT_FREE shows the outstanding amount plus how much
+ * has been paid of the captured starting anchor. Legacy DEBT_FREE goals with
+ * `startingLiabilities = 0` (binary fallback) show only the outstanding.
+ */
+internal fun goalCardSubtitle(progress: GoalProgress): String =
+    when (progress.goal.goalType) {
+        GoalType.NET_WORTH ->
+            "${formatIndianCurrency(progress.currentValue)} of " +
+                formatIndianCurrency(progress.targetValue)
+        GoalType.DEBT_FREE -> {
+            val current = progress.currentValue
+            val start = progress.goal.startingLiabilities
+            if (start.signum() > 0) {
+                val paid = (start - current).coerceAtLeast(BigDecimal.ZERO)
+                "${formatIndianCurrency(current)} outstanding · " +
+                    "${formatIndianCurrency(paid)} paid of ${formatIndianCurrency(start)}"
+            } else {
+                "${formatIndianCurrency(current)} outstanding"
+            }
+        }
+    }
+
 @Composable
 private fun GoalProgressRow(
     progress: GoalProgress,
@@ -81,11 +106,7 @@ private fun GoalProgressRow(
             Column(modifier = Modifier.weight(1f)) {
                 Text(progress.goal.name, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
                 Text(
-                    when (progress.goal.goalType) {
-                        GoalType.NET_WORTH ->
-                            "${formatIndianCurrency(progress.currentValue)} of ${formatIndianCurrency(progress.targetValue)}"
-                        GoalType.DEBT_FREE -> "Debt-free target"
-                    } + " · by ${progress.goal.targetDate.formatted()}",
+                    "${goalCardSubtitle(progress)} · by ${progress.goal.targetDate.formatted()}",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
