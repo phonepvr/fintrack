@@ -6,6 +6,7 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.fintrack.data.db.FintrackDatabase
 import com.fintrack.data.db.migrations.MIGRATION_3_4
+import com.fintrack.data.db.migrations.MIGRATION_4_5
 import com.fintrack.data.db.dao.AimAllocationDao
 import com.fintrack.data.db.dao.AssetClassDao
 import com.fintrack.data.db.dao.GlobalSettingsDao
@@ -49,10 +50,11 @@ object DatabaseModule {
             FintrackDatabase.DATABASE_NAME,
         )
             .openHelperFactory(factory)
-            // v3 → v4 ALTER TABLE runs first; the destructive fallback stays
-            // as a last resort for users coming from v1/v2 (or any future
-            // version without a registered path). v3 onward holds real data.
-            .addMigrations(MIGRATION_3_4)
+            // v3 → v4 → v5 ALTER TABLE chain runs first; the destructive
+            // fallback stays as a last resort for users coming from v1/v2
+            // (or any future version without a registered path). v3 onward
+            // holds real data.
+            .addMigrations(MIGRATION_3_4, MIGRATION_4_5)
             .fallbackToDestructiveMigration()
             .addCallback(object : RoomDatabase.Callback() {
                 override fun onCreate(db: SupportSQLiteDatabase) {

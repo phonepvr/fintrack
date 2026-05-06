@@ -54,4 +54,13 @@ data class GoalEntity(
 
     @ColumnInfo(name = "is_archived", defaultValue = "0")
     val isArchived: Boolean = false,
+
+    /**
+     * Liabilities total captured the moment a DEBT_FREE goal was created.
+     * Anchors gradual progress: `(starting − current) / starting × 100`.
+     * Zero (the default) for NET_WORTH goals and for legacy DEBT_FREE goals
+     * that pre-date this column — those fall back to binary 0/100% progress.
+     */
+    @ColumnInfo(name = "starting_liabilities", defaultValue = "0")
+    val startingLiabilities: BigDecimal = BigDecimal.ZERO,
 )

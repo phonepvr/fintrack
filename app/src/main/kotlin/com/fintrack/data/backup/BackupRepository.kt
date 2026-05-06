@@ -122,6 +122,7 @@ class BackupRepository @Inject constructor(
                 it.targetNetWorth, csvDate(it.targetDate),
                 it.createdAt, it.achievedAt?.let(::csvDate).orEmpty(),
                 it.isArchived.toString(),
+                it.startingLiabilities,
             ) })
             writeCsvEntry(zip, "milestones.csv", MilestonesCsvHeader, payload.milestones.map { listOf(
                 it.id, it.userId, it.type, it.achievedAtSnapshotId,
@@ -235,6 +236,7 @@ class BackupRepository @Inject constructor(
                             createdAt = row[6],
                             achievedAt = row[7].ifBlank { null }?.let(::parseCsvDate),
                             isArchived = row[8].toBooleanLenient(),
+                            startingLiabilities = row[9].ifBlank { "0" },
                         )
                     }
                     "milestones.csv" -> milestones = parseCsv(text, MilestonesCsvHeader) { row ->
@@ -385,6 +387,7 @@ class BackupRepository @Inject constructor(
                 createdAt = it.createdAt.toString(),
                 achievedAt = it.achievedAt?.toString(),
                 isArchived = it.isArchived,
+                startingLiabilities = it.startingLiabilities.toPlainString(),
             ) },
             milestones = milestones.map { MilestoneDto(
                 id = it.id.toString(), userId = it.userId.toString(),
@@ -553,6 +556,8 @@ class BackupRepository @Inject constructor(
                     createdAt = parseInstantSafely(gdto.createdAt) ?: now,
                     achievedAt = gdto.achievedAt?.let(::parseDateLenient),
                     isArchived = gdto.isArchived,
+                    startingLiabilities = runCatching { BigDecimal(gdto.startingLiabilities) }
+                        .getOrDefault(BigDecimal.ZERO),
                 ))
             }
 
@@ -619,7 +624,13 @@ class BackupRepository @Inject constructor(
         val rows = CsvCodec.parse(text)
         if (rows.isEmpty()) return emptyList()
         val firstRow = rows.first()
-        val dataRows = if (firstRow == header) rows.drop(1) else rows
+        // Accept any header whose columns match a prefix of the canonical one —
+        // this lets backups written before a column was appended (e.g. v3.3
+        // goals.csv with no starting_liabilities) still load on later builds.
+        val isHeader = firstRow.isNotEmpty() &&
+            firstRow.size <= header.size &&
+            firstRow.indices.all { firstRow[it] == header[it] }
+        val dataRows = if (isHeader) rows.drop(1) else rows
         return dataRows.map { row ->
             val padded = if (row.size >= header.size) row
                 else row + List(header.size - row.size) { "" }
@@ -654,6 +665,7 @@ class BackupRepository @Inject constructor(
         val GoalsCsvHeader = listOf(
             "id", "user_id", "name", "goal_type", "target_net_worth",
             "target_date", "created_at", "achieved_at", "is_archived",
+            "starting_liabilities",
         )
         val MilestonesCsvHeader = listOf(
             "id", "user_id", "type", "achieved_at_snapshot_id", "achieved_at_date",

@@ -143,6 +143,11 @@ data class GoalDto(
     val createdAt: String,
     val achievedAt: String? = null,
     val isArchived: Boolean,
+    /**
+     * Liabilities snapshot taken when the DEBT_FREE goal was created.
+     * Empty string from pre-v3.4 backups → binary progress fallback on restore.
+     */
+    val startingLiabilities: String = "0",
 )
 
 @Serializable

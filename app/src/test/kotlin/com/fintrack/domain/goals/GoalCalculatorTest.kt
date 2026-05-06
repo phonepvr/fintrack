@@ -24,7 +24,10 @@ class GoalCalculatorTest {
         createdAt = createdAtInstant,
     )
 
-    private fun debtFreeGoal(targetDate: String) = GoalEntity(
+    private fun debtFreeGoal(
+        targetDate: String,
+        startingLiabilities: String = "0",
+    ) = GoalEntity(
         id = UUID.randomUUID(),
         userId = UUID.randomUUID(),
         name = "Debt-free",
@@ -32,6 +35,7 @@ class GoalCalculatorTest {
         targetNetWorth = BigDecimal.ZERO,
         targetDate = LocalDate.parse(targetDate),
         createdAt = createdAtInstant,
+        startingLiabilities = BigDecimal(startingLiabilities),
     )
 
     @Test
@@ -110,7 +114,7 @@ class GoalCalculatorTest {
     }
 
     @Test
-    @DisplayName("DEBT_FREE goal stays at 0% while liabilities > 0")
+    @DisplayName("DEBT_FREE legacy goal (no anchor) stays at 0% while liabilities > 0")
     fun debtFreeNotAchieved() {
         val out = GoalCalculator.progress(
             goal = debtFreeGoal("2027-01-01"),
@@ -119,6 +123,76 @@ class GoalCalculatorTest {
             today = LocalDate.parse("2026-07-01"),
         )
         assertThat(out.progressPct).isEqualTo(BigDecimal.ZERO)
+    }
+
+    @Test
+    @DisplayName("DEBT_FREE with anchor reports gradual progress as debt is paid down")
+    fun debtFreeGradualProgress() {
+        // ₹50L starting → ₹30L outstanding = ₹20L paid down = 40% progress.
+        val out = GoalCalculator.progress(
+            goal = debtFreeGoal(targetDate = "2027-01-01", startingLiabilities = "5000000"),
+            latestNetWorth = BigDecimal("8000000"),
+            latestLiabilities = BigDecimal("3000000"),
+            today = LocalDate.parse("2026-07-01"),
+        )
+        assertThat(out.progressPct).isEqualTo(BigDecimal("40.00"))
+    }
+
+    @Test
+    @DisplayName("DEBT_FREE with anchor reaches 100% and ACHIEVED at zero outstanding")
+    fun debtFreeGradualAchieved() {
+        val out = GoalCalculator.progress(
+            goal = debtFreeGoal(targetDate = "2027-01-01", startingLiabilities = "5000000"),
+            latestNetWorth = BigDecimal("8000000"),
+            latestLiabilities = BigDecimal.ZERO,
+            today = LocalDate.parse("2026-07-01"),
+        )
+        assertThat(out.progressPct).isEqualTo(BigDecimal("100"))
+        assertThat(out.pace).isEqualTo(GoalPace.ACHIEVED)
+    }
+
+    @Test
+    @DisplayName("DEBT_FREE clamps at 0% when current liabilities exceed the anchor")
+    fun debtFreeGradualClampLow() {
+        // User took on more debt after creating the goal; never go negative.
+        val out = GoalCalculator.progress(
+            goal = debtFreeGoal(targetDate = "2027-01-01", startingLiabilities = "5000000"),
+            latestNetWorth = BigDecimal("8000000"),
+            latestLiabilities = BigDecimal("6000000"),
+            today = LocalDate.parse("2026-07-01"),
+        )
+        assertThat(out.progressPct).isEqualTo(BigDecimal("0.00"))
+    }
+
+    @Test
+    @DisplayName("DEBT_FREE pace transitions BEHIND → ON_TRACK → AHEAD as gradual progress climbs")
+    fun debtFreePaceTransitions() {
+        val goal = debtFreeGoal(targetDate = "2026-12-31", startingLiabilities = "5000000")
+        // 6 months elapsed of a 1-year goal → ~50% straight-line.
+        val today = LocalDate.parse("2026-07-01")
+
+        val behind = GoalCalculator.progress(
+            goal = goal,
+            latestNetWorth = BigDecimal.ZERO,
+            latestLiabilities = BigDecimal("4500000"), // 10% paid → < 50 - 5
+            today = today,
+        )
+        val onTrack = GoalCalculator.progress(
+            goal = goal,
+            latestNetWorth = BigDecimal.ZERO,
+            latestLiabilities = BigDecimal("2400000"), // 52% paid → within ±5
+            today = today,
+        )
+        val ahead = GoalCalculator.progress(
+            goal = goal,
+            latestNetWorth = BigDecimal.ZERO,
+            latestLiabilities = BigDecimal("1000000"), // 80% paid → > 50 + 5
+            today = today,
+        )
+
+        assertThat(behind.pace).isEqualTo(GoalPace.BEHIND)
+        assertThat(onTrack.pace).isEqualTo(GoalPace.ON_TRACK)
+        assertThat(ahead.pace).isEqualTo(GoalPace.AHEAD)
     }
 
     @Test

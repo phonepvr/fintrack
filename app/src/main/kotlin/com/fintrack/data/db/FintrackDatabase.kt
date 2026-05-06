@@ -37,6 +37,8 @@ import com.fintrack.data.db.entities.UserEntity
  * resort for users coming from older builds without a registered path).
  *
  * v4 (v3.1 release) — adds GlobalSettings.has_completed_onboarding.
+ * v5 (v3.4 release) — adds Goal.starting_liabilities so DEBT_FREE goals can
+ *   show gradual progress instead of binary 0/100%.
  */
 @Database(
     entities = [
@@ -54,7 +56,7 @@ import com.fintrack.data.db.entities.UserEntity
         MilestoneEntity::class,
         GoalEntity::class,
     ],
-    version = 4,
+    version = 5,
     exportSchema = true,
 )
 @TypeConverters(Converters::class)

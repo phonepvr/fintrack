@@ -58,7 +58,7 @@ object GoalCalculator {
             GoalType.DEBT_FREE -> currentValue.signum() == 0
         }
 
-        val progressPct = computeProgressPct(goal.goalType, currentValue, targetValue, achieved)
+        val progressPct = computeProgressPct(goal, currentValue, targetValue, achieved)
         val straightLinePct = computeStraightLinePct(goal, today)
 
         val pace = when {
@@ -85,13 +85,13 @@ object GoalCalculator {
     }
 
     private fun computeProgressPct(
-        type: GoalType,
+        goal: GoalEntity,
         current: BigDecimal,
         target: BigDecimal,
         achieved: Boolean,
     ): BigDecimal {
         if (achieved) return HUNDRED
-        return when (type) {
+        return when (goal.goalType) {
             GoalType.NET_WORTH -> {
                 if (target.signum() <= 0) BigDecimal.ZERO
                 else current.coerceAtLeast(BigDecimal.ZERO)
@@ -101,9 +101,18 @@ object GoalCalculator {
                     .coerceIn(BigDecimal.ZERO, HUNDRED)
             }
             GoalType.DEBT_FREE -> {
-                // Without an "original liability" anchor, surface a binary
-                // 0 / 100% — DEBT_FREE goals are checked once-and-done.
-                if (current.signum() == 0) HUNDRED else BigDecimal.ZERO
+                val start = goal.startingLiabilities
+                if (start.signum() <= 0) {
+                    // Legacy goals with no anchor (or goals created when the
+                    // user already had no debt) fall back to binary 0/100%.
+                    if (current.signum() == 0) HUNDRED else BigDecimal.ZERO
+                } else {
+                    val paid = (start - current).coerceAtLeast(BigDecimal.ZERO)
+                    paid.divide(start, 6, RoundingMode.HALF_UP)
+                        .multiply(HUNDRED)
+                        .setScale(2, RoundingMode.HALF_UP)
+                        .coerceIn(BigDecimal.ZERO, HUNDRED)
+                }
             }
         }
     }

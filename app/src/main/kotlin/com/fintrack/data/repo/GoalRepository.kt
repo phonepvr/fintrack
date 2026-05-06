@@ -26,6 +26,7 @@ class GoalRepository @Inject constructor(
         goalType: GoalType,
         targetNetWorth: BigDecimal,
         targetDate: LocalDate,
+        startingLiabilities: BigDecimal = BigDecimal.ZERO,
     ): UUID {
         val entity = GoalEntity(
             id = UUID.randomUUID(),
@@ -35,6 +36,7 @@ class GoalRepository @Inject constructor(
             targetNetWorth = targetNetWorth,
             targetDate = targetDate,
             createdAt = Clock.System.now(),
+            startingLiabilities = if (goalType == GoalType.DEBT_FREE) startingLiabilities else BigDecimal.ZERO,
         )
         dao.insert(entity)
         return entity.id

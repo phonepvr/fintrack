@@ -18,3 +18,19 @@ val MIGRATION_3_4: Migration = object : Migration(3, 4) {
         )
     }
 }
+
+/**
+ * v4 → v5: adds Goal.starting_liabilities. BigDecimal columns are stored as
+ * TEXT via Converters.bigDecimalToString. Default '0' means existing
+ * DEBT_FREE goals continue to show binary 0/100% progress (no regression);
+ * new DEBT_FREE goals capture the user's current liabilities at creation
+ * time and animate gradual progress as debt is paid down.
+ */
+val MIGRATION_4_5: Migration = object : Migration(4, 5) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "ALTER TABLE goals " +
+                "ADD COLUMN starting_liabilities TEXT NOT NULL DEFAULT '0'",
+        )
+    }
+}
