@@ -153,18 +153,18 @@ class GoalAchievementDetectorTest {
         val nwAchieved = netWorthGoal(target = "10000000", achievedAt = LocalDate.parse("2026-02-01"))
         val nwReady = netWorthGoal(target = "10000000")
         val nwNotReady = netWorthGoal(target = "20000000")
-        val debtReady = debtFreeGoal(startingLiabilities = "5000000")
-        val debtNotReady = debtFreeGoal(startingLiabilities = "5000000")
+        val debt1 = debtFreeGoal(startingLiabilities = "5000000")
+        val debt2 = debtFreeGoal(startingLiabilities = "5000000")
 
         val newly = GoalAchievementDetector.newlyAchieved(
-            goals = listOf(nwAchieved, nwReady, nwNotReady, debtReady, debtNotReady),
+            goals = listOf(nwAchieved, nwReady, nwNotReady, debt1, debt2),
             currentNetWorth = BigDecimal("12000000"),
             currentLiabilities = BigDecimal.ZERO,
         )
-        // nwAchieved skipped (latch). debtReady would also fire on liabs=0
-        // but currentLiabilities IS zero in this test, so debtNotReady fires too.
-        // Adjust: re-test with non-zero liabilities so debtNotReady doesn't fire.
-        assertThat(newly).containsExactly(nwReady, debtReady, debtNotReady)
+        // nwAchieved skipped by the latch; nwReady fires; nwNotReady stays
+        // out (target unmet); both DEBT_FREE goals fire because liabs == 0
+        // (the detector keys off current liabilities only).
+        assertThat(newly).containsExactly(nwReady, debt1, debt2)
     }
 
     @Test
@@ -183,9 +183,9 @@ class GoalAchievementDetectorTest {
 
     @Test
     @DisplayName("Empty input → empty output")
-    fun emptyList() {
+    fun emptyInput() {
         val newly = GoalAchievementDetector.newlyAchieved(
-            goals = emptyList(),
+            goals = emptyList<GoalEntity>(),
             currentNetWorth = BigDecimal("12000000"),
             currentLiabilities = BigDecimal.ZERO,
         )
